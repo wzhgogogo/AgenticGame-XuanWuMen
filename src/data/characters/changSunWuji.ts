@@ -1,6 +1,6 @@
-import type { Character } from '../../types';
+import type { CharacterCore } from '../../types';
 
-export const changSunWuji: Character = {
+export const changSunWuji: CharacterCore = {
   id: 'changsun_wuji',
   name: '长孙无忌',
   title: '秦王府参军',
@@ -33,24 +33,6 @@ export const changSunWuji: Character = {
       never: ['粗鲁直白', '情绪化表达', '不经思考的发言'],
     },
   },
-  foundationalMemory: [
-    {
-      id: 'mem_cswj_001',
-      date: '大业末年',
-      event: '将妹妹嫁与李世民，从此与李家命运绑定。',
-      emotionalTag: '笃定',
-      importance: 10,
-      relatedCharacters: ['li_shimin'],
-    },
-    {
-      id: 'mem_cswj_002',
-      date: '武德九年六月初三',
-      event: '与房玄龄、杜如晦密议，认为事态危急必须先发制人。',
-      emotionalTag: '紧迫',
-      importance: 10,
-      relatedCharacters: ['li_shimin', 'fang_xuanling'],
-    },
-  ],
   relationships: {
     li_shimin: {
       role: '妹夫、主公',

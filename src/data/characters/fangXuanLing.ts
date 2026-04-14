@@ -1,6 +1,6 @@
-import type { Character } from '../../types';
+import type { CharacterCore } from '../../types';
 
-export const fangXuanLing: Character = {
+export const fangXuanLing: CharacterCore = {
   id: 'fang_xuanling',
   name: '房玄龄',
   title: '秦王府记室参军',
@@ -33,24 +33,6 @@ export const fangXuanLing: Character = {
       never: ['激烈措辞', '断然否定他人', '粗鲁的表达'],
     },
   },
-  foundationalMemory: [
-    {
-      id: 'mem_fxl_001',
-      date: '武德元年',
-      event: '渭北投靠秦王，一见如故，从此成为首席幕僚。',
-      emotionalTag: '坚定',
-      importance: 10,
-      relatedCharacters: ['li_shimin'],
-    },
-    {
-      id: 'mem_fxl_002',
-      date: '武德九年六月初二',
-      event: '被太子设计逐出秦王府，紧急乔装潜回，与无忌密议对策。',
-      emotionalTag: '忧虑',
-      importance: 10,
-      relatedCharacters: ['li_shimin', 'changsun_wuji'],
-    },
-  ],
   relationships: {
     li_shimin: {
       role: '主公',

@@ -1,20 +1,27 @@
 // ===== 人物相关 =====
 
-export interface Character {
+export type CharacterRole = "player_character" | "npc_core" | "npc_secondary";
+
+/** TS 文件导出的角色核心元数据（不含记忆） */
+export interface CharacterCore {
   id: string;
   name: string;
   title: string;
   age: number;
   faction: string;
-  role: "player_character" | "npc_core" | "npc_secondary";
+  role: CharacterRole;
   color: string;
   waitingText: string;
   identity: CharacterIdentity;
-  foundationalMemory: MemoryEntry[];
   relationships: Record<string, Relationship>;
   goals: CharacterGoals;
-  memoryStream?: MemoryEntry[];
-  reflections?: string[];
+}
+
+/** 运行时完整角色 = 核心 + 三层记忆 */
+export interface Character extends CharacterCore {
+  foundationalMemory: MemoryEntry[];
+  shortTermMemory: MemoryEntry[];
+  reflections: string[];
 }
 
 export interface CharacterIdentity {
@@ -32,6 +39,8 @@ export interface CharacterIdentity {
   };
 }
 
+export type MemoryCategory = "foundational" | "short_term" | "reflection";
+
 export interface MemoryEntry {
   id: string;
   date: string;
@@ -39,6 +48,8 @@ export interface MemoryEntry {
   emotionalTag: string;
   importance: number;
   relatedCharacters: string[];
+  category: MemoryCategory;
+  sceneId?: string;
 }
 
 export interface Relationship {
@@ -76,6 +87,68 @@ export interface PhaseConfig {
   suggestedActions: string[];
 }
 
+// ===== 时间线 / 战役系统 =====
+
+export interface TimelineConfig {
+  id: string;
+  name: string;
+  description: string;
+  sceneOrder: string[];
+}
+
+export interface SceneTransition {
+  fromSceneId: string;
+  toSceneId: string;
+  transitionNarration: string;
+}
+
+export interface SceneOutcome {
+  sceneId: string;
+  summary: string;
+  keyDecisions: Decision[];
+  relationshipDeltas: RelationshipDelta[];
+  turnCount: number;
+}
+
+export interface Decision {
+  id: string;
+  description: string;
+  turn: number;
+}
+
+export interface RelationshipDelta {
+  characterId: string;
+  targetId: string;
+  trustChange: number;
+  reason: string;
+}
+
+export type CampaignStatus = "not_started" | "in_scene" | "transitioning" | "completed";
+
+export interface CampaignState {
+  status: CampaignStatus;
+  timelineId: string;
+  currentSceneIndex: number;
+  completedScenes: SceneOutcome[];
+  activeGameState: GameState | null;
+}
+
+/** SceneManager 的接口抽象（CampaignManager 通过此接口操作，不直接 import SceneManager） */
+export interface ISceneManager {
+  getState(): GameState;
+  subscribe(listener: (state: GameState) => void): () => void;
+  getSuggestedActions(): string[];
+  startGame(): Promise<void>;
+  submitPlayerAction(input: string): Promise<void>;
+}
+
+export type SceneManagerFactory = (
+  scene: SceneConfig,
+  npcs: Character[],
+  player: Character,
+  previousSceneSummary?: string,
+) => ISceneManager;
+
 // ===== 对话相关 =====
 
 export interface DialogueEntry {
@@ -105,7 +178,7 @@ export interface GameState {
 // ===== LLM 相关 =====
 
 export interface LLMConfig {
-  provider: string;           // "anthropic" | "openai" | 任意已注册的 provider 名
+  provider: string;
   apiKey: string;
   baseUrl?: string;
   model: string;

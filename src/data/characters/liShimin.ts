@@ -1,6 +1,6 @@
-import type { Character } from '../../types';
+import type { CharacterCore } from '../../types';
 
-export const liShimin: Character = {
+export const liShimin: CharacterCore = {
   id: 'li_shimin',
   name: '李世民',
   title: '秦王',
@@ -33,40 +33,6 @@ export const liShimin: Character = {
       never: ['粗俗之语', '犹豫不决的语气', '谄媚之词'],
     },
   },
-  foundationalMemory: [
-    {
-      id: 'mem_ls_001',
-      date: '武德元年',
-      event: '随父起兵太原，西入关中，攻克长安，大唐开国。',
-      emotionalTag: '豪情',
-      importance: 10,
-      relatedCharacters: ['changsun_wuji', 'weichi_jingde', 'fang_xuanling'],
-    },
-    {
-      id: 'mem_ls_002',
-      date: '武德四年',
-      event: '虎牢关一战，三千骑兵大破窦建德十万大军，天下震动。',
-      emotionalTag: '自豪',
-      importance: 10,
-      relatedCharacters: ['weichi_jingde'],
-    },
-    {
-      id: 'mem_ls_003',
-      date: '武德九年六月初一',
-      event: '太白经天，傅奕密奏"太白见秦分，秦王当有天下"。太子建成借此向父皇进谗。',
-      emotionalTag: '危机',
-      importance: 10,
-      relatedCharacters: ['changsun_wuji', 'fang_xuanling'],
-    },
-    {
-      id: 'mem_ls_004',
-      date: '武德九年六月初三',
-      event: '建成、元吉密谋在昆明池饯行时诛杀自己，消息由东宫率更丞王晊泄露。',
-      emotionalTag: '恐惧与愤怒',
-      importance: 10,
-      relatedCharacters: ['changsun_wuji', 'weichi_jingde', 'fang_xuanling'],
-    },
-  ],
   relationships: {
     changsun_wuji: {
       role: '大舅哥、谋主',

@@ -3,12 +3,13 @@ import { liShimin } from './liShimin';
 import { changSunWuji } from './changSunWuji';
 import { weiChiJingDe } from './weiChiJingDe';
 import { fangXuanLing } from './fangXuanLing';
+import { assembleCharacter } from './memoryLoader';
 
 export const characters: Character[] = [
-  liShimin,
-  changSunWuji,
-  weiChiJingDe,
-  fangXuanLing,
+  assembleCharacter(liShimin),
+  assembleCharacter(changSunWuji),
+  assembleCharacter(weiChiJingDe),
+  assembleCharacter(fangXuanLing),
 ];
 
 export function getCharacterById(id: string): Character | undefined {

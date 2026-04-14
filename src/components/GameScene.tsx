@@ -1,19 +1,16 @@
 import { useState, useEffect, useMemo } from 'react';
-import type { SceneManager } from '../engine/sceneManager';
-import type { GameState, SceneConfig, Character } from '../types';
+import type { GameState, SceneConfig, Character, ISceneManager } from '../types';
 import NarratorPanel from './NarratorPanel';
 import DialogueFlow from './DialogueFlow';
 import ActionPanel from './ActionPanel';
-import EndingScreen from './EndingScreen';
 
 interface GameSceneProps {
-  sceneManager: SceneManager;
+  sceneManager: ISceneManager;
   scene: SceneConfig;
   npcs: Character[];
-  onRestart: () => void;
 }
 
-export default function GameScene({ sceneManager, scene, npcs, onRestart }: GameSceneProps) {
+export default function GameScene({ sceneManager, scene, npcs }: GameSceneProps) {
   const [gameState, setGameState] = useState<GameState>(sceneManager.getState());
 
   useEffect(() => {
@@ -26,10 +23,6 @@ export default function GameScene({ sceneManager, scene, npcs, onRestart }: Game
     const idx = Math.floor(Math.random() * npcs.length);
     return npcs[idx].waitingText;
   }, [npcs, gameState.isNpcThinking]);
-
-  if (gameState.status === 'ending' && gameState.endingText) {
-    return <EndingScreen endingText={gameState.endingText} onRestart={onRestart} />;
-  }
 
   return (
     <div className="h-screen flex flex-col">

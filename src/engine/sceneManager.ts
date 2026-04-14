@@ -24,17 +24,20 @@ export class SceneManager {
   private npcs: Character[];
   private player: Character;
   private systemPrompt: string;
+  private previousSceneSummary?: string;
 
   constructor(
     llmProvider: LLMProvider,
     scene: SceneConfig,
     npcs: Character[],
     player: Character,
+    previousSceneSummary?: string,
   ) {
     this.llmProvider = llmProvider;
     this.scene = scene;
     this.npcs = npcs;
     this.player = player;
+    this.previousSceneSummary = previousSceneSummary;
 
     this.state = {
       status: 'intro',
@@ -50,6 +53,7 @@ export class SceneManager {
       scene,
       [player, ...npcs],
       0,
+      previousSceneSummary,
     );
   }
 
@@ -134,6 +138,7 @@ export class SceneManager {
             this.scene,
             [this.player, ...this.npcs],
             i,
+            this.previousSceneSummary,
           );
         }
         break;

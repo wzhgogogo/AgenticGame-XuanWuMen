@@ -1,6 +1,6 @@
-import type { Character } from '../../types';
+import type { CharacterCore } from '../../types';
 
-export const weiChiJingDe: Character = {
+export const weiChiJingDe: CharacterCore = {
   id: 'weichi_jingde',
   name: '尉迟敬德',
   title: '秦王府右一府统军',
@@ -33,24 +33,6 @@ export const weiChiJingDe: Character = {
       never: ['弯弯绕绕的话', '引经据典', '委婉暗示'],
     },
   },
-  foundationalMemory: [
-    {
-      id: 'mem_wcjd_001',
-      date: '武德三年',
-      event: '降唐归附秦王，李世民力排众议收留自己，以国士待之。',
-      emotionalTag: '感恩',
-      importance: 10,
-      relatedCharacters: ['li_shimin'],
-    },
-    {
-      id: 'mem_wcjd_002',
-      date: '武德九年六月初三',
-      event: '持剑入秦王府，对犹豫的世民直言："大王若不动手，敬德请先告辞，不能坐等被杀。"',
-      emotionalTag: '激愤',
-      importance: 10,
-      relatedCharacters: ['li_shimin', 'changsun_wuji'],
-    },
-  ],
   relationships: {
     li_shimin: {
       role: '主公',

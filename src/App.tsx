@@ -1,10 +1,14 @@
 import { useState, useRef, useCallback } from 'react';
-import type { LLMConfig } from './types';
+import type { LLMConfig, CampaignState, SceneConfig, Character } from './types';
 import { createLLMProvider } from './engine/llm';
 import { SceneManager } from './engine/sceneManager';
-import { defaultScene as sceneConfig } from './data/scenes';
-import { getPlayerCharacter, getNpcCharacters } from './data/characters';
+import { CampaignManager } from './engine/campaignManager';
+import { scenes } from './data/scenes';
+import { defaultTimeline, transitions } from './data/timelines';
+import { characters, getPlayerCharacter, getNpcCharacters } from './data/characters';
 import GameScene from './components/GameScene';
+import TransitionScreen from './components/TransitionScreen';
+import EndingScreen from './components/EndingScreen';
 
 function loadEnvConfig(): LLMConfig {
   return {
@@ -16,9 +20,9 @@ function loadEnvConfig(): LLMConfig {
 }
 
 export default function App() {
-  const [started, setStarted] = useState(false);
+  const [campaignState, setCampaignState] = useState<CampaignState | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const managerRef = useRef<SceneManager | null>(null);
+  const campaignRef = useRef<CampaignManager | null>(null);
 
   const player = getPlayerCharacter();
   const npcs = getNpcCharacters();
@@ -32,29 +36,34 @@ export default function App() {
         return;
       }
       const provider = createLLMProvider(config);
-      const manager = new SceneManager(provider, sceneConfig, npcs, player);
-      managerRef.current = manager;
-      setStarted(true);
-      await manager.startGame();
+
+      // SceneManager 工厂：CampaignManager 通过此创建每个场景的管理器
+      const factory = (scene: SceneConfig, sceneNpcs: Character[], scenePlayer: Character, summary?: string) =>
+        new SceneManager(provider, scene, sceneNpcs, scenePlayer, summary);
+
+      const campaign = new CampaignManager(
+        defaultTimeline,
+        scenes,
+        transitions,
+        factory,
+        characters,
+        player,
+      );
+      campaignRef.current = campaign;
+      campaign.subscribe(setCampaignState);
+      await campaign.startCampaign();
     } catch (e) {
       setError(e instanceof Error ? e.message : '启动失败');
     }
-  }, [npcs, player]);
+  }, [player, npcs]);
 
   const handleRestart = useCallback(async () => {
-    setError(null);
-    try {
-      const config = loadEnvConfig();
-      const provider = createLLMProvider(config);
-      const manager = new SceneManager(provider, sceneConfig, npcs, player);
-      managerRef.current = manager;
-      setStarted(true);
-      await manager.startGame();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : '重启失败');
-    }
-  }, [npcs, player]);
+    setCampaignState(null);
+    campaignRef.current = null;
+    await handleStart();
+  }, [handleStart]);
 
+  // 错误画面
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen px-4">
@@ -72,17 +81,15 @@ export default function App() {
     );
   }
 
-  if (!started || !managerRef.current) {
+  // 开屏
+  if (!campaignState) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen px-4">
-        <h1
-          className="font-game text-2xl mb-2"
-          style={{ color: '#e8e0d0' }}
-        >
+        <h1 className="font-game text-2xl mb-2" style={{ color: '#e8e0d0' }}>
           玄武门之变
         </h1>
         <p className="text-sm mb-8" style={{ color: '#8a8070' }}>
-          武德九年六月初四 · 长安
+          武德九年 · 长安
         </p>
         <button
           onClick={handleStart}
@@ -91,18 +98,51 @@ export default function App() {
           onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#3a3a44'; }}
           onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#2a2a34'; }}
         >
-          开始密议
+          开始
         </button>
       </div>
     );
   }
 
-  return (
-    <GameScene
-      sceneManager={managerRef.current}
-      scene={sceneConfig}
-      npcs={npcs}
-      onRestart={handleRestart}
-    />
-  );
+  const campaign = campaignRef.current!;
+
+  // 场景过渡画面
+  if (campaignState.status === 'transitioning') {
+    const lastOutcome = campaignState.completedScenes[campaignState.completedScenes.length - 1];
+    const transition = campaign.getTransitionToNext();
+    return (
+      <TransitionScreen
+        endingText={lastOutcome?.summary || ''}
+        transitionText={transition?.transitionNarration || ''}
+        onContinue={() => campaign.advanceToNextScene()}
+      />
+    );
+  }
+
+  // 全部完成
+  if (campaignState.status === 'completed') {
+    const lastOutcome = campaignState.completedScenes[campaignState.completedScenes.length - 1];
+    return (
+      <EndingScreen
+        endingText={lastOutcome?.summary || '故事结束。'}
+        onRestart={handleRestart}
+      />
+    );
+  }
+
+  // 游戏中
+  const sceneManager = campaign.getCurrentSceneManager();
+  const currentScene = campaign.getCurrentScene();
+  if (sceneManager && currentScene) {
+    const sceneNpcs = npcs.filter((c) => currentScene.activeNpcIds.includes(c.id));
+    return (
+      <GameScene
+        sceneManager={sceneManager}
+        scene={currentScene}
+        npcs={sceneNpcs}
+      />
+    );
+  }
+
+  return null;
 }
