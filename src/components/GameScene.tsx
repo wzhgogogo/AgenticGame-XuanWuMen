@@ -35,7 +35,7 @@ export default function GameScene({ sceneManager, scene, npcs }: GameSceneProps)
       <ActionPanel
         suggestedActions={sceneManager.getSuggestedActions()}
         onSubmit={(input) => sceneManager.submitPlayerAction(input)}
-        disabled={gameState.isNpcThinking}
+        disabled={gameState.isNpcThinking || gameState.status === 'ending'}
       />
     </div>
   );

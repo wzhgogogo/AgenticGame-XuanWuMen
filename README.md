@@ -1,12 +1,12 @@
 # 玄武门之变 — LLM 驱动的历史互动叙事游戏
 
-v2.0
+v3.0
 
 ## 简介
 
-武德九年，正月至六月。玩家扮演秦王李世民，经历从暗流涌动到最终摊牌的半年博弈。长孙无忌、尉迟敬德、房玄龄等核心幕僚随侍左右，每一个决策都将改变大唐命运的走向。
+武德九年，正月至六月。玩家扮演秦王李世民，在涌现式世界模拟中经历从暗流涌动到最终摊牌的半年博弈。长孙无忌、尉迟敬德、房玄龄等核心幕僚随侍左右，每一个决策都将改变大唐命运的走向。
 
-LLM 实时生成 NPC 对话与旁白，6 个场景串联完整时间线，跨场景记忆传递让 NPC 的态度随玩家决策动态变化。
+没有固定剧情线——7 条压力轴驱动世界运转，NPC 作为自主 Agent 每日决策，事件从利益冲突的压力积累中自然涌现。即便是玄武门之变本身，也可能因为玩家的选择而不发生。
 
 ## 技术栈
 
@@ -38,18 +38,20 @@ VITE_LLM_MODEL=gemini-2.5-flash   # 模型名称
 VITE_LLM_BASE_URL=                # 自定义 API 地址（留空则使用 provider 默认地址）
 ```
 
-## 时间线 · 6 场景
+## 事件骨架
 
-| # | 场景 | 时间 | 地点 | 核心冲突 | 参与NPC |
-|---|------|------|------|---------|---------|
-| 1 | 暗流涌动 | 正月 | 秦王府·书房 | 派张亮赴洛阳联络豪杰，张亮被告下狱 | 长孙无忌、房玄龄 |
-| 2 | 东宫鸩酒 | 二月 | 东宫·宴厅 | 建成设宴，一杯毒酒端到面前 | 长孙无忌、尉迟敬德、房玄龄 |
-| 3 | 洛阳之议 | 三月 | 秦王府·书房 | 陛下欲遣世民赴洛阳，去则避祸失根基 | 长孙无忌、房玄龄 |
-| 4 | 围困削权 | 四五月 | 秦王府·密室 | 弹劾如雪，突厥犯边，核心班底即将被调走 | 长孙无忌、尉迟敬德、房玄龄 |
-| 5 | 太白经天 | 六月初一 | 太极宫·朝堂 | 天象示变，面圣对峙，反告后宫 | 长孙无忌、尉迟敬德、房玄龄 |
-| 6 | 午夜密议 | 六月初三夜 | 秦王府·密室 | 最终决断：动手还是束手待毙 | 长孙无忌、尉迟敬德、房玄龄 |
+v3.0 不再有固定场景序列。以下 8 种事件骨架由压力系统驱动涌现：
 
-场景之间通过过渡叙事衔接，CampaignManager 自动传递前序场景的决策结果和关系变化，LLM 据此调整 NPC 态度和叙事内容。
+| 骨架 | 触发条件举例 | 说明 |
+|------|-------------|------|
+| 宴会危局 | 建成敌意 ≥ 70 | 社交场合暗藏杀机，可涌现为"东宫鸩酒""猎场伏弓"等变体 |
+| 政治对抗 | 朝堂舆论 ≥ 65 | 弹劾攻势、舆论战 |
+| 暗杀危机 | 建成 ≥ 80 且元吉 ≥ 70 | 物理暗杀或伏击 |
+| 部下逼宫 | 秦王府急迫 ≥ 75 且 NPC patience 低 | 核心幕僚逼迫秦王决断 |
+| 皇帝召见 | 李渊猜疑 ≥ 60 或储位危机 ≥ 80 | 面圣训话、调停、问责 |
+| 情报事件 | 储位危机 ≥ 45（day ≥ 5） | 密报传来、间谍暴露 |
+| 盟友离心 | NPC 信任低 + 急迫感高 | 关键人物动摇或叛离 |
+| 军事冲突 | 军事准备 ≥ 40 且储位危机 ≥ 85 | 最终武力对抗（游戏高潮） |
 
 ## 人物
 
@@ -78,7 +80,9 @@ VITE_LLM_BASE_URL=                # 自定义 API 地址（留空则使用 provi
 
 ```
 src/
-├── types/index.ts                # 全局类型定义
+├── types/
+│   ├── index.ts                  # 全局类型定义
+│   └── world.ts                  # v3.0 世界模拟类型（压力、事件、NPC Agent、活动）
 ├── data/
 │   ├── characters/               # 角色数据（一人一文件）
 │   │   ├── liShimin.ts           # 李世民（玩家）
@@ -87,71 +91,74 @@ src/
 │   │   ├── fangXuanLing.ts       # 房玄龄
 │   │   ├── memoryLoader.ts       # 记忆加载（Markdown → MemoryEntry）
 │   │   └── memories/             # 各角色基础记忆（.md 文件）
-│   ├── scenes/                   # 场景配置（一场景一文件）
-│   │   ├── undercurrent.ts       # 暗流涌动（正月）
-│   │   ├── poisonedWine.ts       # 东宫鸩酒（二月）
-│   │   ├── luoyangDebate.ts      # 洛阳之议（三月）
-│   │   ├── politicalSiege.ts     # 围困削权（四五月）
-│   │   ├── taibaiOmen.ts         # 太白经天（六月初一）
-│   │   └── midnightCouncil.ts    # 午夜密议（六月初三夜）
-│   └── timelines/
-│       └── xuanwuGate.ts         # 玄武门时间线（场景编排 + 过渡叙事）
+│   ├── skeletons/                # 事件骨架模板（8 种事件类型）
+│   │   ├── banquetCrisis.ts      # 宴会危局
+│   │   ├── politicalConfrontation.ts  # 政治对抗
+│   │   ├── assassinationCrisis.ts     # 暗杀危机
+│   │   ├── subordinateUltimatum.ts    # 部下逼宫
+│   │   ├── imperialSummons.ts    # 皇帝召见
+│   │   ├── intelligenceEvent.ts  # 情报事件
+│   │   ├── allyWavering.ts       # 盟友离心
+│   │   ├── militaryConflict.ts   # 军事冲突
+│   │   └── index.ts
+│   ├── agents/                   # NPC 行为规则
+│   │   ├── npcDecisionRules.ts   # 每角色确定性规则
+│   │   └── offstageAgents.ts     # 建成/元吉/李渊 每日压力
+│   ├── scenes/                   # v2.0 场景配置（保留作参考）
+│   └── timelines/                # v2.0 时间线（已废弃）
 ├── engine/
 │   ├── llm/                      # LLM 适配器层（Registry 模式）
-│   │   ├── types.ts              # LLMProvider 接口
-│   │   ├── registry.ts           # Provider 注册中心
-│   │   ├── openai.ts             # OpenAI 兼容适配器
-│   │   ├── anthropic.ts          # Anthropic 适配器
-│   │   └── sseParser.ts          # SSE 流式解析
-│   ├── promptBuilder.ts          # System prompt 组装（纯函数，含称谓规则）
-│   ├── sceneManager.ts           # 单场景引擎（状态机 + 观察者模式）
-│   ├── campaignManager.ts        # 多场景编排（记忆传递 + 关系变化）
-│   └── outcomeBuilder.ts         # 场景结果提取（决策识别 + 关系变化估算）
+│   ├── world/                    # v3.0 世界模拟引擎
+│   │   ├── worldSimulator.ts     # 核心模拟循环（替代 CampaignManager）
+│   │   ├── worldState.ts         # 状态初始化 + localStorage 存档
+│   │   ├── pressure.ts           # 压力系统（tick / modifier / trigger）
+│   │   ├── calendar.ts           # 武德九年农历日历
+│   │   ├── npcAgent.ts           # NPC Agent 决策引擎
+│   │   ├── npcPromptBuilder.ts   # NPC 决策紧凑 prompt
+│   │   ├── eventGenerator.ts     # 骨架 → LLM 变体生成
+│   │   ├── eventRunner.ts        # EventInstance → SceneManager 适配
+│   │   └── activities.ts         # 日常活动效果
+│   ├── promptBuilder.ts          # System prompt 组装
+│   ├── sceneManager.ts           # 单场景引擎（复用）
+│   ├── campaignManager.ts        # v2.0 多场景编排（已废弃）
+│   └── outcomeBuilder.ts         # 场景结果提取
 ├── components/
-│   ├── NarratorPanel.tsx          # 顶部场景信息栏
-│   ├── DialogueFlow.tsx           # 对话流渲染
-│   ├── ActionPanel.tsx            # 底部操作面板
-│   ├── EndingScreen.tsx           # 结局画面
-│   ├── TransitionScreen.tsx       # 场景过渡画面
-│   └── GameScene.tsx              # 游戏场景容器
-├── App.tsx                        # 入口：开屏 → 场景 → 过渡 → 结局
+│   ├── DailyActivityScreen.tsx   # 日常活动选择界面
+│   ├── DailyBriefingScreen.tsx   # 当日汇报界面
+│   ├── WorldStateHud.tsx         # 压力定性展示
+│   ├── NarratorPanel.tsx         # 顶部场景信息栏
+│   ├── DialogueFlow.tsx          # 对话流渲染
+│   ├── ActionPanel.tsx           # 底部操作面板
+│   ├── EndingScreen.tsx          # 结局画面
+│   ├── TransitionScreen.tsx      # 场景过渡画面
+│   └── GameScene.tsx             # 游戏场景容器
+├── App.tsx                        # 入口：状态机驱动游戏流程
 └── index.css                      # 全局样式（古风配色 + 字体 + 动画）
 ```
 
 ## 架构设计
 
+### 世界模拟层（v3.0）
+- **WorldSimulator**：核心模拟循环，管理 title_screen → daily_activities → daily_briefing → event_scene → game_over 状态机
+- **压力系统**：7 轴压力引擎，每日 tick（velocity + decay towards baseline），支持 floor/ceiling 约束
+- **NPC Agent**：两阶段决策管线（确定性规则过滤 → LLM 推理），每角色独立 patience/alertness/commitment 状态
+- **幕后 Agent**：建成/元吉/李渊 纯确定性每日压力贡献，不消耗 LLM token
+- **事件生成器**：骨架模板定义结构 + LLM 生成具体变体，同一骨架在不同世界状态下产生不同事件
+
 ### 引擎层
-- **SceneManager**：单场景状态机 + 观察者模式，管理对话循环、阶段推进、结局触发
-- **CampaignManager**：多场景编排，自动传递 SceneOutcome（策记忆、关系变化），生成前情回顾注入下一场景
+- **SceneManager**：单场景状态机 + 观察者模式，管理对话循环、阶段推进、结局触发（v3.0 复用）
 - **PromptBuilder**：纯函数构建 System Prompt，包含角色三层记忆（基础/短期/反思）、称谓规则、输出格式约束
 - **OutcomeBuilder**：启发式提取场景结果（关键决策识别 + 关系变化估算）
 
 ### 数据层
 - **角色系统**：Big Five 人格模型 + 三层记忆 + 关系网络（信任度 0-100）+ 语言风格约束
-- **场景系统**：每场景 3 阶段，每阶段有 turnRange 和 suggestedActions，结局触发支持硬触发（回合数）+ 软触发（语义识别）
-- **时间线系统**：固定场景顺序 + 过渡叙事，方案 A（叙事内容通过记忆传递动态适应玩家决策）
+- **骨架模板**：8 种事件类型，每种定义阶段框架、触发条件、约束、收束规则
+- **日常活动**：5 类 12 项，各有压力效果和场景文案
 
 ### LLM 适配
 - Registry 模式，支持 6 家 LLM 提供商
 - SSE 流式接收
 - JSON 可靠解析：括号计数提取 + 截断修补 + 文本格式 fallback
-
-## v2.0 相比 v1.0 的变化
-
-### 新增
-- 完整武德九年时间线：从 1 个场景扩展到 6 个场景，覆盖正月至六月
-- CampaignManager 多场景编排引擎
-- 跨场景记忆传递与关系变化
-- 场景过渡画面（TransitionScreen）
-- 角色记忆系统（Markdown 文件 → 运行时加载）
-- 完整称谓与人物关系规则（全局 prompt 约束）
-
-### 优化
-- 称谓规则：从简单禁令扩展为正面映射表（A→B 格式），覆盖皇族互称、亲属称呼
-- NPC 参与度按场景调整：政治密谋场景（正月/三月）只有文臣，需要武力的场景才有敬德
-- 配角行为规范：李神通等皇族配角不再出现不合身份的描写
-- JSON 输出格式：characterId 明确列出可选值，杜绝拼音 ID 显示问题
-- 结局触发统一为 minTurns: 5（测试阶段）
 
 ---
 
@@ -220,17 +227,60 @@ src/
 - 场景 2（鸩酒）补充元吉在场 + 李神通宗室重臣身份说明
 - 确认太白经天场景不涉及王晊（避免与后续过渡叙事矛盾）
 
+### v3.0 — 2026-04-15
+
+从固定 6 场景线性序列升级为涌现式世界模拟。事件不再按脚本触发，而是从 NPC 利益冲突的压力积累中自然涌现。
+
+**压力系统（替代固定场景触发）**
+- 新建 7 条压力轴（储位危机、建成敌意、元吉冒进、朝堂舆论、秦王府急迫、李渊猜疑、军事准备），各轴 0-100，带 velocity / baseline / floor / ceiling / decayRate
+- 三通道压力变化：时间漂移（确定性每日 tick）、NPC 行为（agent 决策）、玩家行为（日常活动 + 事件选择）
+- 历史"引力"来自 NPC 性格参数，不来自硬编码脚本——建成的高 baseline 敌意意味着如果玩家不作为，局势会自然升级到触发鸩酒/暗杀；但持续化解可让这些事件永远不发生
+
+**事件系统：骨架模板 + LLM 变体生成**
+- 新建 8 个事件骨架模板（宴会危局、政治对抗、暗杀危机、部下逼宫、皇帝召见、情报事件、盟友离心、军事冲突）
+- 骨架定义事件类型结构（阶段框架、触发条件、约束、收束定义），LLM 根据当前世界状态生成具体变体（名称、地点、NPC 分配、阶段文案）
+- 同一骨架在不同压力状态下生成不同变体：宴会危局在建成敌意 78 时可能是"东宫鸩酒"，元吉冒进 85 时可能是"猎场伏弓"
+- 场景自然收束：取消硬性轮次计数和关键词匹配，改为基于核心悬念解决的语义收束（softCap 引导 + hardCap 兜底）
+
+**NPC Agent 架构**
+- 每个 NPC 每日运行两阶段决策：确定性规则过滤 → LLM 推理（~300 token 紧凑 prompt）
+- NPC Agent 状态：patience / alertness / commitment，每日自然衰减
+- 3 个幕后 Agent（建成、元吉、李渊）：纯确定性每日压力贡献，不消耗 LLM token
+- 涌现式事件举例：尉迟敬德 patience 每日 -2，当 patience < 15 且秦王府急迫 ≥ 75 → 触发"部下逼宫"骨架
+
+**日常活动层**
+- 每天 3 个时间段（晨/午/夜），玩家每段选一个活动
+- 5 类 12 项活动：治政、军务、情报、社交、个人，各有不同压力效果
+- 活动选择时间掩盖后台 NPC agent LLM 调用延迟
+
+**前端状态机重写**
+- 新状态机：title_screen → daily_activities → daily_briefing → [event_scene] → daily_activities → ... → game_over
+- 新增 3 个组件：DailyActivityScreen（日常活动选择）、DailyBriefingScreen（当日汇报 + 事件预告）、WorldStateHud（压力定性展示）
+- App.tsx 用 WorldSimulator 替代 CampaignManager
+- 加载过渡画面掩盖异步 tick 延迟
+
+**存档系统**
+- localStorage 自动存档（事件场景中不存，避免中间状态）
+- 开屏支持"继续游戏"/"新游戏"
+- 世界状态完整序列化/反序列化
+
+**废弃**
+- CampaignManager（被 WorldSimulator 替代）
+- 固定时间线 xuanwuGate.ts
+- 固定场景序列（保留场景数据作为参考）
+
 ## 后续规划
 
 ### 引擎增强
-- 结局触发逻辑优化：硬触发改为 maxTurns，minTurns 作为允许结局的门槛
-- LLM 响应性能监控与优化
-- 条件分支时间线（方案 B：场景间条件跳转，基于 outcomeTag）
+- 骨架 fallback 变体（从 v2.0 场景迁移，LLM 生成失败时兜底）
+- LLM 变体生成重试 + 结构校验
+- 压力参数平衡调优（测试驱动）
+- 更多 NPC 决策规则覆盖
 
 ### 内容扩展
 - 新增 NPC（秦叔宝、张公谨、杜如晦等）
+- 替代历史事件补充（玩家选择不兵变的路线）
 - 角色记忆丰富化
-- 场景 narratorIntro 动态化（根据前序 SceneOutcome 调整开场）
 
 ### 体验增强
 - 美术资源（角色立绘、场景背景）

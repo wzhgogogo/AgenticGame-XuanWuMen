@@ -3,6 +3,7 @@ import type {
 } from '../types';
 import type { LLMProvider } from './llm/types';
 import { buildSystemPrompt, buildMessages, buildFirstNpcMessage } from './promptBuilder';
+import { extractJson } from './jsonExtractor';
 
 // ===== 工具函数 =====
 
@@ -93,7 +94,7 @@ export class SceneManager {
     // 3. 请求第一轮 NPC 发言
     const firstMsg = buildFirstNpcMessage(this.scene);
     // 加入 llmMessages（玩家看不到这条引导消息）
-    this.state.llmMessages.push({ role: 'user', content: firstMsg.content });
+    this.setState({ llmMessages: [...this.state.llmMessages, { role: 'user', content: firstMsg.content }] });
     await this.requestNpcResponse(firstMsg.content, true);
   }
 
@@ -181,11 +182,16 @@ export class SceneManager {
   }
 
   private shouldTriggerEnding(playerInput?: string): boolean {
-    if (this.state.playerTurnCount >= this.scene.endingTrigger.minTurns) {
+    const { minTurns, maxTurns } = this.scene.endingTrigger;
+    const turns = this.state.playerTurnCount;
+
+    // 硬上限：强制结局
+    if (turns >= maxTurns) {
       return true;
     }
-    // 玩家明确表达终结意图时，允许提前触发结局（至少过了一半回合）
-    if (playerInput && this.state.playerTurnCount >= Math.floor(this.scene.endingTrigger.minTurns / 2)) {
+
+    // 软上限区间 [minTurns, maxTurns)：允许 LLM 自行判断结局，或玩家意图触发
+    if (playerInput && turns >= Math.floor(minTurns / 2)) {
       const endingPatterns = [
         '准备', '动手', '出发', '行动', '决定了', '就这么办',
         '下令', '传令', '各自', '散了', '不再犹豫', '誓',
@@ -196,6 +202,7 @@ export class SceneManager {
         return true;
       }
     }
+
     return false;
   }
 
@@ -204,17 +211,19 @@ export class SceneManager {
 
     // 添加玩家消息到 llmMessages（首轮已经在 startGame 中添加了）
     if (!isFirstTurn) {
-      this.state.llmMessages.push({ role: 'user', content: playerInput });
+      this.setState({ llmMessages: [...this.state.llmMessages, { role: 'user', content: playerInput }] });
     }
 
     // 判断是否进入结局
     const isEnding = this.shouldTriggerEnding(isFirstTurn ? undefined : playerInput);
+    const isSoftEnding = !isEnding && this.state.playerTurnCount >= this.scene.endingTrigger.minTurns;
 
     // 构建完整消息数组
     const messages = buildMessages(
       this.systemPrompt,
       this.state.llmMessages,
       isEnding,
+      isSoftEnding,
     );
 
     let fullResponse = '';
@@ -224,7 +233,10 @@ export class SceneManager {
         fullResponse += chunk;
       });
 
-      fullResponse = response.content;
+      // streaming 回调可能未被调用（某些 provider 不走回调），以返回值兜底
+      if (!fullResponse) {
+        fullResponse = response.content;
+      }
     } catch (error) {
       console.error('[SceneManager] LLM 请求失败:', error);
       const errMsg = (error as { message?: string })?.message || String(error);
@@ -234,7 +246,7 @@ export class SceneManager {
       });
       this.setState({ isNpcThinking: false });
       // 移除刚才加的 user 消息，让玩家可以重试
-      this.state.llmMessages.pop();
+      this.setState({ llmMessages: this.state.llmMessages.slice(0, -1) });
       return;
     }
 
@@ -249,7 +261,7 @@ export class SceneManager {
     this.notifyListeners();
 
     // 记录到 llmMessages
-    this.state.llmMessages.push({ role: 'assistant', content: fullResponse });
+    this.setState({ llmMessages: [...this.state.llmMessages, { role: 'assistant', content: fullResponse }] });
 
     // 检查结局
     if (parsed.ending) {
@@ -264,78 +276,12 @@ export class SceneManager {
     this.setState({ isNpcThinking: false });
   }
 
-  /** 从 LLM 原始输出中提取 JSON 字符串，处理思考文本、markdown 包裹和截断 */
-  private extractJson(raw: string): string | null {
-    let str = raw.trim();
-
-    // 如果有 ```json ... ``` 包裹，先提取其中内容
-    const codeBlockMatch = str.match(/```(?:json)?\s*\n?([\s\S]*?)\n?\s*```/);
-    if (codeBlockMatch) {
-      str = codeBlockMatch[1].trim();
-    }
-
-    // 找到第一个 { 的位置
-    const start = str.indexOf('{');
-    if (start === -1) return null;
-
-    // 从第一个 { 开始，用括号计数找到匹配的 }
-    let braces = 0;
-    let inString = false;
-    let escape = false;
-    for (let i = start; i < str.length; i++) {
-      const ch = str[i];
-      if (escape) { escape = false; continue; }
-      if (ch === '\\' && inString) { escape = true; continue; }
-      if (ch === '"') { inString = !inString; continue; }
-      if (inString) continue;
-      if (ch === '{') braces++;
-      else if (ch === '}') braces--;
-      if (braces === 0) {
-        // 找到完整的 JSON 对象
-        const jsonStr = str.slice(start, i + 1);
-        try {
-          JSON.parse(jsonStr);
-          return jsonStr;
-        } catch {
-          return null;
-        }
-      }
-    }
-
-    // 括号没闭合（截断），尝试修补
-    let truncated = str.slice(start);
-    braces = 0;
-    let brackets = 0;
-    inString = false;
-    escape = false;
-    for (const ch of truncated) {
-      if (escape) { escape = false; continue; }
-      if (ch === '\\' && inString) { escape = true; continue; }
-      if (ch === '"') { inString = !inString; continue; }
-      if (inString) continue;
-      if (ch === '{') braces++;
-      else if (ch === '}') braces--;
-      else if (ch === '[') brackets++;
-      else if (ch === ']') brackets--;
-    }
-    if (inString) truncated += '"';
-    for (let i = 0; i < brackets; i++) truncated += ']';
-    for (let i = 0; i < braces; i++) truncated += '}';
-
-    try {
-      JSON.parse(truncated);
-      return truncated;
-    } catch {
-      return null;
-    }
-  }
-
   private parseNpcResponse(raw: string): { entries: DialogueEntry[]; ending?: string } {
     const entries: DialogueEntry[] = [];
     let ending: string | undefined;
 
     // 尝试 JSON 解析（LLM 被要求输出 JSON 格式）
-    const jsonStr = this.extractJson(raw);
+    const jsonStr = extractJson(raw);
     if (jsonStr) {
       try {
         const parsed = JSON.parse(jsonStr);

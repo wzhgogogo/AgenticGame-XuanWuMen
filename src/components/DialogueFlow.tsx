@@ -7,9 +7,17 @@ interface DialogueFlowProps {
   thinkingText?: string;
 }
 
-function renderContent(text: string): string {
-  // Simple bold/italic handling — most formatting is already parsed by sceneManager
+function escapeHtml(text: string): string {
   return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function renderContent(text: string): string {
+  // 先转义 HTML，再做 markdown 格式化，防止 LLM 输出注入
+  return escapeHtml(text)
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>');
 }

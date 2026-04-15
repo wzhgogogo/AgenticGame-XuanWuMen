@@ -13,7 +13,7 @@ export class AnthropicProvider implements LLMProvider {
     this.maxTokens = config.maxTokens || 4096;
   }
 
-  async chat(messages: LLMMessage[], onChunk?: (text: string) => void): Promise<LLMResponse> {
+  async chat(messages: LLMMessage[], onChunk?: (text: string) => void, signal?: AbortSignal): Promise<LLMResponse> {
     // Anthropic 要求 system 单独传，从 messages 中提取
     const systemParts: string[] = [];
     const chatMessages: Array<{ role: string; content: string }> = [];
@@ -43,6 +43,7 @@ export class AnthropicProvider implements LLMProvider {
           ...(systemParts.length > 0 ? { system: systemParts.join("\n\n") } : {}),
           messages: chatMessages,
         }),
+        signal,
       });
     } catch (err) {
       throw { code: "network_error", message: String(err) } as LLMError;

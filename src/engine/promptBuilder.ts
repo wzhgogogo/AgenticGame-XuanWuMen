@@ -187,6 +187,7 @@ export function buildMessages(
   systemPrompt: string,
   llmMessages: Array<{ role: 'user' | 'assistant'; content: string }>,
   isEnding: boolean,
+  isSoftEnding?: boolean,
 ): LLMMessage[] {
   const messages: LLMMessage[] = [
     { role: 'system', content: systemPrompt },
@@ -197,6 +198,11 @@ export function buildMessages(
     messages.push({
       role: 'system',
       content: '现在已经到达结局阶段。请根据之前的对话内容，在本轮回复的JSON中加入 "ending" 字段，撰写200-400字的结局描述。suggestedActions 设为空数组。',
+    });
+  } else if (isSoftEnding) {
+    messages.push({
+      role: 'system',
+      content: '对话已进行多轮，场景可以走向收束。如果你判断冲突已经有了结果，可以在JSON中加入 "ending" 字段撰写结局。如果冲突仍在发展中，则继续正常对话。',
     });
   }
 

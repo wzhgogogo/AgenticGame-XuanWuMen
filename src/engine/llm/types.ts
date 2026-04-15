@@ -10,7 +10,8 @@ export interface LLMResponse {
 export interface LLMProvider {
   chat(
     messages: LLMMessage[],
-    onChunk?: (text: string) => void
+    onChunk?: (text: string) => void,
+    signal?: AbortSignal
   ): Promise<LLMResponse>;
 }
 

@@ -16,7 +16,7 @@ export class OpenAIProvider implements LLMProvider {
     this.baseUrl = (config.baseUrl || "https://api.openai.com/v1").replace(/\/+$/, "");
   }
 
-  async chat(messages: LLMMessage[], onChunk?: (text: string) => void): Promise<LLMResponse> {
+  async chat(messages: LLMMessage[], onChunk?: (text: string) => void, signal?: AbortSignal): Promise<LLMResponse> {
     // OpenAI 格式直接传 messages（包含 system）
     const chatMessages = messages.map((m) => ({ role: m.role, content: m.content }));
 
@@ -34,6 +34,7 @@ export class OpenAIProvider implements LLMProvider {
           stream: true,
           messages: chatMessages,
         }),
+        signal,
       });
     } catch (err) {
       throw { code: "network_error", message: String(err) } as LLMError;
