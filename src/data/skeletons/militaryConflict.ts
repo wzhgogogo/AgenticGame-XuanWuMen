@@ -4,7 +4,7 @@ import type { EventSkeleton } from '../../types/world';
 export const militaryConflict: EventSkeleton = {
   id: 'skeleton_military_conflict',
   category: '军事冲突',
-  description: '局势发展到公开武力阶段——可能是兵权争夺、玄武门伏击、或城内军事对峙。',
+  description: '局势发展到公开武力阶段—',
 
   preconditions: [
     { type: 'pressure_above', params: { axisId: 'military_readiness', value: 40 } },

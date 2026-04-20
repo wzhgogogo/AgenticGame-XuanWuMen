@@ -89,6 +89,7 @@ export function createInitialWorldState(): WorldState {
     eventLog: [],
     pendingEvents: [],
     globalFlags: {},
+    characterMemories: {},
   };
 }
 

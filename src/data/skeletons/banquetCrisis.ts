@@ -4,11 +4,10 @@ import type { EventSkeleton } from '../../types/world';
 export const banquetCrisis: EventSkeleton = {
   id: 'skeleton_banquet_crisis',
   category: '宴会危局',
-  description: '敌对方设宴款待秦王，暗中布局杀机。可能是鸩酒、伏兵、或席间逼迫。',
+  description: '敌对方设宴款待秦王',
 
   preconditions: [
     { type: 'pressure_above', params: { axisId: 'jiancheng_hostility', value: 65 } },
-    { type: 'day_range', params: { minDay: 20, maxDay: 180 } },
   ],
   pressureTriggers: [
     {

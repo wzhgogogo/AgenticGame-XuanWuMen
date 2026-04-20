@@ -1,7 +1,9 @@
 import type { EventInstance } from '../../types/world';
 import type { SceneConfig } from '../../types';
 import { formatDate } from './calendar';
-import type { CalendarState } from '../../types/world';
+import { getNarrativeIntensity } from './pressure';
+import { buildConstraintBlock } from '../../data/promptConstraints';
+import type { CalendarState, PressureAxisId, PressureAxis } from '../../types/world';
 
 /**
  * 将 EventInstance 转换为 SceneConfig，使其可以被现有 SceneManager 消费。
@@ -10,19 +12,26 @@ import type { CalendarState } from '../../types/world';
 export function eventInstanceToSceneConfig(
   instance: EventInstance,
   calendar: CalendarState,
+  pressureAxes?: Record<PressureAxisId, PressureAxis>,
 ): SceneConfig {
+  const { constraint } = pressureAxes
+    ? getNarrativeIntensity(pressureAxes)
+    : { constraint: '' };
+  const dateStr = formatDate(calendar);
   return {
     id: `event_${instance.skeletonId}_${Date.now()}`,
-    time: formatDate(calendar),
+    time: dateStr,
     location: instance.location,
     narratorIntro: instance.narratorIntro,
     activeNpcIds: instance.activeNpcIds,
     phases: instance.phases,
     endingTrigger: {
-      // 使用 resolution 的 softCap/hardCap 作为兜底
       minTurns: instance.resolution.softCap,
       maxTurns: instance.resolution.hardCap,
     },
+    narrativeConstraint: constraint
+      ? buildConstraintBlock(dateStr, constraint, true)
+      : undefined,
   };
 }
 

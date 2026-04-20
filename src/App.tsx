@@ -6,11 +6,15 @@ import type { LLMProvider } from './engine/llm';
 import { SceneManager } from './engine/sceneManager';
 import { WorldSimulator } from './engine/world/worldSimulator';
 import { loadWorldState } from './engine/world/worldState';
+import { getNarrativeIntensity } from './engine/world/pressure';
+import { getDebugEntries, subscribeDebugLog, clearDebugLog } from './engine/debugLog';
 import { characters, getPlayerCharacter, getNpcCharacters } from './data/characters';
 import GameScene from './components/GameScene';
 import EndingScreen from './components/EndingScreen';
 import DailyActivityScreen from './components/DailyActivityScreen';
 import DailyBriefingScreen from './components/DailyBriefingScreen';
+import DebugPanel from './components/DebugPanel';
+import SceneBackground from './components/SceneBackground';
 
 function loadEnvConfig(): LLMConfig {
   // 安全检查：非 localhost 环境下不暴露 API Key
@@ -45,6 +49,19 @@ export default function App() {
 
   const simulatorRef = useRef<WorldSimulator | null>(null);
   const llmProviderRef = useRef<LLMProvider | null>(null);
+
+  const [debugOpen, setDebugOpen] = useState(() => import.meta.env.DEV && new URLSearchParams(window.location.search).has('debug'));
+  const [debugEntries, setDebugEntries] = useState(getDebugEntries);
+
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    const unsub = subscribeDebugLog(setDebugEntries);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 'd') { e.preventDefault(); setDebugOpen((v) => !v); }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => { unsub(); window.removeEventListener('keydown', onKey); };
+  }, []);
 
   const player = getPlayerCharacter();
   const npcs = getNpcCharacters();
@@ -124,7 +141,7 @@ export default function App() {
   const handleEndDay = useCallback(async () => {
     const simulator = simulatorRef.current;
     if (!simulator) return;
-    setLoading('夜幕降临，长安城渐渐安静下来……');
+    setLoading('夜色已深，长安城渐渐安静下来……');
     try {
       const result = await simulator.endDay();
       setTickResult(result);
@@ -180,36 +197,58 @@ export default function App() {
     setCurrentSceneConfig(null);
   }, []);
 
+  const debugPanel = import.meta.env.DEV && debugOpen ? (
+    <DebugPanel
+      worldState={worldState}
+      narrativeIntensity={worldState ? getNarrativeIntensity(worldState.pressureAxes).level : '-'}
+      logEntries={[...debugEntries]}
+      onClear={clearDebugLog}
+    />
+  ) : null;
+
   // 加载过渡画面
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen px-4">
-        <p
-          className="font-game text-sm animate-fade-in"
-          style={{ color: '#8a8070' }}
-        >
-          {loading}
-        </p>
-        <div className="mt-4 thinking-dots" style={{ color: '#4a4a50' }} />
-      </div>
+      <>
+        <div className="h-screen relative flex flex-col items-center justify-center px-4">
+          <SceneBackground />
+          <p
+            className="relative z-10 font-game text-sm animate-fade-in"
+            style={{ color: '#8a8070' }}
+          >
+            {loading}
+          </p>
+          <div className="relative z-10 mt-4 thinking-dots" style={{ color: '#4a4a50' }} />
+        </div>
+        {debugPanel}
+      </>
     );
   }
 
   // 错误画面
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen px-4">
-        <p className="text-sm mb-4" style={{ color: '#E24B4A' }}>{error}</p>
-        <button
-          onClick={handleStart}
-          className="px-6 py-2.5 rounded-sm text-sm cursor-pointer transition-colors"
-          style={{ backgroundColor: '#2a2a34', color: '#e8e0d0' }}
-          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#3a3a44'; }}
-          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#2a2a34'; }}
-        >
-          重试
-        </button>
-      </div>
+      <>
+        <div className="h-screen relative flex flex-col items-center justify-center px-4">
+          <SceneBackground />
+          <p className="relative z-10 text-sm mb-4" style={{ color: '#E24B4A' }}>{error}</p>
+          <button
+            onClick={handleStart}
+            className="relative z-10 px-8 py-2.5 rounded text-sm font-ui cursor-pointer"
+            style={{
+              backgroundColor: 'transparent',
+              color: '#c9a84c',
+              border: '1px solid rgba(201, 168, 76, 0.3)',
+              transition: 'all 0.2s ease',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.6)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.3)'; }}
+          >
+            重试
+          </button>
+        </div>
+        {debugPanel}
+      </>
     );
   }
 
@@ -217,63 +256,114 @@ export default function App() {
   if (gameMode === 'title_screen') {
     const hasSave = !!loadWorldState();
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen px-4">
-        <h1 className="font-game text-2xl mb-2" style={{ color: '#e8e0d0' }}>
-          玄武门之变
-        </h1>
-        <p className="text-sm mb-8" style={{ color: '#8a8070' }}>
-          武德九年 · 长安
-        </p>
-        <div className="flex flex-col gap-3">
-          {hasSave && (
-            <button
-              onClick={handleContinue}
-              className="px-8 py-3 rounded-sm text-sm font-ui cursor-pointer transition-colors"
-              style={{ backgroundColor: '#2a2a34', color: '#e8e0d0' }}
-              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#3a3a44'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#2a2a34'; }}
-            >
-              继续游戏
-            </button>
-          )}
-          <button
-            onClick={handleStart}
-            className="px-8 py-3 rounded-sm text-sm font-ui cursor-pointer transition-colors"
+      <>
+        <div className="h-screen relative flex flex-col items-center justify-center px-4 overflow-hidden">
+          <SceneBackground />
+
+          {/* 标题 */}
+          <h1
+            className="relative z-10 font-calligraphy text-4xl mb-3 stagger-1"
             style={{
-              backgroundColor: hasSave ? '#1a1a24' : '#2a2a34',
-              color: hasSave ? '#8a8070' : '#e8e0d0',
-              border: hasSave ? '1px solid #2a2a34' : 'none',
+              color: '#e8e0d0',
+              textShadow: '0 0 40px rgba(201, 168, 76, 0.3), 0 0 80px rgba(201, 168, 76, 0.1)',
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#3a3a44'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = hasSave ? '#1a1a24' : '#2a2a34'; }}
           >
-            {hasSave ? '新游戏' : '开始'}
-          </button>
+            玄武门之变
+          </h1>
+
+          {/* 副标题 */}
+          <p
+            className="relative z-10 font-game text-sm mb-8 stagger-2"
+            style={{ color: '#8a8070', letterSpacing: '0.3em' }}
+          >
+            武德九年 · 长安
+          </p>
+
+          {/* 金色分隔线 */}
+          <div
+            className="relative z-10 w-48 h-px mb-10 stagger-3"
+            style={{ background: 'linear-gradient(to right, transparent, #c9a84c, transparent)' }}
+          />
+
+          {/* 按钮组 */}
+          <div className="relative z-10 flex flex-col gap-3 stagger-4">
+            {hasSave && (
+              <button
+                onClick={handleContinue}
+                className="px-12 py-3 rounded text-sm font-ui cursor-pointer"
+                style={{
+                  backgroundColor: 'transparent',
+                  color: '#e8e0d0',
+                  border: '1px solid rgba(201, 168, 76, 0.4)',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.7)';
+                  e.currentTarget.style.boxShadow = '0 0 20px rgba(201, 168, 76, 0.1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.4)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
+                继续游戏
+              </button>
+            )}
+            <button
+              onClick={handleStart}
+              className="px-12 py-3 rounded text-sm font-ui cursor-pointer"
+              style={{
+                backgroundColor: 'transparent',
+                color: hasSave ? '#8a8070' : '#e8e0d0',
+                border: `1px solid rgba(201, 168, 76, ${hasSave ? '0.15' : '0.4'})`,
+                transition: 'all 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.7)';
+                e.currentTarget.style.boxShadow = '0 0 20px rgba(201, 168, 76, 0.1)';
+                e.currentTarget.style.color = '#e8e0d0';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = `rgba(201, 168, 76, ${hasSave ? '0.15' : '0.4'})`;
+                e.currentTarget.style.boxShadow = 'none';
+                e.currentTarget.style.color = hasSave ? '#8a8070' : '#e8e0d0';
+              }}
+            >
+              {hasSave ? '新游戏' : '开始'}
+            </button>
+          </div>
         </div>
-      </div>
+        {debugPanel}
+      </>
     );
   }
 
   // 日常活动
   if (gameMode === 'daily_activities' && worldState) {
     return (
-      <DailyActivityScreen
-        state={worldState}
-        onSelectActivity={handleSelectActivity}
-        onEndDay={handleEndDay}
-      />
+      <>
+        <DailyActivityScreen
+          state={worldState}
+          onSelectActivity={handleSelectActivity}
+          onEndDay={handleEndDay}
+        />
+        {debugPanel}
+      </>
     );
   }
 
   // 日报
   if (gameMode === 'daily_briefing' && worldState && tickResult) {
     return (
-      <DailyBriefingScreen
-        state={worldState}
-        tickResult={tickResult}
-        hasEvents={worldState.pendingEvents.length > 0}
-        onProceed={handleProceedFromBriefing}
-      />
+      <>
+        <DailyBriefingScreen
+          state={worldState}
+          tickResult={tickResult}
+          hasEvents={worldState.pendingEvents.length > 0}
+          onProceed={handleProceedFromBriefing}
+        />
+        {debugPanel}
+      </>
     );
   }
 
@@ -281,28 +371,34 @@ export default function App() {
   if (gameMode === 'event_scene' && sceneManager && currentSceneConfig) {
     const sceneNpcs = npcs.filter((c) => currentSceneConfig.activeNpcIds?.includes(c.id));
     return (
-      <EventSceneWrapper
-        sceneManager={sceneManager}
-        scene={currentSceneConfig}
-        npcs={sceneNpcs}
-        onEnd={handleSceneEnd}
-      />
+      <>
+        <EventSceneWrapper
+          sceneManager={sceneManager}
+          scene={currentSceneConfig}
+          npcs={sceneNpcs}
+          onEnd={handleSceneEnd}
+        />
+        {debugPanel}
+      </>
     );
   }
 
   // 游戏结束
   if (gameMode === 'game_over') {
     const simulator = simulatorRef.current;
-    const lastEvent = simulator?.getState().eventLog.slice(-1)[0];
+    const ending = simulator?.getEndingType() || 'deposed';
     return (
-      <EndingScreen
-        endingText={lastEvent?.summary || '历史的车轮滚滚向前，武德九年终于画上了句号。'}
-        onRestart={handleRestart}
-      />
+      <>
+        <EndingScreen
+          endingType={ending}
+          onRestart={handleRestart}
+        />
+        {debugPanel}
+      </>
     );
   }
 
-  return null;
+  return <>{debugPanel}</>;
 }
 
 // 事件场景包装组件：监听 SceneManager 的 ending 状态，通知父级

@@ -9,9 +9,9 @@ import {
   INTELLIGENCE_ACTIVITIES,
   SOCIAL_ACTIVITIES,
   PERSONAL_ACTIVITIES,
-} from './activities';
-import { createInitialWorldState } from './worldState';
-import type { DailyActivity } from '../../types/world';
+} from '../activities';
+import { createInitialWorldState } from '../worldState';
+import type { DailyActivity } from '../../../types/world';
 
 // --- getActivitiesForTimeSlot ---
 

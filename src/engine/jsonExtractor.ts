@@ -2,8 +2,15 @@
  * 从 LLM 原始输出中安全提取第一个完整 JSON 对象。
  * 使用大括号计数法，正确处理 markdown 包裹、思考文本和截断。
  */
+
+const THINKING_TAG_RE = /<(?:thought|thinking|think|reasoning|reflection|inner_monologue)>[\s\S]*?<\/(?:thought|thinking|think|reasoning|reflection|inner_monologue)>/gi;
+
+export function stripThinkingTags(text: string): string {
+  return text.replace(THINKING_TAG_RE, '').trim();
+}
+
 export function extractJson(raw: string): string | null {
-  let str = raw.trim();
+  let str = stripThinkingTags(raw);
 
   // 如果有 ```json ... ``` 包裹，先提取其中内容
   const codeBlockMatch = str.match(/```(?:json)?\s*\n?([\s\S]*?)\n?\s*```/);

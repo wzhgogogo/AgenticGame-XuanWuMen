@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { extractJson } from './jsonExtractor';
+import { extractJson, stripThinkingTags } from './jsonExtractor';
 
 describe('extractJson', () => {
   it('extracts plain JSON string', () => {
@@ -102,5 +102,52 @@ describe('extractJson', () => {
     const parsed = JSON.parse(result!);
     expect(parsed.narrator).toBe('夜色深沉');
     expect(parsed.npcDialogues).toHaveLength(1);
+  });
+});
+
+describe('stripThinkingTags', () => {
+  it('removes <thought> tags', () => {
+    const input = '<thought>让我想想...</thought>{"action":"wait"}';
+    expect(stripThinkingTags(input)).toBe('{"action":"wait"}');
+  });
+
+  it('removes <thinking> tags', () => {
+    const input = '<thinking>分析中</thinking>\n回答内容';
+    expect(stripThinkingTags(input)).toBe('回答内容');
+  });
+
+  it('removes multiple thinking tags', () => {
+    const input = '<thought>first</thought>中间<thought>second</thought>结尾';
+    expect(stripThinkingTags(input)).toBe('中间结尾');
+  });
+
+  it('removes multiline thinking content', () => {
+    const input = `<thought>
+* 分析要点1
+* 分析要点2
+</thought>
+{"narrator":"夜色深沉"}`;
+    const result = stripThinkingTags(input);
+    expect(result).toContain('{"narrator"');
+    expect(result).not.toContain('分析要点');
+  });
+
+  it('is case insensitive', () => {
+    const input = '<THOUGHT>test</THOUGHT>ok';
+    expect(stripThinkingTags(input)).toBe('ok');
+  });
+
+  it('returns original text when no tags present', () => {
+    const input = '{"action":"wait"}';
+    expect(stripThinkingTags(input)).toBe('{"action":"wait"}');
+  });
+});
+
+describe('extractJson + thinking tags', () => {
+  it('extracts JSON after thought tags are stripped', () => {
+    const input = '<thought>让我分析当前局势...</thought>{"action":"lobby","reason":"拉拢"}';
+    const result = extractJson(input);
+    expect(result).not.toBeNull();
+    expect(JSON.parse(result!).action).toBe('lobby');
   });
 });

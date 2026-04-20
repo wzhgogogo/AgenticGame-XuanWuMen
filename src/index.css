@@ -23,6 +23,11 @@ body {
   min-height: 100vh;
 }
 
+/* 书法标题字体 */
+.font-calligraphy {
+  font-family: "Ma Shan Zheng", "STKaiti", "KaiTi", "Noto Serif SC", serif;
+}
+
 /* 古风字体栈 */
 .font-game {
   font-family: "Noto Serif SC", "Source Han Serif CN", "STSong", "SimSun", serif;
@@ -30,6 +35,13 @@ body {
 
 .font-ui {
   font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+/* 毛玻璃面板 */
+.glass-panel {
+  background: rgba(10, 10, 15, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 /* 对话流滚动条 */
@@ -65,6 +77,28 @@ body {
   animation: fadeIn 2s ease-out forwards;
 }
 
+/* 烛光呼吸 */
+@keyframes candleBreath {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.05); }
+}
+
+/* 入场动画序列 */
+@keyframes staggerFadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.stagger-1 { opacity: 0; animation: staggerFadeIn 1s ease-out forwards; }
+.stagger-2 { opacity: 0; animation: staggerFadeIn 1s ease-out 0.5s forwards; }
+.stagger-3 { opacity: 0; animation: staggerFadeIn 1s ease-out 1s forwards; }
+.stagger-4 { opacity: 0; animation: staggerFadeIn 1s ease-out 1.5s forwards; }
+
+/* 缓推镜 */
+@keyframes slowZoom {
+  from { transform: scale(1); }
+  to { transform: scale(1.05); }
+}
+
 /* 思考中动画 */
 .thinking-dots::after {
   content: '';
@@ -75,4 +109,16 @@ body {
   25% { content: '.'; }
   50% { content: '..'; }
   75% { content: '...'; }
+}
+
+/* 动效降级 */
+@media (prefers-reduced-motion: reduce) {
+  .stagger-1, .stagger-2, .stagger-3, .stagger-4 {
+    opacity: 1;
+    animation: none;
+  }
+  .animate-fade-in {
+    animation: none;
+    opacity: 1;
+  }
 }

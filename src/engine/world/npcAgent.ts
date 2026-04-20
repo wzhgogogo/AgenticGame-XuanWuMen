@@ -2,8 +2,7 @@ import type {
   NpcAgentState,
   NpcAction,
   NpcDecisionRule,
-  NpcActionType,
-  PressureModifier,
+  NpcStance,
   WorldState,
   PressureAxisId,
 } from '../../types/world';
@@ -11,39 +10,55 @@ import type { Character } from '../../types';
 
 // ===== NPC Agent 决策引擎 =====
 
+export interface PlausibleActions {
+  allowedStances: NpcStance[];
+  escalationHints: string[];
+  triggerEvent?: string;
+  matchedRuleIds: string[];      // 命中的规则 id（用于 once 消耗追踪）
+  onceRuleIds: string[];         // 其中属于 once 类型的规则 id
+}
+
 /**
  * 阶段1：确定性过滤
- * 根据 NPC 当前状态和世界状态，判断哪些行动类型是合理的
+ * 根据 NPC 当前状态和世界状态，判断 LLM 可选的 stance 清单
  */
 export function filterPlausibleActions(
   agentState: NpcAgentState,
   rules: NpcDecisionRule[],
   worldState: WorldState,
   character: Character,
-): { enabledActions: NpcActionType[]; autoEffects: PressureModifier[]; triggerEvent?: string } {
-  const allEnabled: NpcActionType[] = [];
-  const allEffects: PressureModifier[] = [];
+): PlausibleActions {
+  const stances: NpcStance[] = [];
+  const hints: string[] = [];
+  const matchedRuleIds: string[] = [];
+  const onceRuleIds: string[] = [];
   let triggerEvent: string | undefined;
 
+  const consumed = new Set(agentState.consumedOnceRules ?? []);
+
   for (const rule of rules) {
+    if (rule.once && rule.id && consumed.has(rule.id)) continue;
     if (!matchConditions(rule.conditions, agentState, worldState, character)) continue;
 
-    allEnabled.push(...rule.enabledActions);
-    allEffects.push(...rule.basePressureEffects);
-    if (rule.triggerEvent) {
-      triggerEvent = rule.triggerEvent;
-    }
+    stances.push(...rule.allowedStances);
+    if (rule.escalationHint) hints.push(rule.escalationHint);
+    if (rule.id) matchedRuleIds.push(rule.id);
+    if (rule.once && rule.id) onceRuleIds.push(rule.id);
+    if (rule.triggerEvent) triggerEvent = rule.triggerEvent;
   }
 
-  // 去重
-  const uniqueActions = [...new Set(allEnabled)];
-
-  // 如果没有任何规则命中，默认 wait
-  if (uniqueActions.length === 0) {
-    uniqueActions.push('wait');
+  const uniqueStances = [...new Set(stances)];
+  if (uniqueStances.length === 0) {
+    uniqueStances.push('observe');
   }
 
-  return { enabledActions: uniqueActions, autoEffects: allEffects, triggerEvent };
+  return {
+    allowedStances: uniqueStances,
+    escalationHints: hints,
+    triggerEvent,
+    matchedRuleIds,
+    onceRuleIds,
+  };
 }
 
 function matchConditions(
@@ -112,6 +127,18 @@ export function recordNpcAction(
     recentActions,
     daysSinceLastAction: 0,
   };
+}
+
+/**
+ * 消耗 once 规则（将 ruleId 追加到 consumedOnceRules）
+ */
+export function consumeOnceRule(
+  agent: NpcAgentState,
+  ruleId: string,
+): NpcAgentState {
+  const consumed = new Set(agent.consumedOnceRules ?? []);
+  consumed.add(ruleId);
+  return { ...agent, consumedOnceRules: [...consumed] };
 }
 
 /**

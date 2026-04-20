@@ -4,11 +4,9 @@ import type { EventSkeleton } from '../../types/world';
 export const imperialSummons: EventSkeleton = {
   id: 'skeleton_imperial_summons',
   category: '皇帝召见',
-  description: '李渊单独召见秦王，可能是训斥、试探、调停或另有深意。',
+  description: '李渊单独召见秦王',
 
-  preconditions: [
-    { type: 'day_range', params: { minDay: 15, maxDay: 180 } },
-  ],
+  preconditions: [],
   pressureTriggers: [
     {
       axes: [

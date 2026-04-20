@@ -1,6 +1,6 @@
 # 玄武门之变 — LLM 驱动的历史互动叙事游戏
 
-v3.0
+v3.4
 
 ## 简介
 
@@ -123,31 +123,35 @@ src/
 │   ├── campaignManager.ts        # v2.0 多场景编排（已废弃）
 │   └── outcomeBuilder.ts         # 场景结果提取
 ├── components/
+│   ├── SceneBackground.tsx      # 5层电影感场景背景（渐变+色调+烛光+噪点+暗角）
+│   ├── DialoguePanel.tsx        # 单条对话展示面板（毛玻璃+翻页）
 │   ├── DailyActivityScreen.tsx   # 日常活动选择界面
 │   ├── DailyBriefingScreen.tsx   # 当日汇报界面
 │   ├── WorldStateHud.tsx         # 压力定性展示
-│   ├── NarratorPanel.tsx         # 顶部场景信息栏
-│   ├── DialogueFlow.tsx          # 对话流渲染
-│   ├── ActionPanel.tsx           # 底部操作面板
+│   ├── NarratorPanel.tsx         # 顶部场景信息栏（已不再被 GameScene 引用）
+│   ├── DialogueFlow.tsx          # 滚动消息流（已被 DialoguePanel 替代）
+│   ├── ActionPanel.tsx           # 底部操作面板（2列卡片式）
 │   ├── EndingScreen.tsx          # 结局画面
 │   ├── TransitionScreen.tsx      # 场景过渡画面
-│   └── GameScene.tsx             # 游戏场景容器
+│   └── GameScene.tsx             # 游戏场景容器（全屏+浮动面板布局）
 ├── App.tsx                        # 入口：状态机驱动游戏流程
 └── index.css                      # 全局样式（古风配色 + 字体 + 动画）
 ```
 
 ## 架构设计
 
-### 世界模拟层（v3.0）
+### 世界模拟层
 - **WorldSimulator**：核心模拟循环，管理 title_screen → daily_activities → daily_briefing → event_scene → game_over 状态机
 - **压力系统**：7 轴压力引擎，每日 tick（velocity + decay towards baseline），支持 floor/ceiling 约束
-- **NPC Agent**：两阶段决策管线（确定性规则过滤 → LLM 推理），每角色独立 patience/alertness/commitment 状态
+- **NPC Agent**：两阶段决策管线（确定性规则过滤 → LLM 推理），每角色独立 patience/alertness/commitment 状态，多 NPC 并行决策（Promise.all）
 - **幕后 Agent**：建成/元吉/李渊 纯确定性每日压力贡献，不消耗 LLM token
 - **事件生成器**：骨架模板定义结构 + LLM 生成具体变体，同一骨架在不同世界状态下产生不同事件
+- **跨场景记忆**：场景结束后 LLM 提取 NPC 记忆（memoryExtractor），持久化到 WorldState.characterMemories，注入后续 NPC 决策和场景对话 prompt
 
 ### 引擎层
-- **SceneManager**：单场景状态机 + 观察者模式，管理对话循环、阶段推进、结局触发（v3.0 复用）
+- **SceneManager**：单场景状态机 + 观察者模式，管理对话循环、阶段推进、结局触发
 - **PromptBuilder**：纯函数构建 System Prompt，包含角色三层记忆（基础/短期/反思）、称谓规则、输出格式约束
+- **约束中枢**（promptConstraints.ts）：所有 LLM prompt 约束的唯一来源，两层设计——历史事实层（人物表/称谓/禁用词，不变）+ 叙事节奏层（烈度约束，随压力值动态变化）。消费方通过 `buildConstraintBlock()` 统一获取
 - **OutcomeBuilder**：启发式提取场景结果（关键决策识别 + 关系变化估算）
 
 ### 数据层
@@ -159,6 +163,11 @@ src/
 - Registry 模式，支持 6 家 LLM 提供商
 - SSE 流式接收
 - JSON 可靠解析：括号计数提取 + 截断修补 + 文本格式 fallback
+
+### 测试与评估
+- 单测 220 用例（vitest）：覆盖压力系统、日历、NPC Agent、骨架模板、事件生成/适配、prompt 构造
+- 自动跑局脚本（autoplay.test.ts）：随机活动 + 随机玩家输入，收集 LLM 输出日志，内置 RPM 限速器
+- Eval 框架（规划中）：量化指标 + LLM-as-Judge 半自动评估
 
 ---
 
@@ -268,6 +277,156 @@ src/
 - CampaignManager（被 WorldSimulator 替代）
 - 固定时间线 xuanwuGate.ts
 - 固定场景序列（保留场景数据作为参考）
+
+### v3.1 — 2026-04-17
+
+用户测试反馈驱动的节奏优化与结局体系。
+
+**节奏加速**
+- 压力轴 velocity 全线翻倍（military_readiness 除外），事件触发速度提升一倍
+- 去掉 4 个骨架的 minDay 限制（宴会危局、政治对抗、皇帝召见、盟友离心），事件触发完全靠压力阈值
+- 情报事件 minDay 从 5 降至 2，军事冲突保留 minDay: 60
+- 游戏时间上限从 month > 8 缩短至 month > 6
+
+**结局体系（5 种结局）**
+- 兵变成功（military_readiness ≥ 50 + 军事冲突完成）：历史正轨，秦王登基
+- 兵变失败→被擒（readiness < 30 + 军事冲突完成）：大势已去
+- 兵变失败→内战→胜利（readiness ≥ 30 + 军事冲突完成）：退守反攻，惨胜登基
+- 隐忍→被废（时间到或关键压力 ≥ 95）：建成得势，秦王出局
+- 隐忍→兄弟和好（时间到 + hostility < 30 + crisis < 40）：极难达成的和平结局
+- EndingScreen 重写，每种结局有独立标题和叙述文案
+
+**日报去重**
+- 修复日报画面 NPC narrativeHook 重复显示问题（briefing 文本和"府中动态"卡片各显示一遍）
+- buildDailyBriefing 只保留日期头 + 事件预告，NPC 动态交给组件独立渲染
+
+**活动文案扩充**
+- 12 个日常活动的 flavorTexts 从每个 2-3 条扩充至约 50 条，大幅减少重复感
+- 文案覆盖：政务、军事、情报、社交、个人五大类，风格多样（紧张/日常/反思）
+
+**骨架优化**
+- 情报骨架描述修复（病句修正）
+- 多个骨架描述精简，去掉冗余的破折号后缀
+
+### v3.2 — 2026-04-19
+
+跨场景角色记忆系统 + 架构规范强化。
+
+**跨场景记忆（#12）**
+- 新建 memoryExtractor.ts：场景结束后用一次 LLM 调用（~200-300 tokens）从对话摘要中提取每个参与 NPC 的关键记忆（承诺、冲突、情感变化）
+- WorldState 新增 `characterMemories: Record<string, MemoryEntry[]>`，记忆随存档持久化，新开一局自动清空
+- worldSimulator.ts handleEventEnd 中 fire-and-forget 调用记忆提取，不阻塞游戏流程
+- 提取结果同步到 Character.shortTermMemory，promptBuilder 场景对话自动注入近期记忆
+- npcPromptBuilder 注入最近 5 条角色记忆到每日决策 prompt，NPC 决策不再只看压力数字
+- 每角色记忆上限 10 条，超出时保留最新
+- restoreGame 兼容旧存档（characterMemories 缺失时补空）
+
+**构建修复**
+- 修复 eventGenerator.test.ts 中 pressureSnapshot 类型错误（`{}` → 完整 7 轴快照），npm run build 恢复通过
+
+**架构规范升级（arch-guard skill）**
+- 新增防膨胀规则：文件 ≤300 行、函数 ≤50 行、参数 ≤5 个、禁止预设式开发
+- 新增代码卫生规则：死代码必删、注释只写 WHY、禁止 any、LLM 返回必须验证
+- 新增 LLM 调用规则：prompt 与调用分离、失败静默、不阻塞 UI、标注 token 量
+- 新增状态管理规则：状态集中 WorldState、单向数据流、存档兼容性
+- 项目结构更新为 v3.0 实际目录
+- 自检清单从 6 项扩充到 12 项（分层 + 体积 + 卫生 + 安全四维）
+
+### v3.3 — 2026-04-19
+
+电影叙事风美术重构 Sprint 1：视觉骨架搭建。
+
+**布局重构**
+- 所有屏幕从 flex 分段式布局改为全屏场景 + 浮动面板结构
+- 不使用 letterbox 遮幅，改用 vignette 暗角模拟电影感（保留垂直空间给文字）
+
+**场景背景系统**
+- 新建 SceneBackground 组件：5 层叠加（CSS 径向渐变底色 + 阶段色调滤镜 + 烛光呼吸动画 + SVG feTurbulence 噪点 + vignette 暗角）
+- 3 阶段色调自动切换：冷靛蓝（危机揭示）→ 暖琥珀（激辩定策）→ 深红金（最终决断），3s ease 过渡
+- 全部纯 CSS 实现，无真实图片依赖，可降级
+
+**对话系统改造**
+- 新建 DialoguePanel 组件，替代 DialogueFlow 滚动消息流
+- 改为单条对话展示 + 翻页浏览（空格/方向键/点击），`[当前/总数]` 进度指示
+- 毛玻璃面板（glass-panel：`rgba(10,10,15,0.85)` + `backdrop-filter: blur(12px)`）
+- 括号内动作描写自动渲染为斜体灰色
+- 旁白模式：无面板框，居中大字 + 金色分隔线装饰
+
+**交互卡片化**
+- ActionPanel 从横排按钮改为 2 列网格卡片
+- 深色底 + 金色细边框，hover 时边框亮起 + `scale(1.02)` 微放大
+
+**标题画面**
+- 电影海报式重设计：Ma Shan Zheng 书法字体标题 + 金色 text-shadow 发光
+- 渐变金色分隔线 + `letter-spacing: 0.3em` 副标题
+- Stagger 入场动画序列（标题 → 副标题 → 分隔线 → 按钮，各延迟 0.5s）
+- 所有按钮改为透明底 + 金色边框 + hover 发光
+
+**全局视觉统一**
+- 所有屏幕（日常活动、日报、过场、结局、加载、错误）统一 SceneBackground + 金色边框按钮风格
+- index.css 新增书法字体类、烛光呼吸动画、毛玻璃通用样式
+- `prefers-reduced-motion` 降级：关闭所有动画
+
+### v3.4 — 2026-04-19
+
+LLM prompt 约束集中化 + NPC 并行决策 + 自动化测试基础设施。
+
+**约束系统重构**
+- 新建 promptConstraints.ts 作为 LLM prompt 约束中枢，统一管理历史事实层（人物表、禁用词）和称谓规则
+- 导出 `buildConstraintBlock(dateStr, intensityConstraint, detailed?)` 统一拼装约束，消费方不再各自拼字符串
+- promptBuilder.ts / npcPromptBuilder.ts / eventRunner.ts 全部改为引用 promptConstraints.ts
+- 删除旧的 historicalConstraint.ts（内容合并到 promptConstraints.ts）
+
+**NPC 决策并行化**
+- worldSimulator.ts 的 `runWorldTick()` 中 NPC 决策从串行改为 `Promise.all` 并行
+- 分三阶段：确定性规则过滤（串行）→ LLM 决策（并行）→ 结果合并（串行）
+- 3 个 NPC 的日决策延迟从 ~3x 降为 ~1x
+
+**自动化测试基础设施**
+- 新建 autoplay.test.ts 自动跑局脚本：vitest 驱动，mock localStorage，随机活动 + 随机玩家输入，实时 flush JSON 日志
+- 玩家输入池 6 类（观望/散场/决断/消极/对抗/申辩），随机打散
+- 内置滑动窗口速率限制器（RPM_LIMIT=13），适配 Gemini 等低频 API
+- ⚠️ **已知问题**：约束重构后 autoplay 脚本在 vitest 中运行不稳定（`Cannot read properties of undefined (reading 'config')`），疑似 vitest Windows 环境下模块加载竞争问题，待排查
+
+**单测补全**
+- 新增 skeletons.test.ts（77 用例）：批量验证 8 种骨架模板结构 + 关键业务值
+- 新增 eventGenerator.test.ts（13 用例）：事件生成 mock LLM 测试
+- 新增 eventRunner.test.ts（9 用例）：EventInstance → SceneConfig 适配测试
+- 新增 npcPromptBuilder.test.ts（14 用例）：NPC 决策 prompt 构造测试
+- 全量 220 用例通过
+
+**Eval 框架（第一版方案）**
+- 新建 .claude/skills/eval/ 评估 skill：读取 autoplay 日志，计算量化指标 + LLM-as-Judge 半自动评估
+- 待 autoplay 稳定后启用
+
+### v3.4.1 — 2026-04-20
+
+叙事结局安全网 + NPC 决策修复 + 叙事约束补齐 + 引擎目录清理。
+
+**叙事结局安全网**
+- worldSimulator.ts 新增 `detectNarrativeEnding(summary)` 正则检测：事件结局文本含终结性关键词（幽禁/囚禁/斩首/处死/流放/削爵等）时直接触发 game over
+- 匹配要求主语含"秦王/李世民/世民"，避免误匹配 NPC 遭遇
+- 叙事检测优先于机械检测（压力阈值/骨架类型），零 token 开销
+- 修复了 autoplay 中 Day 2 "秦王被幽禁"但游戏继续推进 27 天的 bug
+
+**NPC 决策修复**
+- 修复 100% NPC 决策降级问题：prompt 中世界状态显示中文标签但 normalizeIntent 期望英文 axisId，导致所有 pressureDeltas 被丢弃
+- npcPromptBuilder 世界状态行增加英文 ID、白名单提示改纯英文 ID、JSON 示例用具体英文 ID
+- NPC 压力白名单调整：尉迟敬德增加 jiancheng_hostility，三人职能分化更明确
+
+**叙事 prompt 约束补齐**
+- buildSystemPrompt 输出格式段追加 3 条写作规则：禁未来事件、白描史书体、称谓不混用
+- buildMessages 结局 prompt 注入当前游戏日期，防止 LLM 在一月就写出六月的事件
+- 结局硬性约束：禁止出现玄武门之变/登基/即位/贞观/太宗，禁止时间跳跃
+
+**引擎目录清理**
+- 删除废弃文件：campaignManager.ts、outcomeBuilder.ts、__test__promptBuilder.ts
+- promptBuilder.ts 从 engine/ 根移至 engine/world/，与 npcPromptBuilder.ts 同级
+- 7 个测试文件迁入 engine/world/__tests__/，源码目录更清爽
+
+**Autoplay 扩展**
+- MAX_DAYS 从 15 提升到 30，超时从 30 分钟提升到 60 分钟
+- 成功跑完全程（136 条日志，~28 分钟）
 
 ## 后续规划
 

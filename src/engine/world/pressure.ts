@@ -22,12 +22,12 @@ export interface PressureAxisConfig {
 }
 
 export const DEFAULT_PRESSURE_CONFIGS: PressureAxisConfig[] = [
-  { id: 'succession_crisis',     initialValue: 45, velocity: 0.3,  baseline: 70, floor: 30, ceiling: 100, decayRate: 0.05 },
-  { id: 'jiancheng_hostility',   initialValue: 40, velocity: 0.5,  baseline: 55, floor: 20, ceiling: 100, decayRate: 0.03 },
-  { id: 'yuanji_ambition',       initialValue: 35, velocity: 0.3,  baseline: 45, floor: 15, ceiling: 100, decayRate: 0.04 },
-  { id: 'court_opinion',         initialValue: 30, velocity: 0.2,  baseline: 40, floor: 10, ceiling: 100, decayRate: 0.05 },
-  { id: 'qinwangfu_desperation', initialValue: 25, velocity: 0.3,  baseline: 35, floor: 10, ceiling: 100, decayRate: 0.04 },
-  { id: 'imperial_suspicion',    initialValue: 20, velocity: 0.2,  baseline: 30, floor: 10, ceiling: 100, decayRate: 0.05 },
+  { id: 'succession_crisis',     initialValue: 45, velocity: 0.6,  baseline: 70, floor: 30, ceiling: 100, decayRate: 0.05 },
+  { id: 'jiancheng_hostility',   initialValue: 40, velocity: 1.0,  baseline: 55, floor: 20, ceiling: 100, decayRate: 0.03 },
+  { id: 'yuanji_ambition',       initialValue: 35, velocity: 0.6,  baseline: 45, floor: 15, ceiling: 100, decayRate: 0.04 },
+  { id: 'court_opinion',         initialValue: 30, velocity: 0.4,  baseline: 40, floor: 10, ceiling: 100, decayRate: 0.05 },
+  { id: 'qinwangfu_desperation', initialValue: 25, velocity: 0.6,  baseline: 35, floor: 10, ceiling: 100, decayRate: 0.04 },
+  { id: 'imperial_suspicion',    initialValue: 20, velocity: 0.4,  baseline: 30, floor: 10, ceiling: 100, decayRate: 0.05 },
   { id: 'military_readiness',    initialValue: 20, velocity: -0.1, baseline: 20, floor: 0,  ceiling: 100, decayRate: 0.03 },
 ];
 
@@ -134,6 +134,32 @@ export function snapshotPressure(
     snapshot[id] = axes[id].value;
   }
   return snapshot;
+}
+
+export type NarrativeIntensity = 'low' | 'medium' | 'high' | 'extreme';
+
+export function getNarrativeIntensity(
+  axes: Record<PressureAxisId, PressureAxis>,
+): { level: NarrativeIntensity; constraint: string } {
+  const values = Object.values(axes).map((a) => a.value);
+  const avg = values.reduce((s, v) => s + v, 0) / values.length;
+
+  if (avg >= 75) return {
+    level: 'extreme',
+    constraint: '叙事烈度：极高。允许武装冲突、兵变、生死摊牌。',
+  };
+  if (avg >= 55) return {
+    level: 'high',
+    constraint: '叙事烈度：高。允许暗杀阴谋、逼宫、阵营分裂、直接对抗，但不允许全面武装冲突。',
+  };
+  if (avg >= 30) return {
+    level: 'medium',
+    constraint: '叙事烈度：中。允许公开争论、弹劾、政治拉拢、小规模冲突，但不允许暗杀或武装对抗。',
+  };
+  return {
+    level: 'low',
+    constraint: '叙事烈度：低。只允许暗流涌动、试探、情报收集、日常政务，禁止任何公开冲突或武力对抗。',
+  };
 }
 
 // ===== 事件触发检查 =====

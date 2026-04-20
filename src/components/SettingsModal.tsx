@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { LLMConfig } from '../types';
 import { getRegisteredProviders } from '../engine/llm';
+import { SETTINGS_STORAGE_KEY } from './settingsStorage';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -25,18 +26,6 @@ const MODEL_PLACEHOLDERS: Record<string, string> = {
   moonshot: 'moonshot-v1-8k',
 };
 
-const STORAGE_KEY = 'xuanwumen_llm_config';
-
-export function loadSavedConfig(): LLMConfig | null {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw) as LLMConfig;
-  } catch {
-    return null;
-  }
-}
-
 export default function SettingsModal({ isOpen, onSave, onClose, initialConfig }: SettingsModalProps) {
   const providers = getRegisteredProviders();
   const [provider, setProvider] = useState(initialConfig?.provider || providers[0] || 'openai');
@@ -56,7 +45,7 @@ export default function SettingsModal({ isOpen, onSave, onClose, initialConfig }
       model: model || MODEL_PLACEHOLDERS[provider] || 'model-name',
       baseUrl: baseUrl || undefined,
     };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(config));
     onSave(config);
   };
 

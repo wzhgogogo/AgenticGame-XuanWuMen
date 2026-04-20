@@ -1,5 +1,6 @@
 import type { WorldState, WorldTickResult } from '../types/world';
 import WorldStateHud from './WorldStateHud';
+import SceneBackground from './SceneBackground';
 
 interface DailyBriefingScreenProps {
   state: WorldState;
@@ -17,17 +18,19 @@ export default function DailyBriefingScreen({
   const lines = tickResult.dailyBriefing.split('\n');
 
   return (
-    <div className="h-screen flex flex-col">
-      <WorldStateHud state={state} />
+    <div className="h-screen relative flex flex-col">
+      <SceneBackground />
+      <div className="relative z-10">
+        <WorldStateHud state={state} />
+      </div>
 
-      <div className="flex-1 flex items-center justify-center px-4">
-        <div className="max-w-md w-full animate-fade-in">
+      <div className="flex-1 relative z-10 flex items-center justify-center px-4">
+        <div className="max-w-md w-full">
           {/* 日报内容 */}
-          <div className="mb-8">
+          <div className="glass-panel rounded-lg px-6 py-5 mb-6 animate-fade-in">
             {lines.map((line, i) => {
               if (!line.trim()) return <div key={i} className="h-3" />;
 
-              // 标题行（带【】）
               if (line.startsWith('【')) {
                 return (
                   <p
@@ -40,7 +43,6 @@ export default function DailyBriefingScreen({
                 );
               }
 
-              // 紧急事态提示
               if (line.includes('紧急事态')) {
                 return (
                   <p
@@ -53,7 +55,6 @@ export default function DailyBriefingScreen({
                 );
               }
 
-              // 普通内容
               return (
                 <p
                   key={i}
@@ -69,8 +70,7 @@ export default function DailyBriefingScreen({
           {/* NPC 行动摘要 */}
           {tickResult.npcActions.length > 0 && (
             <div
-              className="mb-6 px-3 py-2 rounded-sm"
-              style={{ backgroundColor: '#1a1a24', border: '1px solid #2a2a34' }}
+              className="glass-panel rounded-lg mb-6 px-4 py-3"
             >
               <p className="text-xs mb-2" style={{ color: '#8a8070' }}>
                 府中动态
@@ -87,17 +87,20 @@ export default function DailyBriefingScreen({
           <div className="flex justify-center">
             <button
               onClick={onProceed}
-              className="px-8 py-2.5 rounded-sm text-sm font-ui cursor-pointer transition-colors"
+              className="px-10 py-2.5 rounded text-sm font-ui cursor-pointer"
               style={{
-                backgroundColor: hasEvents ? '#3a2020' : '#2a2a34',
+                backgroundColor: 'transparent',
                 color: '#e8e0d0',
-                border: hasEvents ? '1px solid #E24B4A40' : 'none',
+                border: `1px solid ${hasEvents ? 'rgba(199, 62, 58, 0.4)' : 'rgba(201, 168, 76, 0.4)'}`,
+                transition: 'all 0.2s ease',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = hasEvents ? '#4a2828' : '#3a3a44';
+                e.currentTarget.style.borderColor = hasEvents ? 'rgba(199, 62, 58, 0.7)' : 'rgba(201, 168, 76, 0.7)';
+                e.currentTarget.style.boxShadow = `0 0 20px ${hasEvents ? 'rgba(199, 62, 58, 0.1)' : 'rgba(201, 168, 76, 0.1)'}`;
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = hasEvents ? '#3a2020' : '#2a2a34';
+                e.currentTarget.style.borderColor = hasEvents ? 'rgba(199, 62, 58, 0.4)' : 'rgba(201, 168, 76, 0.4)';
+                e.currentTarget.style.boxShadow = 'none';
               }}
             >
               {hasEvents ? '处理事态' : '翌日'}

@@ -24,3 +24,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Claude Code 本地配置与 autoplay 日志
+.claude/
+scripts/logs/

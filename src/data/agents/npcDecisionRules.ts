@@ -1,117 +1,123 @@
-import type { NpcDecisionRule } from '../../types/world';
+import type { NpcDecisionRule, NpcImpactProfile } from '../../types/world';
+
+// ===== 每 NPC 压力影响白名单 =====
+// LLM 提议的 pressureDelta 只在白名单内被采纳，超出即丢弃该条（不是整个 intent）
+export const NPC_IMPACT_PROFILES: Record<string, NpcImpactProfile> = {
+  changsun_wuji: {
+    whitelist: ['court_opinion', 'succession_crisis', 'jiancheng_hostility'],
+  },
+  weichi_jingde: {
+    whitelist: ['military_readiness', 'qinwangfu_desperation', 'imperial_suspicion', 'jiancheng_hostility'],
+  },
+  fang_xuanling: {
+    whitelist: ['succession_crisis', 'qinwangfu_desperation', 'court_opinion'],
+  },
+};
 
 // ===== 长孙无忌：谨慎谋士 =====
 // 特征：耐心高，不会直接逼迫，偏好政治手段和情报收集
-// 只有局势非常严峻时才会转向激进
-
 export const changSunWujiRules: NpcDecisionRule[] = [
-  // 日常：收集情报、游说中立派
+  // 日常：观望 / 情报 / 温和进言
   {
-    conditions: { daysSinceLastActionAbove: 2 },
-    enabledActions: ['gather_intel', 'lobby'],
-    basePressureEffects: [],
+    id: 'csw_daily',
+    conditions: {},
+    allowedStances: ['observe', 'intel', 'persuade'],
   },
-  // 局势紧张时：暗中谋划、联络盟友
+  // 局势紧张：加入谋划和联络
   {
-    conditions: {
-      pressureAbove: { succession_crisis: 60 },
-    },
-    enabledActions: ['scheme', 'seek_allies'],
-    basePressureEffects: [
-      { axisId: 'military_readiness', delta: 1, reason: '无忌暗中布局', source: 'changsun_wuji' },
-    ],
+    id: 'csw_tense',
+    conditions: { pressureAbove: { succession_crisis: 55 } },
+    allowedStances: ['intel', 'persuade', 'scheme'],
+    escalationHint: '储位已明紧张，须有所筹谋',
   },
-  // 急迫到极点：向玩家施压（但措辞温和）
+  // 府中急迫：加入对抗
   {
+    id: 'csw_urgent',
     conditions: {
-      patienceBelow: 30,
-      pressureAbove: { qinwangfu_desperation: 70 },
+      patienceBelow: 40,
+      pressureAbove: { qinwangfu_desperation: 60 },
     },
-    enabledActions: ['pressure_player'],
-    basePressureEffects: [
-      { axisId: 'qinwangfu_desperation', delta: 3, reason: '无忌谏言催促', source: 'changsun_wuji' },
-    ],
+    allowedStances: ['persuade', 'scheme', 'confront'],
+    escalationHint: '府中众心已动，须催秦王决断',
+  },
+  // 破局：私通或出走（一生一次）
+  {
+    id: 'csw_abandon',
+    conditions: {
+      patienceBelow: 10,
+      pressureAbove: { qinwangfu_desperation: 80, succession_crisis: 75 },
+    },
+    allowedStances: ['abandon', 'confront'],
+    escalationHint: '若秦王仍犹豫，无忌可能挂冠或另投',
+    once: true,
   },
 ];
 
 // ===== 尉迟敬德：暴烈武将 =====
 // 特征：耐心低、衰减快，偏好直接对抗
-// 极端情况下会直接逼宫或出走
-
 export const weiChiJingDeRules: NpcDecisionRule[] = [
-  // 日常：等待，但越来越不耐烦
+  // 耐心高：观望为主，可以练兵
   {
+    id: 'wcj_calm',
     conditions: { patienceAbove: 60 },
-    enabledActions: ['wait'],
-    basePressureEffects: [],
+    allowedStances: ['observe', 'intel', 'mobilize'],
   },
-  // 有些焦躁：练兵、提升军事准备
+  // 耐心中段：加紧练兵、温和进言
   {
-    conditions: {
-      patienceBelow: 60,
-      patienceAbove: 30,
-    },
-    enabledActions: ['gather_intel'],
-    basePressureEffects: [
-      { axisId: 'military_readiness', delta: 2, reason: '敬德加紧练兵', source: 'weichi_jingde' },
-    ],
+    id: 'wcj_restless',
+    conditions: { patienceBelow: 60, patienceAbove: 30 },
+    allowedStances: ['persuade', 'mobilize', 'scheme'],
+    escalationHint: '敬德心中焦躁，欲加紧武备',
   },
-  // 非常焦躁：向玩家施压
+  // 耐心低：直接催促或对抗
   {
+    id: 'wcj_aggressive',
     conditions: {
       patienceBelow: 30,
       pressureAbove: { qinwangfu_desperation: 50 },
     },
-    enabledActions: ['pressure_player', 'confront'],
-    basePressureEffects: [
-      { axisId: 'qinwangfu_desperation', delta: 5, reason: '敬德急躁催促', source: 'weichi_jingde' },
-    ],
+    allowedStances: ['confront', 'mobilize'],
+    escalationHint: '敬德已按捺不住，或当面逼秦王决断',
   },
-  // 最后通牒：耐心耗尽
+  // 破局：逼宫（一生一次）
   {
+    id: 'wcj_breakdown',
     conditions: {
       patienceBelow: 15,
-      pressureAbove: { qinwangfu_desperation: 75 },
+      pressureAbove: { qinwangfu_desperation: 70 },
     },
-    enabledActions: ['confront'],
-    basePressureEffects: [
-      { axisId: 'qinwangfu_desperation', delta: 20, reason: '敬德最后通牒', source: 'weichi_jingde' },
-    ],
+    allowedStances: ['breakdown', 'confront'],
+    escalationHint: '敬德可能越级调兵、直闯秦王府逼决断',
+    once: true,
     triggerEvent: 'skeleton_subordinate_ultimatum',
   },
 ];
 
 // ===== 房玄龄：稳健谋士 =====
 // 特征：耐心最高，擅长谋划和情报分析
-// 偏好慢工出细活，很少直接施压
-
 export const fangXuanLingRules: NpcDecisionRule[] = [
-  // 日常：收集情报、分析局势
+  // 日常：观望 / 情报 / 谋划
   {
-    conditions: { daysSinceLastActionAbove: 3 },
-    enabledActions: ['gather_intel', 'scheme'],
-    basePressureEffects: [],
+    id: 'fxl_daily',
+    conditions: {},
+    allowedStances: ['observe', 'intel', 'scheme'],
   },
-  // 有规划地推进
+  // 推进阶段：加上温和进言
   {
-    conditions: {
-      pressureAbove: { succession_crisis: 55 },
-    },
-    enabledActions: ['scheme', 'seek_allies'],
-    basePressureEffects: [
-      { axisId: 'military_readiness', delta: 1, reason: '玄龄谋划部署', source: 'fang_xuanling' },
-    ],
+    id: 'fxl_planning',
+    conditions: { pressureAbove: { succession_crisis: 50 } },
+    allowedStances: ['intel', 'scheme', 'persuade'],
+    escalationHint: '储位将明，玄龄须与无忌定方略',
   },
-  // 关键时刻：联合无忌一起施压
+  // 关键时刻：加入对抗
   {
+    id: 'fxl_urgent',
     conditions: {
-      patienceBelow: 25,
+      patienceBelow: 30,
       pressureAbove: { qinwangfu_desperation: 65 },
     },
-    enabledActions: ['pressure_player', 'lobby'],
-    basePressureEffects: [
-      { axisId: 'qinwangfu_desperation', delta: 3, reason: '玄龄联合谏言', source: 'fang_xuanling' },
-    ],
+    allowedStances: ['persuade', 'scheme', 'confront'],
+    escalationHint: '玄龄须联无忌共谏秦王',
   },
 ];
 

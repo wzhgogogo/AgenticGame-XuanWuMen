@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createCalendar, advanceDay, advanceTimeOfDay, formatDate, formatCalendar, formatMonth, isAfterDate, getDaysInMonth } from './calendar';
+import { createCalendar, advanceDay, advanceTimeOfDay, formatDate, formatCalendar, formatMonth, isAfterDate, getDaysInMonth } from '../calendar';
 
 describe('createCalendar', () => {
   it('creates calendar with default values', () => {

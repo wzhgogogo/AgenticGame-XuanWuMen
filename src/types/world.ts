@@ -1,4 +1,4 @@
-import type { PhaseConfig } from './index';
+import type { PhaseConfig, MemoryEntry } from './index';
 
 // ===== 日历系统 =====
 
@@ -52,15 +52,18 @@ export interface FactionState {
 
 // ===== NPC Agent =====
 
-export type NpcActionType =
-  | 'lobby'              // 游说/拉拢
-  | 'confront'           // 当面对质/逼迫
-  | 'scheme'             // 暗中谋划
-  | 'gather_intel'       // 收集情报
-  | 'wait'               // 按兵不动
-  | 'pressure_player'    // 向玩家施压
-  | 'seek_allies'        // 联络盟友
-  | 'sabotage';          // 破坏/阻挠
+/**
+ * NPC 立场大类。规则层只定立场，LLM 在立场内自由产出具体 action 文本。
+ */
+export type NpcStance =
+  | 'observe'     // 观望：听朝议、按兵不动
+  | 'intel'       // 情报：探亲信、布暗桩
+  | 'persuade'    // 温和施压：上书、夜谈、劝谏
+  | 'scheme'      // 暗中谋划：串联、立誓
+  | 'confront'    // 当面对抗：闯府、质问
+  | 'mobilize'    // 动员武力：练兵、点将、藏甲
+  | 'breakdown'   // 失控：越级调兵、逼宫秦王（全局限 1 次）
+  | 'abandon';    // 出走/被收买：挂冠、投敌（全局限 1 次）
 
 export interface NpcAgentState {
   characterId: string;
@@ -70,18 +73,23 @@ export interface NpcAgentState {
   currentPlan: string | null;
   recentActions: NpcAction[];
   daysSinceLastAction: number;
+  consumedOnceRules?: string[]; // 已消耗的 once 规则 id（breakdown/abandon 用）
 }
 
 export interface NpcAction {
   characterId: string;
-  actionType: NpcActionType;
+  stance: NpcStance;
+  action: string;            // LLM 自由命名的具体动作，如"夜召秦叔宝点检甲胄"
   description: string;
+  target?: string;
   pressureEffects: PressureModifier[];
   triggerEvent?: string;     // 可直接触发某个骨架事件
   narrativeHook?: string;    // 用于日报叙事
+  degradeLevel?: 0 | 1 | 2 | 3; // 降级等级：0=合法, 1=矫正, 2=stance降级, 3=回退observe
 }
 
 export interface NpcDecisionRule {
+  id?: string;               // 规则 id（once 规则必需，用于消耗追踪）
   conditions: {
     patienceBelow?: number;
     patienceAbove?: number;
@@ -91,9 +99,17 @@ export interface NpcDecisionRule {
     relationshipBelow?: { targetId: string; trust: number };
     relationshipAbove?: { targetId: string; trust: number };
   };
-  enabledActions: NpcActionType[];
-  basePressureEffects: PressureModifier[];
+  allowedStances: NpcStance[];
+  escalationHint?: string;   // 注入 prompt 的情绪提示
+  once?: boolean;            // true = 本规则触发一次后永久失效
   triggerEvent?: string;
+}
+
+/**
+ * 每 NPC 配置的影响白名单：LLM 提议的 pressureDelta 只有在白名单内才被采纳。
+ */
+export interface NpcImpactProfile {
+  whitelist: PressureAxisId[];
 }
 
 // ===== 幕后 Agent（建成/元吉/李渊） =====
@@ -236,6 +252,7 @@ export interface WorldState {
   eventLog: CompletedEvent[];
   pendingEvents: PendingEvent[];
   globalFlags: Record<string, boolean | number | string>;
+  characterMemories: Record<string, MemoryEntry[]>;
 }
 
 // ===== 前端状态机 =====
@@ -246,6 +263,13 @@ export type GameMode =
   | 'daily_briefing'
   | 'event_scene'
   | 'game_over';
+
+export type EndingType =
+  | 'coup_success'            // 兵变成功，秦王登基
+  | 'coup_fail_captured'      // 兵变失败，被擒被杀
+  | 'coup_fail_civil_war_win' // 兵变失败但内战后胜利
+  | 'deposed'                 // 隐忍路线，被废/流放/被杀
+  | 'peace';                  // 隐忍路线，兄弟和好（极难）
 
 export interface WorldTickResult {
   pressureChanges: PressureModifier[];

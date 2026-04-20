@@ -4,10 +4,10 @@ import type { EventSkeleton } from '../../types/world';
 export const intelligenceEvent: EventSkeleton = {
   id: 'skeleton_intelligence_event',
   category: '情报事件',
-  description: '秦王府获得或丢失关键情报——可能是密报传来，也可能是己方间谍暴露。',
+  description: '秦王府收到重要情报',
 
   preconditions: [
-    { type: 'day_range', params: { minDay: 5, maxDay: 180 } },
+    { type: 'day_range', params: { minDay: 2, maxDay: 180 } },
   ],
   pressureTriggers: [
     {

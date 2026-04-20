@@ -1,5 +1,6 @@
-import type { Character, SceneConfig, SceneOutcome, DialogueEntry, GameState } from '../types';
-import type { LLMMessage } from './llm/types';
+import type { Character, SceneConfig, SceneOutcome, DialogueEntry } from '../../types';
+import type { LLMMessage } from '../llm/types';
+import { NAMING_RULES, HISTORICAL_CONTEXT } from '../../data/promptConstraints';
 
 // ===== 内部辅助：构建角色描述块（三层记忆） =====
 
@@ -95,28 +96,7 @@ export function buildSystemPrompt(
   sections.push(`你是一个历史互动叙事游戏的AI叙事引擎。你同时扮演多个NPC角色与旁白。
 你必须严格保持每个NPC的性格、语言风格和立场，绝不混淆。
 
-===== 称谓与人物关系规则（所有角色必须遵守） =====
-
-正式称谓：
-NPC称呼皇帝李渊→"陛下"或"圣上"。
-NPC称呼太子李建成→"太子"或"太子殿下"。
-NPC称呼齐王李元吉→"齐王"。
-NPC称呼秦王李世民→"殿下"或"秦王"。
-NPC称呼淮安王李神通→"淮安王"。
-
-亲属称呼（仅限玩家角色李世民使用）：
-李世民称李渊→"父皇"。
-李世民称李建成→"大哥"或"太子"。
-李世民称李元吉→"四弟"或"齐王"。
-李世民称李神通→"叔父"。
-
-其他皇族互称：
-李建成称李世民→"二郎"或"秦王"。
-李元吉称李世民→"二哥"或"秦王"。
-李神通称李世民→"世民"或"秦王"（叔侄关系，非兄弟）。
-
-配角行为规范：
-旁白中出现的非NPC人物（如李神通、傅奕、李建成、李元吉等）须符合其历史身份和地位。皇族成员不可出现跪求、哀求等不合身份的描写。`);
+${NAMING_RULES}`);
 
   // 1.5 前情回顾（跨场景时注入）
   if (previousSceneSummary) {
@@ -128,7 +108,9 @@ NPC称呼淮安王李神通→"淮安王"。
 场景: ${scene.id}
 时间: ${scene.time}
 地点: ${scene.location}
-当前阶段: ${phase.name}（第${phase.turnRange[0]}~${phase.turnRange[1]}回合）`);
+当前阶段: ${phase.name}（第${phase.turnRange[0]}~${phase.turnRange[1]}回合）
+
+【约束】${scene.narrativeConstraint || `${HISTORICAL_CONTEXT}\n当前日期：${scene.time}。禁止时间跳跃。`}`);
 
   // 3. 玩家角色
   if (player) {
@@ -165,7 +147,10 @@ ${buildCharacterBlock(player)}`);
 - characterId 只能使用以下值：${npcIdList}
 - suggestedActions: 提供2~4个玩家可选的行动建议，符合当前阶段的剧情走向
 - 每个NPC的台词必须符合其性格和语言风格设定
-- 当前阶段建议行动方向: ${phase.suggestedActions.join('、')}`);
+- 当前阶段建议行动方向: ${phase.suggestedActions.join('、')}
+- narrator 禁止出现尚未发生的事件（玄武门之变、登基、即位、贞观、太宗等）
+- narrator 用白描史书体，不用现代比喻（如"火种""暗流""风暴"）
+- 每个NPC台词必须用其设定的称谓规则，不得混用`);
 
   // 6. 结局触发
   sections.push(`===== 结局机制 =====
@@ -188,21 +173,24 @@ export function buildMessages(
   llmMessages: Array<{ role: 'user' | 'assistant'; content: string }>,
   isEnding: boolean,
   isSoftEnding?: boolean,
+  currentDate?: string,
 ): LLMMessage[] {
   const messages: LLMMessage[] = [
     { role: 'system', content: systemPrompt },
     ...llmMessages.map((m) => ({ role: m.role as LLMMessage['role'], content: m.content })),
   ];
 
+  const datePrefix = `当前游戏日期：${currentDate ?? '未知'}。`;
+
   if (isEnding) {
     messages.push({
       role: 'system',
-      content: '现在已经到达结局阶段。请根据之前的对话内容，在本轮回复的JSON中加入 "ending" 字段，撰写200-400字的结局描述。suggestedActions 设为空数组。',
+      content: `${datePrefix}现在已经到达结局阶段。请根据之前的对话内容，在本轮回复的JSON中加入 "ending" 字段，撰写200-400字的结局描述。suggestedActions 设为空数组。\n\n【结局写作硬性约束】\n- 结局只能描写本场景内已经发生的事，不得快进到未来\n- 不得描写场景之后的任何事件走向、最终结局或历史结论\n- 不得出现：玄武门之变、血洗玄武门、登基、即位、入继大统、贞观、太宗\n- 不得以"此后""不久之后""数月后"等方式跳跃时间\n- 违反以上任一条，视为输出无效`,
     });
   } else if (isSoftEnding) {
     messages.push({
       role: 'system',
-      content: '对话已进行多轮，场景可以走向收束。如果你判断冲突已经有了结果，可以在JSON中加入 "ending" 字段撰写结局。如果冲突仍在发展中，则继续正常对话。',
+      content: `${datePrefix}对话已进行多轮，场景可以走向收束。如果你判断冲突已经有了结果，可以在JSON中加入 "ending" 字段撰写结局。如果冲突仍在发展中，则继续正常对话。\n\n注意：结局只能描写本场景内已发生的事，不得快进到未来，不得出现玄武门之变、登基、即位等尚未发生的事件。`,
     });
   }
 
@@ -213,7 +201,6 @@ export function buildMessages(
 
 export function buildUserMessages(
   dialogueHistory: DialogueEntry[],
-  _gameState: GameState,
 ): LLMMessage[] {
   const messages: LLMMessage[] = [];
 

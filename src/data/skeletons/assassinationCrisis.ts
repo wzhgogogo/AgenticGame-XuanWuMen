@@ -4,7 +4,7 @@ import type { EventSkeleton } from '../../types/world';
 export const assassinationCrisis: EventSkeleton = {
   id: 'skeleton_assassination_crisis',
   category: '暗杀危机',
-  description: '敌对方策划直接的物理消灭——伏兵、刺客、或围杀。',
+  description: '敌对方策划直接的刺杀行动',
 
   preconditions: [
     { type: 'pressure_above', params: { axisId: 'jiancheng_hostility', value: 75 } },

@@ -4,11 +4,10 @@ import type { EventSkeleton } from '../../types/world';
 export const politicalConfrontation: EventSkeleton = {
   id: 'skeleton_political_confrontation',
   category: '政治对抗',
-  description: '敌对方在朝堂上对秦王发起政治攻击——弹劾、削权、或以天象为由打压。',
+  description: '敌对方在朝堂上对秦王发起政治攻击',
 
   preconditions: [
     { type: 'pressure_above', params: { axisId: 'court_opinion', value: 50 } },
-    { type: 'day_range', params: { minDay: 10, maxDay: 180 } },
   ],
   pressureTriggers: [
     {

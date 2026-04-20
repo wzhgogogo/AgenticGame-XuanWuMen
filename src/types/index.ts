@@ -78,6 +78,7 @@ export interface SceneConfig {
     minTurns: number;
     maxTurns: number;
   };
+  narrativeConstraint?: string;
 }
 
 export interface PhaseConfig {
@@ -183,4 +184,13 @@ export interface LLMConfig {
   baseUrl?: string;
   model: string;
   maxTokens?: number;
+}
+
+// ===== Debug =====
+
+export interface DebugLogEntry {
+  timestamp: number;
+  category: 'llm_call' | 'npc_decision' | 'event_trigger' | 'pressure' | 'memory' | 'system';
+  title: string;
+  detail?: string;
 }

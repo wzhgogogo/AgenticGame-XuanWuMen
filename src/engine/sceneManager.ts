@@ -2,8 +2,9 @@ import type {
   GameState, DialogueEntry, SceneConfig, Character, PhaseConfig,
 } from '../types';
 import type { LLMProvider } from './llm/types';
-import { buildSystemPrompt, buildMessages, buildFirstNpcMessage } from './promptBuilder';
-import { extractJson } from './jsonExtractor';
+import { buildSystemPrompt, buildMessages, buildFirstNpcMessage } from './world/promptBuilder';
+import { extractJson, stripThinkingTags } from './jsonExtractor';
+import { debugLog } from './debugLog';
 
 // ===== 工具函数 =====
 
@@ -190,16 +191,27 @@ export class SceneManager {
       return true;
     }
 
-    // 软上限区间 [minTurns, maxTurns)：允许 LLM 自行判断结局，或玩家意图触发
-    if (playerInput && turns >= Math.floor(minTurns / 2)) {
-      const endingPatterns = [
-        '准备', '动手', '出发', '行动', '决定了', '就这么办',
-        '下令', '传令', '各自', '散了', '不再犹豫', '誓',
-        '放弃', '不干了', '算了', '罢了', '投降', '归顺',
-      ];
+    if (playerInput) {
       const input = playerInput.trim();
-      if (endingPatterns.some((p) => input.includes(p))) {
+
+      // 散场类：玩家明确要结束，不受回合数限制
+      const dismissPatterns = [
+        '下去', '退下', '散去', '就这样', '到此为止', '先退下',
+        '散了', '放弃', '不干了', '算了', '罢了', '投降', '归顺',
+      ];
+      if (dismissPatterns.some((p) => input.includes(p))) {
         return true;
+      }
+
+      // 决策类：需要足够回合铺垫
+      if (turns >= Math.floor(minTurns / 2)) {
+        const decisionPatterns = [
+          '准备', '动手', '出发', '行动', '决定了', '就这么办',
+          '下令', '传令', '各自', '不再犹豫', '誓',
+        ];
+        if (decisionPatterns.some((p) => input.includes(p))) {
+          return true;
+        }
       }
     }
 
@@ -224,11 +236,13 @@ export class SceneManager {
       this.state.llmMessages,
       isEnding,
       isSoftEnding,
+      this.scene.time,
     );
 
     let fullResponse = '';
 
     try {
+      debugLog('llm_call', `场景对话`, `System prompt (前200字):\n${this.systemPrompt.slice(0, 200)}...\n\n玩家输入: ${playerInput}`);
       const response = await this.llmProvider.chat(messages, (chunk: string) => {
         fullResponse += chunk;
       });
@@ -251,6 +265,7 @@ export class SceneManager {
     }
 
     // 解析响应
+    debugLog('llm_call', `场景LLM返回`, fullResponse.slice(0, 500));
     const parsed = this.parseNpcResponse(fullResponse);
 
     // 添加解析后的 entries 到对话历史
@@ -260,8 +275,8 @@ export class SceneManager {
     };
     this.notifyListeners();
 
-    // 记录到 llmMessages
-    this.setState({ llmMessages: [...this.state.llmMessages, { role: 'assistant', content: fullResponse }] });
+    // 记录到 llmMessages（去除思考标签）
+    this.setState({ llmMessages: [...this.state.llmMessages, { role: 'assistant', content: stripThinkingTags(fullResponse) }] });
 
     // 检查结局
     if (parsed.ending) {
@@ -288,12 +303,15 @@ export class SceneManager {
 
         // narrator
         if (parsed.narrator) {
-          entries.push({
-            id: generateId(),
-            type: 'narrator',
-            content: parsed.narrator,
-            timestamp: Date.now(),
-          });
+          const cleaned = stripThinkingTags(parsed.narrator);
+          if (cleaned) {
+            entries.push({
+              id: generateId(),
+              type: 'narrator',
+              content: cleaned,
+              timestamp: Date.now(),
+            });
+          }
         }
 
         // npcDialogues
@@ -306,7 +324,7 @@ export class SceneManager {
               type: 'npc',
               speaker: npc?.id || d.characterId,
               speakerName: npc?.name || d.characterId,
-              content: d.content,
+              content: stripThinkingTags(d.content),
               color: npc?.color,
               timestamp: Date.now(),
             });

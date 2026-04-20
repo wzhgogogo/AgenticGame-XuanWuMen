@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import type { WorldState, DailyActivity, TimeOfDay } from '../types/world';
 import { getActivitiesForTimeSlot } from '../engine/world/activities';
 import WorldStateHud from './WorldStateHud';
+import SceneBackground from './SceneBackground';
 
 interface DailyActivityScreenProps {
   state: WorldState;
@@ -56,7 +57,6 @@ export default function DailyActivityScreen({
     setFlavorText(text);
     setSelectedActivities((prev) => ({ ...prev, [currentSlot.key]: activity.id }));
 
-    // 延迟后自动推进到下一个时段
     setTimeout(() => {
       setFlavorText(null);
       setCurrentSlotIndex((prev) => prev < TIME_SLOTS.length - 1 ? prev + 1 : prev);
@@ -66,13 +66,16 @@ export default function DailyActivityScreen({
   const allSlotsFilled = TIME_SLOTS.every((slot) => selectedActivities[slot.key]);
 
   return (
-    <div className="h-screen flex flex-col">
-      <WorldStateHud state={state} />
+    <div className="h-screen relative flex flex-col">
+      <SceneBackground />
+      <div className="relative z-10">
+        <WorldStateHud state={state} />
+      </div>
 
       {/* 时间段指示器 */}
       <div
-        className="flex items-center justify-center gap-6 py-3"
-        style={{ borderBottom: '1px solid #2a2a34' }}
+        className="relative z-10 flex items-center justify-center gap-6 py-3"
+        style={{ borderBottom: '1px solid rgba(201, 168, 76, 0.1)' }}
       >
         {TIME_SLOTS.map((slot, idx) => {
           const done = !!selectedActivities[slot.key];
@@ -88,7 +91,7 @@ export default function DailyActivityScreen({
             >
               <span>{slot.icon}</span>
               <span className={active ? 'font-game' : ''}>{slot.label}</span>
-              {done && <span style={{ color: '#6BBF8F' }}>&#10003;</span>}
+              {done && <span style={{ color: '#c9a84c' }}>&#10003;</span>}
             </div>
           );
         })}
@@ -96,7 +99,7 @@ export default function DailyActivityScreen({
 
       {/* 风味文本显示 */}
       {flavorText ? (
-        <div className="flex-1 flex items-center justify-center px-8">
+        <div className="flex-1 relative z-10 flex items-center justify-center px-8">
           <p
             className="font-game text-sm leading-relaxed text-center max-w-md animate-fade-in"
             style={{ color: '#c0b8a0' }}
@@ -106,7 +109,7 @@ export default function DailyActivityScreen({
         </div>
       ) : (
         /* 活动选择区域 */
-        <div className="flex-1 overflow-y-auto px-4 py-4">
+        <div className="flex-1 relative z-10 overflow-y-auto px-4 py-4">
           <div className="max-w-lg mx-auto">
             <p className="text-xs mb-4" style={{ color: '#8a8070' }}>
               {currentSlot.icon} {currentSlot.label}间 — 选择今日{currentSlot.label}间的安排
@@ -119,18 +122,19 @@ export default function DailyActivityScreen({
                   <button
                     key={activity.id}
                     onClick={() => handleSelectActivity(activity)}
-                    className="w-full text-left px-4 py-3 rounded-sm cursor-pointer transition-colors"
+                    className="w-full text-left px-4 py-3 rounded cursor-pointer"
                     style={{
-                      backgroundColor: '#1a1a24',
-                      border: '1px solid #2a2a34',
+                      backgroundColor: 'rgba(20, 20, 30, 0.6)',
+                      border: '1px solid rgba(201, 168, 76, 0.1)',
+                      transition: 'all 0.2s ease',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = catColor;
-                      e.currentTarget.style.backgroundColor = '#1e1e28';
+                      e.currentTarget.style.borderColor = catColor + '60';
+                      e.currentTarget.style.backgroundColor = 'rgba(30, 28, 40, 0.8)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = '#2a2a34';
-                      e.currentTarget.style.backgroundColor = '#1a1a24';
+                      e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.1)';
+                      e.currentTarget.style.backgroundColor = 'rgba(20, 20, 30, 0.6)';
                     }}
                   >
                     <div className="flex items-center gap-2 mb-1">
@@ -157,13 +161,24 @@ export default function DailyActivityScreen({
 
       {/* 结束今日按钮 */}
       {allSlotsFilled && !flavorText && (
-        <div className="px-4 py-4 flex justify-center" style={{ borderTop: '1px solid #2a2a34' }}>
+        <div className="relative z-10 px-4 py-4 flex justify-center" style={{ borderTop: '1px solid rgba(201, 168, 76, 0.1)' }}>
           <button
             onClick={onEndDay}
-            className="px-8 py-2.5 rounded-sm text-sm font-ui cursor-pointer transition-colors"
-            style={{ backgroundColor: '#2a2a34', color: '#e8e0d0' }}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#3a3a44'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#2a2a34'; }}
+            className="px-10 py-2.5 rounded text-sm font-ui cursor-pointer"
+            style={{
+              backgroundColor: 'transparent',
+              color: '#e8e0d0',
+              border: '1px solid rgba(201, 168, 76, 0.4)',
+              transition: 'all 0.2s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.7)';
+              e.currentTarget.style.boxShadow = '0 0 20px rgba(201, 168, 76, 0.1)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.4)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
           >
             结束今日
           </button>

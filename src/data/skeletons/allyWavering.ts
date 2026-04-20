@@ -4,11 +4,10 @@ import type { EventSkeleton } from '../../types/world';
 export const allyWavering: EventSkeleton = {
   id: 'skeleton_ally_wavering',
   category: '盟友离心',
-  description: '秦王府的某个关键成员心生动摇——可能被敌方收买、对前途绝望、或因主公犹豫而失去信心。',
+  description: '秦王府的某个关键成员心生动摇',
 
   preconditions: [
     { type: 'pressure_above', params: { axisId: 'qinwangfu_desperation', value: 60 } },
-    { type: 'day_range', params: { minDay: 25, maxDay: 180 } },
   ],
   pressureTriggers: [
     {

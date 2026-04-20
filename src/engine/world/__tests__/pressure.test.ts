@@ -6,9 +6,9 @@ import {
   applyPressureModifiers,
   checkEventTriggers,
   snapshotPressure,
-} from './pressure';
-import { createInitialWorldState } from './worldState';
-import type { PressureAxis, PressureModifier, EventSkeleton } from '../../types/world';
+} from '../pressure';
+import { createInitialWorldState } from '../worldState';
+import type { PressureAxis, PressureAxisId, PressureModifier, EventSkeleton } from '../../../types/world';
 
 // --- helper ---
 
@@ -129,7 +129,7 @@ describe('applyPressureModifiers', () => {
   it('skips invalid axisId without crashing', () => {
     const axes = createDefaultPressureAxes();
     const mods: PressureModifier[] = [
-      { axisId: 'nonexistent' as any, delta: 10, reason: 'test', source: 'test' },
+      { axisId: 'nonexistent' as PressureAxisId, delta: 10, reason: 'test', source: 'test' },
     ];
     expect(() => applyPressureModifiers(axes, mods)).not.toThrow();
   });
@@ -251,7 +251,7 @@ describe('checkEventTriggers', () => {
 
   it('does not duplicate already pending events', () => {
     const state = createInitialWorldState();
-    state.pendingEvents = [{ skeletonId: 'test_skeleton', triggeredOnDay: 0, pressureSnapshot: {} as any }];
+    state.pendingEvents = [{ skeletonId: 'test_skeleton', triggeredOnDay: 0, pressureSnapshot: {} as Record<PressureAxisId, number> }];
     const skeletons = [makeMinimalSkeleton()];
     const result = checkEventTriggers(state, skeletons);
     expect(result).toHaveLength(0);
