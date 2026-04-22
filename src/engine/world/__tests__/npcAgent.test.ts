@@ -92,9 +92,9 @@ describe('tickNpcAgent', () => {
 describe('recordNpcAction', () => {
   it('adds action to recentActions', () => {
     const agent = makeAgent({ recentActions: [] });
-    const result = recordNpcAction(agent, makeAction({ stance: 'persuade' }));
+    const result = recordNpcAction(agent, makeAction({ stance: 'advise' }));
     expect(result.recentActions).toHaveLength(1);
-    expect(result.recentActions[0].stance).toBe('persuade');
+    expect(result.recentActions[0].stance).toBe('advise');
   });
 
   it('resets daysSinceLastAction to 0', () => {
@@ -108,9 +108,9 @@ describe('recordNpcAction', () => {
       makeAction({ description: `action_${i}` }),
     );
     const agent = makeAgent({ recentActions: actions });
-    const result = recordNpcAction(agent, makeAction({ stance: 'confront', description: 'new' }));
+    const result = recordNpcAction(agent, makeAction({ stance: 'pressure', description: 'new' }));
     expect(result.recentActions).toHaveLength(5);
-    expect(result.recentActions[4].stance).toBe('confront');
+    expect(result.recentActions[4].stance).toBe('pressure');
     expect(result.recentActions[0].description).toBe('action_1');
   });
 });
@@ -143,7 +143,7 @@ describe('filterPlausibleActions', () => {
   it('returns observe when no rules match', () => {
     const agent = makeAgent({ patience: 80 });
     const rules: NpcDecisionRule[] = [
-      { id: 'r1', conditions: { patienceBelow: 30 }, allowedStances: ['confront'] },
+      { id: 'r1', conditions: { patienceBelow: 30 }, allowedStances: ['pressure'] },
     ];
     const result = filterPlausibleActions(agent, rules, createInitialWorldState(), makeCharacter());
     expect(result.allowedStances).toEqual(['observe']);
@@ -152,11 +152,11 @@ describe('filterPlausibleActions', () => {
   it('matches patienceBelow condition', () => {
     const agent = makeAgent({ patience: 20 });
     const rules: NpcDecisionRule[] = [
-      { id: 'r1', conditions: { patienceBelow: 30 }, allowedStances: ['confront', 'mobilize'] },
+      { id: 'r1', conditions: { patienceBelow: 30 }, allowedStances: ['pressure', 'drill'] },
     ];
     const result = filterPlausibleActions(agent, rules, createInitialWorldState(), makeCharacter());
-    expect(result.allowedStances).toContain('confront');
-    expect(result.allowedStances).toContain('mobilize');
+    expect(result.allowedStances).toContain('pressure');
+    expect(result.allowedStances).toContain('drill');
   });
 
   it('matches pressureAbove condition', () => {
@@ -183,7 +183,7 @@ describe('filterPlausibleActions', () => {
       {
         id: 'r1',
         conditions: { patienceBelow: 20 },
-        allowedStances: ['confront'],
+        allowedStances: ['pressure'],
         escalationHint: '耐心告罄',
       },
     ];
@@ -194,7 +194,7 @@ describe('filterPlausibleActions', () => {
   it('returns triggerEvent from matched rule', () => {
     const agent = makeAgent({ patience: 5 });
     const rules: NpcDecisionRule[] = [
-      { id: 'r1', conditions: { patienceBelow: 10 }, allowedStances: ['confront'], triggerEvent: 'skeleton_ultimatum' },
+      { id: 'r1', conditions: { patienceBelow: 10 }, allowedStances: ['pressure'], triggerEvent: 'skeleton_ultimatum' },
     ];
     const result = filterPlausibleActions(agent, rules, createInitialWorldState(), makeCharacter());
     expect(result.triggerEvent).toBe('skeleton_ultimatum');
@@ -203,13 +203,13 @@ describe('filterPlausibleActions', () => {
   it('deduplicates stances across multiple rules', () => {
     const agent = makeAgent({ patience: 10, daysSinceLastAction: 5 });
     const rules: NpcDecisionRule[] = [
-      { id: 'r1', conditions: { patienceBelow: 20 }, allowedStances: ['confront', 'persuade'] },
-      { id: 'r2', conditions: { daysSinceLastActionAbove: 3 }, allowedStances: ['confront', 'scheme'] },
+      { id: 'r1', conditions: { patienceBelow: 20 }, allowedStances: ['pressure', 'advise'] },
+      { id: 'r2', conditions: { daysSinceLastActionAbove: 3 }, allowedStances: ['pressure', 'scheme'] },
     ];
     const result = filterPlausibleActions(agent, rules, createInitialWorldState(), makeCharacter());
-    const confrontCount = result.allowedStances.filter((s) => s === 'confront').length;
-    expect(confrontCount).toBe(1);
-    expect(result.allowedStances).toContain('persuade');
+    const pressureCount = result.allowedStances.filter((s) => s === 'pressure').length;
+    expect(pressureCount).toBe(1);
+    expect(result.allowedStances).toContain('advise');
     expect(result.allowedStances).toContain('scheme');
   });
 

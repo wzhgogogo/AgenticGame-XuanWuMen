@@ -27,7 +27,7 @@ export default function DailyBriefingScreen({
       <div className="flex-1 relative z-10 flex items-center justify-center px-4">
         <div className="max-w-md w-full">
           {/* 日报内容 */}
-          <div className="glass-panel rounded-lg px-6 py-5 mb-6 animate-fade-in">
+          <div className="document-panel rounded-lg px-6 py-5 mb-6 animate-fade-in">
             {lines.map((line, i) => {
               if (!line.trim()) return <div key={i} className="h-3" />;
 
@@ -70,7 +70,8 @@ export default function DailyBriefingScreen({
           {/* NPC 行动摘要 */}
           {tickResult.npcActions.length > 0 && (
             <div
-              className="glass-panel rounded-lg mb-6 px-4 py-3"
+              className="document-panel rounded-lg mb-6 px-4 py-3"
+              style={{ borderLeft: '2px solid rgba(201, 168, 76, 0.2)' }}
             >
               <p className="text-xs mb-2" style={{ color: '#8a8070' }}>
                 府中动态

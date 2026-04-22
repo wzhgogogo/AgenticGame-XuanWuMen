@@ -37,11 +37,78 @@ body {
   font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 
-/* 毛玻璃面板 */
+/* 文书拟物面板（替代毛玻璃） */
+.document-panel {
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      rgba(232, 224, 208, 0.012) 1px,
+      transparent 2px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      rgba(232, 224, 208, 0.008) 1px,
+      transparent 3px
+    ),
+    linear-gradient(
+      170deg,
+      rgba(30, 25, 20, 0.92) 0%,
+      rgba(18, 15, 12, 0.95) 100%
+    );
+  border: 1px solid rgba(201, 168, 76, 0.12);
+  border-top: 2px solid rgba(201, 168, 76, 0.15);
+  border-bottom: 2px solid rgba(201, 168, 76, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(232, 224, 208, 0.04),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* 兼容别名 */
 .glass-panel {
-  background: rgba(10, 10, 15, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      rgba(232, 224, 208, 0.012) 1px,
+      transparent 2px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      rgba(232, 224, 208, 0.008) 1px,
+      transparent 3px
+    ),
+    linear-gradient(
+      170deg,
+      rgba(30, 25, 20, 0.92) 0%,
+      rgba(18, 15, 12, 0.95) 100%
+    );
+  border: 1px solid rgba(201, 168, 76, 0.12);
+  border-top: 2px solid rgba(201, 168, 76, 0.15);
+  border-bottom: 2px solid rgba(201, 168, 76, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(232, 224, 208, 0.04),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* 笔触感金色分隔线 */
+.ink-divider {
+  height: 1px;
+  background: radial-gradient(ellipse at center, #c9a84c 0%, rgba(201, 168, 76, 0.3) 40%, transparent 70%);
+}
+
+/* 朱砂印章装饰 */
+.seal-mark {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  background: rgba(199, 62, 58, 0.12);
+  border: 1.5px solid rgba(199, 62, 58, 0.2);
+  transform: rotate(-8deg);
 }
 
 /* 对话流滚动条 */
@@ -99,6 +166,12 @@ body {
   to { transform: scale(1.05); }
 }
 
+/* 光束缓慢漂移 */
+@keyframes lightShift {
+  0%, 100% { opacity: 0.6; transform: translateX(0); }
+  50% { opacity: 1; transform: translateX(3%); }
+}
+
 /* 思考中动画 */
 .thinking-dots::after {
   content: '';
@@ -111,6 +184,296 @@ body {
   75% { content: '...'; }
 }
 
+/* ========== 案台桌面系统 ========== */
+
+.imperial-desk {
+  position: relative;
+  width: min(80vw, 900px);
+  height: min(60vh, 550px);
+  background:
+    /* 粗木纹——水平方向 */
+    repeating-linear-gradient(93deg, transparent 0px, rgba(139,90,43,0.07) 1px, transparent 2px, transparent 6px),
+    repeating-linear-gradient(87deg, transparent 0px, rgba(120,75,35,0.05) 1px, transparent 3px, transparent 8px),
+    /* 细木纹——垂直方向 */
+    repeating-linear-gradient(178deg, transparent 0px, rgba(100,70,30,0.04) 1px, transparent 2px, transparent 5px),
+    /* 木节/色差 */
+    radial-gradient(ellipse at 25% 40%, rgba(100,65,25,0.08) 0%, transparent 30%),
+    radial-gradient(ellipse at 70% 70%, rgba(80,50,20,0.06) 0%, transparent 25%),
+    /* 基底色 */
+    linear-gradient(170deg, rgba(60,40,20,0.97) 0%, rgba(42,28,14,0.98) 50%, rgba(28,18,10,0.99) 100%);
+  border: 2px solid rgba(90,60,25,0.3);
+  border-top: 3px solid rgba(100,70,30,0.2);
+  border-radius: 2px;
+  box-shadow:
+    inset 0 0 80px rgba(0,0,0,0.5),
+    inset 0 0 160px rgba(0,0,0,0.2),
+    inset 0 2px 0 rgba(139,90,43,0.1),
+    inset 0 -2px 0 rgba(0,0,0,0.3),
+    0 10px 40px rgba(0,0,0,0.7),
+    0 2px 8px rgba(0,0,0,0.4);
+  overflow: hidden;
+}
+
+.imperial-desk-light {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: all 2s ease;
+  z-index: 10;
+}
+
+/* 晨——右侧窗光 */
+.imperial-desk--morning .imperial-desk-light {
+  background:
+    linear-gradient(to left, rgba(200,170,90,0.18) 0%, transparent 55%),
+    radial-gradient(ellipse at 90% 25%, rgba(230,200,130,0.15) 0%, transparent 50%);
+}
+.imperial-desk--morning {
+  box-shadow:
+    inset 0 0 40px rgba(0,0,0,0.25),
+    inset 0 0 80px rgba(0,0,0,0.1),
+    inset 0 2px 0 rgba(139,90,43,0.08),
+    0 8px 32px rgba(0,0,0,0.5);
+}
+
+/* 午——正上方暖光 */
+.imperial-desk--afternoon .imperial-desk-light {
+  background:
+    linear-gradient(to bottom, rgba(210,190,150,0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 55% 15%, rgba(210,190,150,0.1) 0%, transparent 45%);
+}
+
+/* 夜——烛光聚中心 */
+.imperial-desk--evening .imperial-desk-light {
+  background:
+    radial-gradient(ellipse at 42% 48%, rgba(200,140,50,0.2) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 50%, rgba(140,80,25,0.12) 0%, transparent 55%);
+  animation: candleBreath 5s ease-in-out infinite;
+}
+.imperial-desk--evening {
+  box-shadow:
+    inset 0 0 100px rgba(0,0,0,0.7),
+    inset 0 0 200px rgba(0,0,0,0.4),
+    0 8px 32px rgba(0,0,0,0.8);
+}
+
+/* 时间段墨印指示器 */
+.desk-time-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid rgba(201,168,76,0.08);
+}
+
+.desk-time-stamp {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  color: #4a4a50;
+  opacity: 0.6;
+  transition: all 0.3s ease;
+}
+.desk-time-stamp--active {
+  color: #e8e0d0;
+  opacity: 1;
+}
+.desk-time-stamp--done .desk-time-check {
+  color: #c9a84c;
+  font-size: 0.7rem;
+}
+.desk-time-icon { font-size: 0.85rem; }
+.desk-time-label { font-family: "Noto Serif SC", serif; }
+
+/* 桌上物件 */
+.desk-object {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: 1px solid rgba(100,70,30,0.2);
+  border-radius: 2px;
+  background:
+    repeating-linear-gradient(2deg, transparent, rgba(180,150,100,0.02) 1px, transparent 2px),
+    linear-gradient(170deg, rgba(50,38,22,0.92) 0%, rgba(30,22,12,0.96) 100%);
+  box-shadow:
+    0 3px 10px rgba(0,0,0,0.5),
+    0 1px 3px rgba(0,0,0,0.3),
+    inset 0 1px 0 rgba(180,150,100,0.05);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  padding: 0;
+}
+.desk-object:hover {
+  transform: scale(1.06);
+  border-color: rgba(100,70,30,0.35);
+  box-shadow: 0 5px 18px rgba(0,0,0,0.6), 0 0 8px color-mix(in srgb, var(--obj-color, #c9a84c) 15%, transparent);
+}
+.desk-object-icon {
+  font-size: 0.75rem;
+  color: #c0b8a0;
+  font-family: "Noto Serif SC", serif;
+}
+.desk-object-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.desk-object-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(201,168,76,0.15);
+  color: #c9a84c;
+  font-size: 0.55rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 物件类别特化 */
+.desk-object-governance {
+  border-top: 2px solid rgba(201,168,76,0.2);
+}
+.desk-object-military {
+  border-radius: 6px;
+  background:
+    linear-gradient(170deg, rgba(60,45,25,0.9) 0%, rgba(35,25,15,0.95) 100%);
+}
+.desk-object-intelligence {
+  clip-path: polygon(0 10%, 85% 0%, 100% 0%, 100% 100%, 0% 100%);
+  padding-top: 6px;
+}
+.desk-object-social {
+  border-left: 3px solid rgba(199,62,58,0.2);
+}
+.desk-object-personal {
+  background:
+    repeating-linear-gradient(0deg, transparent, rgba(232,224,208,0.02) 8px, transparent 9px),
+    repeating-linear-gradient(90deg, transparent, rgba(232,224,208,0.02) 8px, transparent 9px),
+    linear-gradient(170deg, rgba(40,32,22,0.9) 0%, rgba(25,18,10,0.95) 100%);
+}
+
+/* 活动卡片展开 */
+.desk-activity-cards {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 30;
+  min-width: 180px;
+}
+.desk-activity-card {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  padding: 8px 12px;
+  background: rgba(25,20,15,0.92);
+  border: 1px solid rgba(201,168,76,0.1);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  animation: deskCardAppear 0.3s ease-out forwards;
+  animation-delay: var(--card-delay, 0s);
+  opacity: 0;
+}
+.desk-activity-card:hover {
+  background: rgba(40,32,22,0.95);
+  border-color: rgba(201,168,76,0.25);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.desk-card-name {
+  font-family: "Noto Serif SC", serif;
+  font-size: 0.8rem;
+  color: #e8e0d0;
+  margin-bottom: 2px;
+}
+.desk-card-desc {
+  font-size: 0.65rem;
+  color: #8a8070;
+  line-height: 1.4;
+}
+
+/* 风味文本叠层 */
+.desk-flavor-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 15;
+}
+.desk-flavor-paper {
+  max-width: 320px;
+  padding: 20px 28px;
+  background:
+    repeating-linear-gradient(0deg, transparent, rgba(232,224,208,0.01) 1px, transparent 2px),
+    linear-gradient(170deg, rgba(35,28,18,0.95) 0%, rgba(22,16,10,0.98) 100%);
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: 3px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+  animation: fadeIn 1s ease-out forwards;
+}
+.desk-flavor-paper p {
+  font-size: 0.85rem;
+  line-height: 1.8;
+  color: #c0b8a0;
+  text-align: center;
+  margin: 0;
+}
+
+/* 卡片出现动画 */
+@keyframes deskCardAppear {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 物件出现动画 */
+@keyframes deskObjectAppear {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.desk-object-wrapper {
+  animation: deskObjectAppear 0.5s ease-out forwards;
+}
+
+/* ========== 长安地图（桌面痕迹层） ========== */
+.changan-map {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.changan-map svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.changan-map-label {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 7px;
+  fill: rgba(160, 140, 100, 0.25);
+  letter-spacing: 1px;
+}
+
+.changan-map-label--highlight {
+  fill: rgba(180, 150, 70, 0.3);
+  font-size: 6.5px;
+}
+
 /* 动效降级 */
 @media (prefers-reduced-motion: reduce) {
   .stagger-1, .stagger-2, .stagger-3, .stagger-4 {
@@ -120,5 +483,9 @@ body {
   .animate-fade-in {
     animation: none;
     opacity: 1;
+  }
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }

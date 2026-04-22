@@ -41,12 +41,12 @@ export default function SceneBackground({ phaseIndex = 0 }: SceneBackgroundProps
         }}
       />
 
-      {/* Layer 3: Candlelight glow */}
+      {/* Layer 3: Directional candlelight (asymmetric) */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'radial-gradient(ellipse at 25% 50%, rgba(201, 168, 76, 0.08) 0%, transparent 50%)',
+          background: 'radial-gradient(ellipse at 10% 60%, rgba(201, 168, 76, 0.12) 0%, transparent 40%)',
           animation: 'candleBreath 5s ease-in-out infinite',
         }}
       />
@@ -54,15 +54,15 @@ export default function SceneBackground({ phaseIndex = 0 }: SceneBackgroundProps
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'radial-gradient(ellipse at 70% 30%, rgba(201, 168, 76, 0.05) 0%, transparent 40%)',
+          background: 'conic-gradient(from 200deg at 5% 80%, rgba(201, 168, 76, 0.06) 0deg, transparent 30deg)',
           animation: 'candleBreath 7s ease-in-out 2s infinite',
         }}
       />
 
-      {/* Layer 4: Film grain noise (SVG filter) */}
+      {/* Layer 4: Paper-grain noise (SVG filter) */}
       <svg style={{ position: 'absolute', width: 0, height: 0 }}>
         <filter id="scene-noise">
-          <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
+          <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch" />
           <feColorMatrix type="saturate" values="0" />
         </filter>
       </svg>
@@ -71,7 +71,8 @@ export default function SceneBackground({ phaseIndex = 0 }: SceneBackgroundProps
           position: 'absolute',
           inset: 0,
           filter: 'url(#scene-noise)',
-          opacity: 0.04,
+          opacity: 0.06,
+          mixBlendMode: 'overlay',
         }}
       />
 
@@ -81,6 +82,25 @@ export default function SceneBackground({ phaseIndex = 0 }: SceneBackgroundProps
           position: 'absolute',
           inset: 0,
           boxShadow: 'inset 0 0 150px 60px rgba(0,0,0,0.7)',
+        }}
+      />
+
+      {/* Layer 6: Diagonal light beam */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(215deg, transparent 40%, rgba(201, 168, 76, 0.03) 50%, transparent 60%)',
+          animation: 'lightShift 12s ease-in-out infinite',
+        }}
+      />
+
+      {/* Layer 7: Desk surface edge */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(to top, rgba(40, 30, 20, 0.4) 0%, transparent 15%)',
         }}
       />
     </div>

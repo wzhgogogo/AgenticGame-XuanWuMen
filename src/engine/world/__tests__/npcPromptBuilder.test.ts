@@ -17,7 +17,7 @@ function makeAgent(overrides: Partial<NpcAgentState> = {}): NpcAgentState {
   };
 }
 
-const DEFAULT_STANCES: NpcStance[] = ['observe', 'persuade', 'confront'];
+const DEFAULT_STANCES: NpcStance[] = ['observe', 'advise', 'pressure'];
 
 // ===== buildNpcDecisionPrompt =====
 
@@ -50,11 +50,11 @@ describe('buildNpcDecisionPrompt', () => {
 
   it('includes allowed stance keys and their Chinese labels', () => {
     const state = createInitialWorldState();
-    const result = buildNpcDecisionPrompt('weichi_jingde', '尉迟敬德', makeAgent(), ['mobilize', 'scheme'], state);
-    expect(result).toContain('mobilize');
+    const result = buildNpcDecisionPrompt('weichi_jingde', '尉迟敬德', makeAgent(), ['drill', 'scheme'], state);
+    expect(result).toContain('drill');
     expect(result).toContain('scheme');
-    expect(result).toContain('动员武力');
-    expect(result).toContain('暗中谋划');
+    expect(result).toContain('练兵备战');
+    expect(result).toContain('对内串联');
   });
 
   it('includes JSON output schema with stance/action/pressureDeltas', () => {

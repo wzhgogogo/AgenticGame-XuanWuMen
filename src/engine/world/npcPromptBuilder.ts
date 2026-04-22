@@ -1,4 +1,5 @@
 import type { NpcAgentState, NpcStance, WorldState } from '../../types/world';
+import type { CharacterCore } from '../../types';
 import { PRESSURE_AXIS_LABELS, getPressureLabel } from './worldState';
 import { formatDate } from './calendar';
 import { getNarrativeIntensity } from './pressure';
@@ -6,14 +7,25 @@ import { buildConstraintBlock } from '../../data/promptConstraints';
 import type { PressureAxisId } from '../../types/world';
 
 const STANCE_GUIDE: Record<NpcStance, { name: string; examples: string }> = {
-  observe:   { name: '观望',     examples: '听朝议、盯局势、按兵不动' },
-  intel:     { name: '情报',     examples: '探亲信、布暗桩、截密报' },
-  persuade:  { name: '温和施压', examples: '上书、夜谈、劝谏' },
-  scheme:    { name: '暗中谋划', examples: '串联、立誓、埋伏笔' },
-  confront:  { name: '当面对抗', examples: '闯府、质问、要求决断' },
-  mobilize:  { name: '动员武力', examples: '练兵、点将、藏甲' },
-  breakdown: { name: '失控破局', examples: '越级调兵、逼宫秦王（一生一次）' },
-  abandon:   { name: '出走决裂', examples: '挂冠、投敌、私通东宫（一生一次）' },
+  observe:     { name: '观望',       examples: '听朝议、盯局势、按兵不动' },
+  plant_spy:   { name: '安插探子',   examples: '安排心腹混入东宫、收买宫中内侍、渗透皇宫' },
+  counterspy:  { name: '反间搜敌',   examples: '排查府中可疑人等、清除敌方眼线、审讯叛徒' },
+  analyze:     { name: '情报研判',   examples: '解读截获密报、研判敌方动向、紧急转移人员' },
+  advise:      { name: '温和进言',   examples: '夜谈献策、上书建议、私下劝导' },
+  remonstrate: { name: '强硬劝谏',   examples: '跪谏秦王、以死相争、直言不讳' },
+  lobby:       { name: '游说拉拢',   examples: '联络中立朝臣、争取外部支持、宴请要员' },
+  scheme:      { name: '对内串联',   examples: '暗中拉拢府中将领、密约立誓、统一内部' },
+  coordinate:  { name: '对外联络',   examples: '联络府外盟友、与外镇将领通信、传递密函' },
+  strategize:  { name: '谋划方略',   examples: '密议大计、拟定兵变方略、布局伏笔' },
+  drill:       { name: '练兵备战',   examples: '点检甲仗、操练兵马、磨砺刀兵' },
+  rally:       { name: '动员激励',   examples: '召集心腹、鼓舞士气、激励将士' },
+  patrol:      { name: '巡逻戒备',   examples: '巡视府卫、加强警戒、布置暗哨' },
+  pressure:    { name: '当面施压',   examples: '闯东宫质问、威慑敌方、公开对峙' },
+  defy:        { name: '越级抗命',   examples: '擅自调兵、违令行事、先斩后奏' },
+  assassinate: { name: '安排暗杀',   examples: '刺杀敌方幕僚、除掉关键人物、暗中下手' },
+  capture:     { name: '安排抓人',   examples: '秘密拘押敌方密探、扣留使者、绑架要员' },
+  breakdown:   { name: '失控破局',   examples: '越级调兵、逼宫秦王（一生一次）' },
+  abandon:     { name: '出走决裂',   examples: '挂冠、投敌、私通东宫（一生一次）' },
 };
 
 /**
@@ -28,11 +40,23 @@ export function buildNpcDecisionPrompt(
   options: {
     escalationHints?: string[];
     impactWhitelist?: PressureAxisId[];
+    character?: CharacterCore;
   } = {},
 ): string {
   const lines: string[] = [];
 
   lines.push(`你是${characterName}，秦王李世民的核心幕僚。`);
+
+  if (options.character) {
+    const c = options.character;
+    const traits = c.identity.personality.traitKeywords.join('、');
+    lines.push(`性格：${c.identity.oneLiner}特质：${traits}。`);
+    if (c.goals.shortTerm.length > 0) {
+      lines.push(`当前目标：${c.goals.shortTerm.join('；')}。`);
+    }
+    lines.push(`内心：${c.goals.internalConflict}`);
+  }
+
   const { constraint } = getNarrativeIntensity(worldState.pressureAxes);
   lines.push(buildConstraintBlock(formatDate(worldState.calendar), constraint));
   lines.push('');

@@ -50,7 +50,7 @@ export default function DialoguePanel({ entries, isNpcThinking, thinkingText }: 
 
   if (isNpcThinking && thinkingText) {
     return (
-      <div className="glass-panel rounded-lg px-6 py-5 mx-4 mb-4 max-w-2xl w-full self-center">
+      <div className="document-panel rounded-lg px-6 py-5 mx-4 mb-4 max-w-2xl w-full self-center">
         <p className="font-game italic text-sm text-center" style={{ color: '#8a8070' }}>
           {thinkingText}<span className="thinking-dots" />
         </p>
@@ -66,22 +66,18 @@ export default function DialoguePanel({ entries, isNpcThinking, thinkingText }: 
   if (isNarrator) {
     return (
       <div
-        className="px-6 py-8 mx-4 mb-4 max-w-2xl w-full self-center cursor-pointer"
+        className="relative px-6 py-8 mx-4 mb-4 max-w-2xl w-full self-center cursor-pointer"
         onClick={goNext}
       >
-        <div
-          className="w-16 h-px mx-auto mb-4"
-          style={{ background: 'linear-gradient(to right, transparent, #c9a84c, transparent)' }}
-        />
+        {/* 朱砂印章装饰 */}
+        <div className="seal-mark absolute" style={{ top: 8, right: 12 }} />
+        <div className="ink-divider w-20 mx-auto mb-4" />
         <p
           className="font-game text-base leading-relaxed whitespace-pre-line text-center"
           style={{ color: '#c0b8a0' }}
           dangerouslySetInnerHTML={{ __html: renderContent(entry.content) }}
         />
-        <div
-          className="w-16 h-px mx-auto mt-4"
-          style={{ background: 'linear-gradient(to right, transparent, #c9a84c, transparent)' }}
-        />
+        <div className="ink-divider w-20 mx-auto mt-4" />
         {entries.length > 1 && (
           <p className="text-center text-xs mt-3" style={{ color: '#4a4a50' }}>
             {viewIndex + 1} / {entries.length}
@@ -93,7 +89,7 @@ export default function DialoguePanel({ entries, isNpcThinking, thinkingText }: 
 
   return (
     <div
-      className="glass-panel rounded-lg px-6 py-5 mx-4 mb-4 max-w-2xl w-full self-center cursor-pointer"
+      className="document-panel rounded-lg px-6 py-5 mx-4 mb-4 max-w-2xl w-full self-center cursor-pointer"
       onClick={goNext}
     >
       <div className="flex items-baseline justify-between mb-3">

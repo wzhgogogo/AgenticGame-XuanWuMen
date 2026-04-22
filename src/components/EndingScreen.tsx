@@ -62,8 +62,8 @@ export default function EndingScreen({ endingType, onRestart }: EndingScreenProp
         </h2>
 
         <p
-          className="font-game text-sm leading-loose whitespace-pre-line text-center stagger-3"
-          style={{ color: '#c0b8a0' }}
+          className="font-game text-sm leading-loose whitespace-pre-line stagger-3"
+          style={{ color: '#c0b8a0', borderLeft: '2px solid rgba(199, 62, 58, 0.15)', paddingLeft: '1rem' }}
         >
           {ending.text}
         </p>

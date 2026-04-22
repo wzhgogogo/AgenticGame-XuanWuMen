@@ -233,8 +233,8 @@ export class WorldSimulator {
   /**
    * 事件场景结束后的处理
    */
-  handleEventEnd(summary: string): void {
-    if (!this.currentEventInstance) return;
+  handleEventEnd(summary: string): Promise<void> {
+    if (!this.currentEventInstance) return Promise.resolve();
 
     const npcIds = [...this.currentEventInstance.activeNpcIds];
     const sceneId = this.currentEventInstance.skeletonId;
@@ -261,11 +261,25 @@ export class WorldSimulator {
       ),
     };
 
+    // 事件反馈 NPC 状态：参与事件的 NPC 耐心下降（紧迫感），未参与的不受影响
+    const updatedAgents = { ...this.state.npcAgents };
+    for (const npcId of npcIds) {
+      const agent = updatedAgents[npcId];
+      if (!agent) continue;
+      updatedAgents[npcId] = {
+        ...agent,
+        patience: Math.max(0, agent.patience - 5),
+        alertness: Math.min(100, agent.alertness + 10),
+        daysSinceLastAction: 0,
+      };
+    }
+    this.state = { ...this.state, npcAgents: updatedAgents };
+
     this.currentEventInstance = null;
     this.currentSceneManager = null;
 
-    // 异步提取角色记忆（不阻塞流程）
-    this.extractAndStoreMemories(summary, npcIds, sceneId, dateStr);
+    // 提取角色记忆（返回 Promise 以便调用方可选择等待）
+    const memoryPromise = this.extractAndStoreMemories(summary, npcIds, sceneId, dateStr);
 
     // 检查事件结局文本是否包含终结性叙事（秦王被杀/被囚等）
     const narrativeEnding = this.detectNarrativeEnding(summary);
@@ -280,6 +294,7 @@ export class WorldSimulator {
     }
 
     this.notify();
+    return memoryPromise;
   }
 
   private detectNarrativeEnding(summary: string): EndingType | null {
@@ -411,7 +426,7 @@ export class WorldSimulator {
         .filter((t) => t.allowedStances.length > 0)
         .map(async (t) => {
           try {
-            return await this.runNpcLlmDecision(t.charId, t.character.name, t.tickedAgent, t.allowedStances, t.escalationHints);
+            return await this.runNpcLlmDecision(t.charId, t.character.name, t.tickedAgent, t.allowedStances, t.escalationHints, t.character);
           } catch {
             return null;
           }
@@ -547,11 +562,13 @@ export class WorldSimulator {
     agentState: NpcAgentState,
     allowedStances: NpcStance[],
     escalationHints: string[],
+    character?: Character,
   ): Promise<NpcAction | null> {
     const impactProfile = NPC_IMPACT_PROFILES[charId];
     const prompt = buildNpcDecisionPrompt(charId, charName, agentState, allowedStances, this.state, {
       escalationHints,
       impactWhitelist: impactProfile?.whitelist,
+      character,
     });
 
     debugLog('llm_call', `NPC决策: ${charName}`, `可选立场: ${allowedStances.join(', ')}\n\nPrompt:\n${prompt}`);
@@ -685,7 +702,8 @@ export class WorldSimulator {
   private capsForStance(stance: NpcStance): { perDelta: number; totalAbs: number; maxCount: number } {
     if (stance === 'breakdown') return { perDelta: 8, totalAbs: 15, maxCount: 4 };
     if (stance === 'abandon')   return { perDelta: 6, totalAbs: 12, maxCount: 4 };
-    if (stance === 'confront' || stance === 'mobilize') return { perDelta: 4, totalAbs: 7, maxCount: 3 };
+    if (stance === 'assassinate' || stance === 'capture' || stance === 'defy') return { perDelta: 5, totalAbs: 10, maxCount: 3 };
+    if (stance === 'pressure' || stance === 'remonstrate' || stance === 'drill' || stance === 'rally' || stance === 'patrol') return { perDelta: 4, totalAbs: 7, maxCount: 3 };
     return { perDelta: 3, totalAbs: 5, maxCount: 3 };
   }
 

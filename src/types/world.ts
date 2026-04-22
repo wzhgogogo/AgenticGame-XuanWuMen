@@ -56,14 +56,30 @@ export interface FactionState {
  * NPC 立场大类。规则层只定立场，LLM 在立场内自由产出具体 action 文本。
  */
 export type NpcStance =
-  | 'observe'     // 观望：听朝议、按兵不动
-  | 'intel'       // 情报：探亲信、布暗桩
-  | 'persuade'    // 温和施压：上书、夜谈、劝谏
-  | 'scheme'      // 暗中谋划：串联、立誓
-  | 'confront'    // 当面对抗：闯府、质问
-  | 'mobilize'    // 动员武力：练兵、点将、藏甲
-  | 'breakdown'   // 失控：越级调兵、逼宫秦王（全局限 1 次）
-  | 'abandon';    // 出走/被收买：挂冠、投敌（全局限 1 次）
+  // 通用
+  | 'observe'       // 观望：听朝议、按兵不动
+  // 情报
+  | 'plant_spy'     // 安插探子：安排心腹混入东宫、收买宫中内侍
+  | 'counterspy'    // 反间搜敌：排查府中可疑人等、清除敌方眼线
+  | 'analyze'       // 情报分析+应急响应：解读密报、研判动向、紧急应对
+  // 谋略
+  | 'advise'        // 温和进言：夜谈献策、上书建议
+  | 'remonstrate'   // 强硬劝谏/死谏秦王：跪谏、以死相争
+  | 'lobby'         // 对外游说拉拢：联络中立朝臣、争取外部支持
+  | 'scheme'        // 对内串联：暗中拉拢府中将领、密约立誓
+  | 'coordinate'    // 对外联络：联络府外盟友、与外镇将领通信
+  | 'strategize'    // 长期方略谋划：密议大计、拟定方略
+  // 武力
+  | 'drill'         // 练兵备战：点检甲仗、操练兵马
+  | 'rally'         // 动员激励：召集心腹、鼓舞士气
+  | 'patrol'        // 巡逻戒备：巡视府卫、加强警戒
+  | 'pressure'      // 当面施压（对外）：闯东宫质问、威慑敌方
+  | 'defy'          // 越级抗命：擅自调兵、违令行事
+  | 'assassinate'   // 安排暗杀：刺杀敌方幕僚、除掉关键人物
+  | 'capture'       // 安排抓人：秘密拘押密探、扣留使者
+  // 极端
+  | 'breakdown'     // 失控破局（一生一次）
+  | 'abandon';      // 出走决裂（一生一次）
 
 export interface NpcAgentState {
   characterId: string;

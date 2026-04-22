@@ -261,15 +261,19 @@ export default function App() {
           <SceneBackground />
 
           {/* 标题 */}
-          <h1
-            className="relative z-10 font-calligraphy text-4xl mb-3 stagger-1"
-            style={{
-              color: '#e8e0d0',
-              textShadow: '0 0 40px rgba(201, 168, 76, 0.3), 0 0 80px rgba(201, 168, 76, 0.1)',
-            }}
-          >
-            玄武门之变
-          </h1>
+          <div className="relative z-10 stagger-1">
+            <h1
+              className="font-calligraphy text-4xl mb-3"
+              style={{
+                color: '#e8e0d0',
+                textShadow: '0 0 40px rgba(201, 168, 76, 0.3), 0 0 80px rgba(201, 168, 76, 0.1)',
+              }}
+            >
+              玄武门之变
+            </h1>
+            {/* 朱砂印章 */}
+            <div className="seal-mark absolute" style={{ top: -8, right: -36 }} />
+          </div>
 
           {/* 副标题 */}
           <p

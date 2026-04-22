@@ -24,7 +24,7 @@ export default function ActionPanel({ suggestedActions, onSubmit, disabled }: Ac
   };
 
   return (
-    <div className="glass-panel rounded-lg mx-4 mb-4 px-5 py-4 max-w-2xl w-full self-center">
+    <div className="document-panel rounded-lg mx-4 mb-4 px-5 py-4 max-w-2xl w-full self-center">
       {/* 抉择卡片 */}
       {suggestedActions.length > 0 && (
         <div className="grid grid-cols-2 gap-3 mb-3">
@@ -35,22 +35,23 @@ export default function ActionPanel({ suggestedActions, onSubmit, disabled }: Ac
               disabled={disabled}
               className="text-left px-4 py-3 rounded text-sm font-game cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
               style={{
-                backgroundColor: 'rgba(20, 20, 30, 0.6)',
-                border: '1px solid rgba(201, 168, 76, 0.2)',
+                backgroundColor: 'rgba(25, 20, 15, 0.7)',
+                border: '1px solid rgba(201, 168, 76, 0.1)',
+                borderTop: '1px solid rgba(232, 224, 208, 0.06)',
                 color: '#e8e0d0',
                 transition: 'all 0.2s ease',
               }}
               onMouseEnter={(e) => {
                 if (!disabled) {
-                  e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.5)';
+                  e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.4)';
                   e.currentTarget.style.transform = 'scale(1.02)';
-                  e.currentTarget.style.backgroundColor = 'rgba(30, 28, 40, 0.8)';
+                  e.currentTarget.style.backgroundColor = 'rgba(35, 28, 20, 0.85)';
                 }
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.2)';
+                e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.1)';
                 e.currentTarget.style.transform = 'scale(1)';
-                e.currentTarget.style.backgroundColor = 'rgba(20, 20, 30, 0.6)';
+                e.currentTarget.style.backgroundColor = 'rgba(25, 20, 15, 0.7)';
               }}
             >
               {action}
@@ -68,15 +69,17 @@ export default function ActionPanel({ suggestedActions, onSubmit, disabled }: Ac
           onKeyDown={handleKeyDown}
           disabled={disabled}
           placeholder="以秦王的身份说……"
-          className="flex-1 px-3 py-2 rounded text-sm outline-none disabled:opacity-40"
+          className="flex-1 px-3 py-2 text-sm outline-none disabled:opacity-40"
           style={{
-            backgroundColor: 'rgba(20, 20, 30, 0.4)',
-            border: '1px solid rgba(201, 168, 76, 0.1)',
+            backgroundColor: 'transparent',
+            border: 'none',
+            borderBottom: '1px solid rgba(201, 168, 76, 0.15)',
+            borderRadius: 0,
             color: '#c0b8a0',
             transition: 'border-color 0.2s ease',
           }}
-          onFocus={(e) => { e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.3)'; }}
-          onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.1)'; }}
+          onFocus={(e) => { e.currentTarget.style.borderBottomColor = 'rgba(201, 168, 76, 0.4)'; }}
+          onBlur={(e) => { e.currentTarget.style.borderBottomColor = 'rgba(201, 168, 76, 0.15)'; }}
         />
         <button
           onClick={handleSubmit}

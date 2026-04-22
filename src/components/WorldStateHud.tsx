@@ -32,50 +32,53 @@ const DISPLAY_AXES: PressureAxisId[] = [
 export default function WorldStateHud({ state }: WorldStateHudProps) {
   return (
     <div
-      className="px-4 py-3"
-      style={{ backgroundColor: '#12121a', borderBottom: '1px solid #2a2a34' }}
+      className="px-4 py-1.5"
+      style={{
+        background: 'linear-gradient(90deg, rgba(20, 14, 8, 0.9) 0%, rgba(25, 18, 12, 0.9) 50%, rgba(20, 14, 8, 0.9) 100%)',
+        borderBottom: '1px solid rgba(139, 90, 43, 0.15)',
+      }}
     >
-      <div className="flex items-center justify-between mb-2">
-        <span className="font-game text-sm" style={{ color: '#e8e0d0' }}>
+      <div className="flex items-center gap-6">
+        <span className="font-game text-xs shrink-0" style={{ color: '#b0a080' }}>
           {formatCalendar(state.calendar)}
         </span>
-      </div>
 
-      <div className="grid grid-cols-2 gap-x-6 gap-y-1.5">
-        {DISPLAY_AXES.map((axisId) => {
-          const axis = state.pressureAxes[axisId];
-          if (!axis) return null;
-          const label = PRESSURE_AXIS_LABELS[axisId];
-          const level = getPressureLabel(axis.value);
-          const color = getPressureColor(axis.value);
-          const width = getPressureWidth(axis.value);
+        <div className="flex-1 grid grid-cols-3 gap-x-5 gap-y-0.5">
+          {DISPLAY_AXES.map((axisId) => {
+            const axis = state.pressureAxes[axisId];
+            if (!axis) return null;
+            const label = PRESSURE_AXIS_LABELS[axisId];
+            const level = getPressureLabel(axis.value);
+            const color = getPressureColor(axis.value);
+            const width = getPressureWidth(axis.value);
 
-          return (
-            <div key={axisId} className="flex items-center gap-2">
-              <span
-                className="text-xs shrink-0"
-                style={{ color: '#8a8070', width: '4.5rem' }}
-              >
-                {label}
-              </span>
-              <div
-                className="flex-1 h-1.5 rounded-full overflow-hidden"
-                style={{ backgroundColor: '#1a1a24' }}
-              >
+            return (
+              <div key={axisId} className="flex items-center gap-1.5">
+                <span
+                  className="text-xs shrink-0"
+                  style={{ color: '#6a6050', width: '3.5rem', fontSize: '0.65rem' }}
+                >
+                  {label}
+                </span>
                 <div
-                  className="h-full rounded-full transition-all duration-500"
-                  style={{ width: `${width}%`, backgroundColor: color }}
-                />
+                  className="flex-1 h-1 rounded-full overflow-hidden"
+                  style={{ backgroundColor: 'rgba(232, 224, 208, 0.04)' }}
+                >
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{ width: `${width}%`, backgroundColor: color }}
+                  />
+                </div>
+                <span
+                  className="text-xs shrink-0"
+                  style={{ color, width: '1.5rem', textAlign: 'right', fontSize: '0.6rem' }}
+                >
+                  {level}
+                </span>
               </div>
-              <span
-                className="text-xs shrink-0"
-                style={{ color, width: '2rem', textAlign: 'right' }}
-              >
-                {level}
-              </span>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
   );

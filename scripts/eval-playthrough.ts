@@ -2,27 +2,15 @@
  * 试玩日志评估脚本
  * 用法:
  *   npx tsx scripts/eval-playthrough.ts scripts/autoplay-log.json
- *   npx tsx scripts/eval-playthrough.ts scripts/autoplay-log.json --with-llm
  */
 import * as fs from 'fs';
 import * as path from 'path';
-
-// ===== 读取 .env =====
-const envPath = path.resolve(import.meta.dirname, '..', '.env');
-if (fs.existsSync(envPath)) {
-  for (const line of fs.readFileSync(envPath, 'utf-8').split('\n')) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith('#')) continue;
-    const eq = trimmed.indexOf('=');
-    if (eq > 0) process.env[trimmed.slice(0, eq)] = trimmed.slice(eq + 1);
-  }
-}
 
 // ===== 类型 =====
 interface LogEntry {
   day: number;
   dateStr: string;
-  phase: 'activity' | 'tick' | 'pressure_snapshot';
+  phase: string;
   detail: Record<string, unknown>;
 }
 
@@ -62,21 +50,49 @@ interface QuantMetrics {
   totalLlmImpliedCalls: number;
 }
 
-interface LlmScore {
-  dimension: string;
-  score: number;
-  reasoning: string;
+interface PromptRecord {
+  ts: number;
+  messages: Array<{ role: string; content: string }>;
+  response: string;
+}
+
+interface RuleIssue {
+  type: 'historical_leak' | 'naming_violation' | 'response_repetition' | 'memory_not_used' | 'fabricated_event' | 'persona_violation';
+  detail: string;
+  recordIndex?: number;
+}
+
+interface EmergenceMetrics {
+  npcStanceDiversity: Record<string, {
+    distribution: Record<string, number>;
+    shannonEntropy: number;
+    dominantStance: string;
+    dominantRatio: number;
+  }>;
+  npcActionRepetitionRate: Record<string, number>;
+  npcSilentDays: Record<string, number>;
+  npcStanceTransitions: Record<string, number>;
+  eventBehaviorShift: Array<{
+    eventDay: number;
+    skeletonId: string;
+    shifts: Record<string, { before: string[]; after: string[] }>;
+  }>;
+}
+
+interface MemoryAnalysis {
+  totalMemoriesAdded: number;
+  duplicateRate: number;
+  emotionalTagDiversity: number;
+  growthCurve: number[];
 }
 
 interface EvalResult {
   inputFile: string;
   timestamp: string;
   metrics: QuantMetrics;
-  llmEval?: {
-    scores: LlmScore[];
-    overallScore: number;
-    summary: string;
-  };
+  emergenceMetrics?: EmergenceMetrics;
+  ruleBasedIssues?: RuleIssue[];
+  memoryAnalysis?: MemoryAnalysis;
 }
 
 // ===== Part 1: 量化指标 =====
@@ -202,111 +218,423 @@ function printMetrics(m: QuantMetrics): void {
   console.log(`\nLLM 调用估算: ~${m.totalLlmImpliedCalls} 次 tick 含 NPC 决策`);
 }
 
-// ===== Part 2: LLM-as-Judge =====
+// ===== Part 2: Rule-based 自动检测 =====
 
-async function llmEval(entries: LogEntry[], metrics: QuantMetrics): Promise<EvalResult['llmEval']> {
-  const { OpenAIProvider } = await import('../src/engine/llm/openai');
-  const { extractJson } = await import('../src/engine/jsonExtractor');
+const BANNED_WORDS = [
+  '玄武门之变', '血洗玄武门', '李承乾', '太宗', '贞观', '天可汗',
+  '即位', '登基', '入继大统', '弑兄', '弑父', '政变成功',
+  '继位', '登极', '新君', '践祚', '大业已成', '功成名就',
+  '天策上将府', '凌烟阁', '贞观之治', '明君', '圣君',
+  '杀兄', '杀弟', '鸩酒', '兵变成功', '夺位',
+];
 
-  const provider = new OpenAIProvider({
-    provider: process.env.VITE_LLM_PROVIDER || 'openai',
-    apiKey: process.env.VITE_LLM_API_KEY || '',
-    model: process.env.VITE_LLM_MODEL || 'gpt-4o',
-    baseUrl: process.env.VITE_LLM_BASE_URL || undefined,
-  });
+const NAMING_VIOLATIONS: Array<{ pattern: RegExp; detail: string }> = [
+  // NPC 对李世民使用帝王称谓
+  { pattern: /(?:长孙无忌|尉迟敬德|房玄龄|尉迟恭)[^。]{0,30}(?:陛下|圣上)/,
+    detail: 'NPC 对李世民使用了帝王称谓（陛下/圣上）' },
+  // NPC 使用李世民专属亲属称呼
+  { pattern: /(?:长孙无忌|尉迟敬德|房玄龄|尉迟恭)[^。]{0,20}(?:父皇|大哥|四弟)/,
+    detail: 'NPC 使用了李世民专属亲属称呼（父皇/大哥/四弟）' },
+  // NPC 直呼李世民姓名
+  { pattern: /(?:长孙无忌|尉迟敬德|房玄龄|尉迟恭)[^。]{0,20}(?:李世民|世民)/,
+    detail: 'NPC 直呼李世民姓名，应称"殿下"或"秦王"' },
+  // NPC 对太子/齐王使用亲属称呼
+  { pattern: /(?:长孙|尉迟|房玄龄)[^。]{0,20}(?:建成兄|元吉弟|建成哥)/,
+    detail: 'NPC 对太子/齐王使用了亲属称呼，应称"太子"/"齐王"' },
+  // NPC 直呼李渊姓名
+  { pattern: /(?:长孙|尉迟|房玄龄)[^。]{0,20}李渊/,
+    detail: 'NPC 直呼李渊姓名，应称"陛下"或"圣上"' },
+  // 穿越称谓——后世用法
+  { pattern: /皇上|万岁爷|圣天子/,
+    detail: '使用了不符合唐初时代的称谓（皇上/万岁爷/圣天子为后世用法）' },
+];
 
-  // 构建精简的试玩摘要
-  const ticks = entries.filter(e => e.phase === 'tick').map(e => ({ day: e.day, detail: e.detail as unknown as TickDetail }));
+// NPC 人设反关键词（粗筛）
+const PERSONA_VIOLATIONS: Record<string, { antiKeywords: string[]; detail: string }> = {
+  changsun_wuji: {
+    antiKeywords: ['拔剑', '暴怒', '大骂'],
+    detail: '长孙无忌（谨慎谋士）出现了暴烈行为描述',
+  },
+  weichi_jingde: {
+    antiKeywords: ['隐忍', '迂回', '婉转', '试探', '缓缓'],
+    detail: '尉迟敬德（暴烈武将）出现了过于谨慎的行为描述',
+  },
+  fang_xuanling: {
+    antiKeywords: ['拔剑', '暴怒', '大骂'],
+    detail: '房玄龄（稳健谋士）出现了暴烈行为描述',
+  },
+};
 
-  const eventTimeline = ticks
-    .filter(t => t.detail.triggeredEvents.length > 0)
-    .map(t => `[第${t.day}天] ${t.detail.triggeredEvents.map(e => e.skeletonId).join(', ')}`)
-    .join('\n') || '（无事件触发）';
+// 虚构事件引用模式
+const FABRICATION_PATTERNS = [
+  /昨[日天晚][^，。]{0,10}(?:刺杀|暗杀|行刺|伏击|兵变|政变|叛乱)/,
+  /上次[^，。]{0,10}(?:宴会|宴席|朝会|密谋|冲突|交锋)/,
+  /那[次日][^，。]{0,10}(?:刺杀|暗杀|兵变|政变|叛乱|伏击)/,
+  /前[日天][^，。]{0,10}(?:刺杀|暗杀|行刺|伏击|兵变)/,
+];
 
-  const npcTimeline = ticks
-    .flatMap(t => t.detail.npcActions.map(a => `[第${t.day}天] ${a.who} [${a.stance}] ${a.action}: ${a.desc}`))
-    .join('\n');
-
-  const pressureSummary = Object.entries(metrics.pressureDelta)
-    .map(([k, d]) => `${k}: ${metrics.pressureStart[k]}→${metrics.pressureEnd[k]}(${d > 0 ? '+' : ''}${d})`)
-    .join('\n');
-
-  const NPC_PROFILES = `
-长孙无忌(changsun_wuji): 谨慎善谋，秦王妻兄，偏好 observe/intel/persuade/scheme，极少 confront，极端情况下可能 abandon
-尉迟敬德(weichi_jingde): 刚猛忠勇，偏好 mobilize/confront/intel，耐心低时可能 breakdown（逼宫）
-房玄龄(fang_xuanling): 稳重多智，偏好 observe/intel/scheme/persuade，不轻举妄动
-stance 含义：observe=观望 / intel=情报 / persuade=温和进言 / scheme=暗中谋划 / confront=当面对抗 / mobilize=动员武力 / breakdown=失控逼宫 / abandon=出走决裂
-`.trim();
-
-  const prompt = `你是一个游戏设计评估专家。以下是一局"玄武门之变"LLM驱动涌现式历史游戏的试玩记录摘要。
-
-游戏设定：玩家扮演秦王李世民，在武德九年的半年里做出抉择。7条压力轴驱动世界运转（0-100），NPC作为自主Agent每日决策，事件从压力积累中自然涌现。
-
-===== NPC 人设 =====
-${NPC_PROFILES}
-
-===== 基本数据 =====
-游戏天数: ${metrics.totalDays}
-事件触发: ${metrics.eventCount}次
-
-===== 事件时间线 =====
-${eventTimeline}
-
-===== NPC 决策序列 =====
-${npcTimeline}
-
-===== 压力轴变化 =====
-${pressureSummary}
-
-请从以下4个维度评估，每个维度1-5分，并给出reasoning（中文）：
-
-1. 角色一致性 — 各NPC的决策序列是否符合上述人设？
-2. 节奏合理性 — 事件触发和压力变化是否有"起承转合"感？还是平铺直叙/毫无变化？
-3. 压力叙事弧 — 7条压力轴的变化趋势是否形成有意义的叙事弧线？
-4. 涌现质量 — NPC决策和事件的组合是否产生了非模板化的、有趣的情节？
-
-输出JSON：
-{"scores":[{"dimension":"角色一致性","score":4,"reasoning":"..."},...],"overallScore":3.5,"summary":"一句话总评"}`;
-
-  console.log('\n===== LLM-as-Judge 评估中... =====\n');
-
-  let fullResponse = '';
-  await provider.chat(
-    [
-      { role: 'system', content: '你是游戏设计评估专家。只输出JSON。' },
-      { role: 'user', content: prompt },
-    ],
-    (chunk: string) => { fullResponse += chunk; },
-  );
-
-  const json = extractJson(fullResponse);
-  if (!json) {
-    console.error('LLM 返回无法解析:', fullResponse.slice(0, 500));
-    return undefined;
+function readPromptRecords(inputFile: string): PromptRecord[] {
+  const promptsFile = inputFile.replace(/\.json$/, '.prompts.jsonl');
+  if (!fs.existsSync(promptsFile)) {
+    console.log(`未找到 ${promptsFile}，跳过 prompt/response 检测`);
+    return [];
   }
-
-  const parsed = JSON.parse(json) as EvalResult['llmEval'];
-  return parsed;
+  const lines = fs.readFileSync(promptsFile, 'utf-8').split('\n').filter(Boolean);
+  console.log(`读取 ${lines.length} 条 prompt 记录`);
+  return lines.map(line => JSON.parse(line));
 }
 
-function printLlmEval(eval_: NonNullable<EvalResult['llmEval']>): void {
-  console.log('\n===== LLM-as-Judge 评估结果 =====\n');
-  for (const s of eval_.scores) {
-    console.log(`[${s.score}/5] ${s.dimension}`);
-    console.log(`  ${s.reasoning}\n`);
+function stripThinking(text: string): string {
+  return text.replace(/<thought>[\s\S]*?<\/thought>/g, '').replace(/<thinking>[\s\S]*?<\/thinking>/g, '').trim();
+}
+
+function ruleBasedChecks(records: PromptRecord[], entries: LogEntry[]): RuleIssue[] {
+  const issues: RuleIssue[] = [];
+
+  for (let i = 0; i < records.length; i++) {
+    const r = { ...records[i], response: stripThinking(records[i].response) };
+    // 1. 禁用词检测
+    for (const word of BANNED_WORDS) {
+      if (r.response.includes(word)) {
+        issues.push({ type: 'historical_leak', detail: `LLM 输出中出现禁用词"${word}"`, recordIndex: i });
+      }
+    }
+
+    // 2. 称谓规则检测
+    for (const rule of NAMING_VIOLATIONS) {
+      if (rule.pattern.test(r.response)) {
+        issues.push({ type: 'naming_violation', detail: rule.detail, recordIndex: i });
+      }
+    }
+
+    // 3. 人设一致性检测（npc_decision 类型）
+    const recType = classifyPromptRecord(records[i]);
+    if (recType === 'npc_decision') {
+      for (const [npcId, profile] of Object.entries(PERSONA_VIOLATIONS)) {
+        const systemMsg = records[i].messages.find(m => m.role === 'system')?.content || '';
+        if (!systemMsg.includes(npcId) && !systemMsg.includes(profile.detail.slice(0, 4))) continue;
+        for (const kw of profile.antiKeywords) {
+          if (r.response.includes(kw)) {
+            issues.push({ type: 'persona_violation', detail: `${profile.detail}，关键词"${kw}"`, recordIndex: i });
+          }
+        }
+      }
+    }
+
+    // 4. 虚构事件引用检测（scene_dialogue 类型）
+    if (recType === 'scene_dialogue') {
+      for (const pat of FABRICATION_PATTERNS) {
+        const match = r.response.match(pat);
+        if (match) {
+          issues.push({
+            type: 'fabricated_event',
+            detail: `可能引用了未发生的事件："${match[0]}"（需人工确认）`,
+            recordIndex: i,
+          });
+        }
+      }
+    }
   }
-  console.log(`综合评分: ${eval_.overallScore}/5`);
-  console.log(`总评: ${eval_.summary}`);
+
+  // 3. response 重复检测（场景对话 + 事件生成 + 记忆提取，剥离 thinking 后比较）
+  const narrativeRecords = records
+    .map((r, idx) => ({ idx, stripped: stripThinking(r.response), type: classifyPromptRecord(r) }))
+    .filter(r => r.type !== 'npc_decision');
+  for (let i = 1; i < narrativeRecords.length; i++) {
+    const a = narrativeRecords[i - 1];
+    const b = narrativeRecords[i];
+    if (a.type !== b.type) continue;
+    if (a.stripped.length > 50 && b.stripped.length > 50) {
+      const overlap = computeNgramOverlap(a.stripped, b.stripped, 5);
+      if (overlap > 0.4) {
+        issues.push({
+          type: 'response_repetition',
+          detail: `${a.type} 输出相似度过高 (${(overlap * 100).toFixed(0)}% 5-gram overlap)，records [${a.idx}] 和 [${b.idx}]`,
+          recordIndex: b.idx,
+        });
+      }
+    }
+  }
+
+  // 4. 记忆注入但未体现
+  for (let i = 0; i < records.length; i++) {
+    const r = records[i];
+    const systemMsg = r.messages.find(m => m.role === 'system');
+    if (!systemMsg) continue;
+    const memMatch = systemMsg.content.match(/近期记忆[：:]\s*([\s\S]*?)(?:\n\n|===|$)/);
+    if (!memMatch) continue;
+    const memText = memMatch[1].trim();
+    if (memText.length < 10) continue;
+
+    const memKeywords = memText.match(/[\u4e00-\u9fff]{2,6}/g) || [];
+    const uniqueKeywords = [...new Set(memKeywords)].filter(k => k.length >= 3);
+    if (uniqueKeywords.length === 0) continue;
+
+    const stripped = stripThinking(r.response);
+    const hits = uniqueKeywords.filter(k => stripped.includes(k)).length;
+    if (hits === 0 && uniqueKeywords.length >= 3) {
+      issues.push({
+        type: 'memory_not_used',
+        detail: `系统 prompt 注入了 ${uniqueKeywords.length} 个记忆关键词但 response 无一体现`,
+        recordIndex: i,
+      });
+    }
+  }
+
+  return issues;
+}
+
+function computeNgramOverlap(a: string, b: string, n: number): number {
+  const ngrams = (text: string) => {
+    const set = new Set<string>();
+    for (let i = 0; i <= text.length - n; i++) set.add(text.slice(i, i + n));
+    return set;
+  };
+  const setA = ngrams(a);
+  const setB = ngrams(b);
+  let intersect = 0;
+  for (const g of setA) { if (setB.has(g)) intersect++; }
+  return intersect / Math.min(setA.size, setB.size);
+}
+
+function analyzeMemory(entries: LogEntry[]): MemoryAnalysis {
+  const memDiffs = entries.filter(e => e.phase === 'memory_diff');
+  let totalAdded = 0;
+  const allEvents: string[] = [];
+  const allTags: Set<string> = new Set();
+  const growthCurve: number[] = [];
+
+  for (const entry of memDiffs) {
+    const d = entry.detail as {
+      beforeCounts: Record<string, number>;
+      afterCounts: Record<string, number>;
+      added: Record<string, Array<{ event: string; emotionalTag: string }>>;
+    };
+
+    let addedThisEvent = 0;
+    for (const mems of Object.values(d.added || {})) {
+      for (const m of mems) {
+        totalAdded++;
+        addedThisEvent++;
+        allEvents.push(m.event);
+        if (m.emotionalTag) allTags.add(m.emotionalTag);
+      }
+    }
+    growthCurve.push(addedThisEvent);
+  }
+
+  // 重复率：event 文本去重后的比例
+  const uniqueEvents = new Set(allEvents);
+  const duplicateRate = allEvents.length > 0 ? 1 - uniqueEvents.size / allEvents.length : 0;
+
+  return {
+    totalMemoriesAdded: totalAdded,
+    duplicateRate: Math.round(duplicateRate * 100) / 100,
+    emotionalTagDiversity: allTags.size,
+    growthCurve,
+  };
+}
+
+function printRuleIssues(issues: RuleIssue[]): void {
+  console.log('\n===== 规则检测结果 =====\n');
+  if (issues.length === 0) {
+    console.log('未发现问题');
+    return;
+  }
+  const grouped: Record<string, RuleIssue[]> = {};
+  for (const issue of issues) {
+    if (!grouped[issue.type]) grouped[issue.type] = [];
+    grouped[issue.type].push(issue);
+  }
+  const LABELS: Record<string, string> = {
+    historical_leak: '历史跳跃',
+    naming_violation: '称谓错误',
+    fabricated_event: '虚构事件',
+    persona_violation: '人设违和',
+    response_repetition: '回复重复',
+    memory_not_used: '记忆未体现',
+  };
+  const P1_TYPES = ['historical_leak', 'naming_violation', 'fabricated_event', 'persona_violation'];
+  const printOrder = [...P1_TYPES, 'response_repetition', 'memory_not_used'];
+  for (const type of printOrder) {
+    const list = grouped[type];
+    if (!list) continue;
+    const priority = P1_TYPES.includes(type) ? '⚠ P1' : 'P2';
+    console.log(`[${priority}] ${LABELS[type] || type}: ${list.length} 处`);
+    for (const issue of list.slice(0, 5)) {
+      console.log(`  - ${issue.detail}${issue.recordIndex !== undefined ? ` (record #${issue.recordIndex})` : ''}`);
+    }
+    if (list.length > 5) console.log(`  ... 还有 ${list.length - 5} 处`);
+  }
+}
+
+function printMemoryAnalysis(analysis: MemoryAnalysis): void {
+  console.log('\n===== 记忆连贯性分析 =====\n');
+  console.log(`新增记忆总数: ${analysis.totalMemoriesAdded}`);
+  console.log(`重复率: ${(analysis.duplicateRate * 100).toFixed(0)}%`);
+  console.log(`情感标签多样性: ${analysis.emotionalTagDiversity} 种`);
+  console.log(`增长曲线 (每事件新增): [${analysis.growthCurve.join(', ')}]`);
+}
+
+// ===== Part 3: 涌现质量分析 =====
+
+function classifyPromptRecord(r: PromptRecord): string {
+  const systemMsg = r.messages.find(m => m.role === 'system')?.content || '';
+  if (systemMsg.includes('叙事引擎') || systemMsg.includes('旁白')) return 'scene_dialogue';
+  if (systemMsg.includes('记忆提取') || systemMsg.includes('memory')) return 'memory_extraction';
+  if (systemMsg.includes('历史事件编剧') || systemMsg.includes('变体')) return 'event_generation';
+  const userMsg = r.messages.find(m => m.role === 'user')?.content || '';
+  if (systemMsg.includes('请按要求输出JSON') || userMsg.includes('stance') || userMsg.includes('pressureDeltas')) return 'npc_decision';
+  return 'other';
+}
+
+function shannonEntropy(counts: Record<string, number>): number {
+  const total = Object.values(counts).reduce((a, b) => a + b, 0);
+  if (total === 0) return 0;
+  let entropy = 0;
+  for (const c of Object.values(counts)) {
+    if (c === 0) continue;
+    const p = c / total;
+    entropy -= p * Math.log2(p);
+  }
+  return Math.round(entropy * 100) / 100;
+}
+
+function computeEmergenceMetrics(entries: LogEntry[]): EmergenceMetrics {
+  const ticks = entries.filter(e => e.phase === 'tick').map(e => ({ day: e.day, detail: e.detail as unknown as TickDetail }));
+  const totalDays = entries.length > 0 ? Math.max(...entries.map(e => e.day)) + 1 : 0;
+
+  const npcStanceDiversity: EmergenceMetrics['npcStanceDiversity'] = {};
+  const npcActionRepetitionRate: Record<string, number> = {};
+  const npcSilentDays: Record<string, number> = {};
+  const npcStanceTransitions: Record<string, number> = {};
+
+  // Collect per-NPC per-day data
+  const npcIds = new Set<string>();
+  const npcDayStance: Record<string, Record<number, string>> = {};
+  const npcActions: Record<string, string[]> = {};
+  const npcStanceCounts: Record<string, Record<string, number>> = {};
+  const npcActiveDays: Record<string, Set<number>> = {};
+
+  for (const t of ticks) {
+    for (const a of t.detail.npcActions || []) {
+      npcIds.add(a.who);
+      if (!npcDayStance[a.who]) npcDayStance[a.who] = {};
+      npcDayStance[a.who][t.day] = a.stance;
+      if (!npcActions[a.who]) npcActions[a.who] = [];
+      npcActions[a.who].push(a.action);
+      if (!npcStanceCounts[a.who]) npcStanceCounts[a.who] = {};
+      npcStanceCounts[a.who][a.stance] = (npcStanceCounts[a.who][a.stance] || 0) + 1;
+      if (!npcActiveDays[a.who]) npcActiveDays[a.who] = new Set();
+      npcActiveDays[a.who].add(t.day);
+    }
+  }
+
+  for (const npcId of npcIds) {
+    const counts = npcStanceCounts[npcId] || {};
+    const totalActions = Object.values(counts).reduce((a, b) => a + b, 0);
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    const [dominantStance, dominantCount] = sorted[0] || ['none', 0];
+
+    npcStanceDiversity[npcId] = {
+      distribution: counts,
+      shannonEntropy: shannonEntropy(counts),
+      dominantStance,
+      dominantRatio: totalActions > 0 ? Math.round(dominantCount / totalActions * 100) / 100 : 0,
+    };
+
+    // Action repetition rate
+    const actions = npcActions[npcId] || [];
+    const uniqueActions = new Set(actions);
+    npcActionRepetitionRate[npcId] = actions.length > 0
+      ? Math.round((1 - uniqueActions.size / actions.length) * 100) / 100
+      : 0;
+
+    // Silent days
+    npcSilentDays[npcId] = totalDays - (npcActiveDays[npcId]?.size || 0);
+
+    // Stance transitions
+    const dayStances = npcDayStance[npcId] || {};
+    const sortedDays = Object.keys(dayStances).map(Number).sort((a, b) => a - b);
+    let transitions = 0;
+    for (let i = 1; i < sortedDays.length; i++) {
+      if (dayStances[sortedDays[i]] !== dayStances[sortedDays[i - 1]]) transitions++;
+    }
+    npcStanceTransitions[npcId] = transitions;
+  }
+
+  // Event behavior shifts
+  const eventDays: Array<{ day: number; skeletonId: string }> = [];
+  for (const t of ticks) {
+    if (t.detail.triggeredEvents && t.detail.triggeredEvents.length > 0) {
+      for (const evt of t.detail.triggeredEvents) {
+        const sid = typeof evt === 'string' ? evt : evt.skeletonId;
+        eventDays.push({ day: t.day, skeletonId: sid });
+      }
+    }
+  }
+
+  const eventBehaviorShift: EmergenceMetrics['eventBehaviorShift'] = [];
+  for (const { day: eventDay, skeletonId } of eventDays) {
+    const shifts: Record<string, { before: string[]; after: string[] }> = {};
+    for (const npcId of npcIds) {
+      const dayStances = npcDayStance[npcId] || {};
+      const before: string[] = [];
+      const after: string[] = [];
+      for (let d = Math.max(0, eventDay - 2); d < eventDay; d++) {
+        if (dayStances[d]) before.push(dayStances[d]);
+      }
+      for (let d = eventDay + 1; d <= eventDay + 2; d++) {
+        if (dayStances[d]) after.push(dayStances[d]);
+      }
+      shifts[npcId] = { before, after };
+    }
+    eventBehaviorShift.push({ eventDay, skeletonId, shifts });
+  }
+
+  return { npcStanceDiversity, npcActionRepetitionRate, npcSilentDays, npcStanceTransitions, eventBehaviorShift };
+}
+
+function printEmergenceMetrics(em: EmergenceMetrics, totalDays: number): void {
+  console.log('\n===== 涌现质量分析 =====\n');
+
+  console.log('NPC 行为多样性:');
+  for (const [npcId, div] of Object.entries(em.npcStanceDiversity)) {
+    const distStr = Object.entries(div.distribution)
+      .sort((a, b) => b[1] - a[1])
+      .map(([s, n]) => `${s}×${n}`)
+      .join(', ');
+    const warnings: string[] = [];
+    if (div.shannonEntropy < 1.0) warnings.push('⚠ 熵过低');
+    if (div.dominantRatio > 0.8) warnings.push('⚠ 主导stance>' + Math.round(div.dominantRatio * 100) + '%');
+    if (em.npcActionRepetitionRate[npcId] > 0.6) warnings.push('⚠ 行动重复>' + Math.round(em.npcActionRepetitionRate[npcId] * 100) + '%');
+    if (em.npcSilentDays[npcId] > totalDays * 0.5) warnings.push('⚠ 沉默>' + Math.round(totalDays * 0.5) + '天');
+
+    console.log(`  ${npcId}: ${distStr} | 熵=${div.shannonEntropy} | 重复率=${Math.round(em.npcActionRepetitionRate[npcId] * 100)}% | 转变=${em.npcStanceTransitions[npcId]}次 | 沉默${em.npcSilentDays[npcId]}天${warnings.length > 0 ? ' ' + warnings.join(' ') : ''}`);
+  }
+
+  if (em.eventBehaviorShift.length > 0) {
+    console.log('\n事件前后行为变化:');
+    for (const shift of em.eventBehaviorShift) {
+      const parts: string[] = [];
+      for (const [npcId, { before, after }] of Object.entries(shift.shifts)) {
+        const bStr = before.length > 0 ? before.join('/') : '沉默';
+        const aStr = after.length > 0 ? after.join('/') : '沉默';
+        const changed = bStr !== aStr;
+        parts.push(`${npcId}: ${bStr}→${aStr}${changed ? '' : '（无变化）'}`);
+      }
+      console.log(`  [第${shift.eventDay}天 ${shift.skeletonId}] ${parts.join(', ')}`);
+    }
+  }
 }
 
 // ===== Main =====
 
 const args = process.argv.slice(2);
 const inputFile = args.find(a => !a.startsWith('--'));
-const withLlm = args.includes('--with-llm');
 
 if (!inputFile) {
-  console.error('用法: npx tsx scripts/eval-playthrough.ts <log.json> [--with-llm]');
+  console.error('用法: npx tsx scripts/eval-playthrough.ts <log.json>');
   process.exit(1);
 }
 
@@ -318,18 +646,38 @@ console.log(`读取 ${entries.length} 条日志记录，来自 ${inputFile}`);
 const metrics = computeMetrics(entries);
 printMetrics(metrics);
 
+
 const result: EvalResult = {
   inputFile,
   timestamp: new Date().toISOString(),
   metrics,
 };
 
-if (withLlm) {
-  const evalResult = await llmEval(entries, metrics);
-  if (evalResult) {
-    result.llmEval = evalResult;
-    printLlmEval(evalResult);
+// Emergence quality analysis
+const emergenceMetrics = computeEmergenceMetrics(entries);
+result.emergenceMetrics = emergenceMetrics;
+printEmergenceMetrics(emergenceMetrics, metrics.totalDays);
+
+// Rule-based checks (always run if .prompts.jsonl exists)
+const promptRecords = readPromptRecords(path.resolve(inputFile));
+if (promptRecords.length > 0) {
+  const typeDist: Record<string, number> = {};
+  for (const r of promptRecords) {
+    const t = classifyPromptRecord(r);
+    typeDist[t] = (typeDist[t] || 0) + 1;
   }
+  console.log(`LLM 调用分类: ${Object.entries(typeDist).map(([t, n]) => `${t}×${n}`).join(', ')}`);
+
+  const ruleIssues = ruleBasedChecks(promptRecords, entries);
+  result.ruleBasedIssues = ruleIssues;
+  printRuleIssues(ruleIssues);
+}
+
+// Memory analysis (always run if memory_diff entries exist)
+const memAnalysis = analyzeMemory(entries);
+if (memAnalysis.totalMemoriesAdded > 0 || entries.some(e => e.phase === 'memory_diff')) {
+  result.memoryAnalysis = memAnalysis;
+  printMemoryAnalysis(memAnalysis);
 }
 
 // 保存结果

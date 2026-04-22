@@ -35,8 +35,8 @@ const { characters, getPlayerCharacter, getNpcCharacters } = await import('../sr
 const { ALL_ACTIVITIES } = await import('../src/engine/world/activities');
 const { SceneManager } = await import('../src/engine/sceneManager');
 
-// --- 速率限制包装（Gemini 15 RPM） ---
-const RPM_LIMIT = 13;
+// --- 速率限制包装（Gemini 20 RPM；并行跑多局时用 AUTOPLAY_RPM 分配） ---
+const RPM_LIMIT = Number(process.env.AUTOPLAY_RPM) || 13;
 const WINDOW_MS = 60_000;
 const callTimestamps: number[] = [];
 
@@ -56,6 +56,21 @@ function rateLimitedProvider(base: ReturnType<typeof createLLMProvider>): Return
       }
       callTimestamps.push(Date.now());
       return base.chat(messages, onChunk, signal);
+    },
+  };
+}
+
+function loggingProvider(base: ReturnType<typeof createLLMProvider>): ReturnType<typeof createLLMProvider> {
+  return {
+    chat: async (messages, onChunk?, signal?) => {
+      const result = await base.chat(messages, onChunk, signal);
+      const record = {
+        ts: Date.now(),
+        messages: messages.map(m => ({ role: m.role, content: m.content })),
+        response: result.content,
+      };
+      fs.appendFileSync(promptsPath, JSON.stringify(record) + '\n');
+      return result;
     },
   };
 }
@@ -98,7 +113,7 @@ function timestampSlug(d = new Date()): string {
 
 const logsDir = path.resolve(import.meta.dirname!, 'logs');
 fs.mkdirSync(logsDir, { recursive: true });
-const outPath = path.resolve(logsDir, `${timestampSlug()}-autoplay.json`);
+let outPath = '';
 
 function flushLogs() {
   fs.writeFileSync(outPath, JSON.stringify(logs, null, 2), 'utf-8');
@@ -109,6 +124,100 @@ function log(day: number, dateStr: string, phase: string, detail: Record<string,
   logs.push(entry);
   console.log(`[Day ${day}] ${phase}:`, JSON.stringify(detail).slice(0, 200));
   flushLogs();
+}
+
+// --- 策略化活动选择 ---
+
+type Strategy =
+  | 'suppress_jiancheng'
+  | 'suppress_emperor'
+  | 'military_prep'
+  | 'reactive_defense'
+  | 'diplomacy'
+  | 'endure'
+  | 'abandon';
+
+const STRATEGY: Strategy = (process.env.AUTOPLAY_STRATEGY as Strategy) || 'suppress_emperor';
+
+outPath = path.resolve(logsDir, `${timestampSlug()}-${STRATEGY}-autoplay.json`);
+const promptsPath = outPath.replace('.json', '.prompts.jsonl');
+
+function actById(id: string) {
+  return ALL_ACTIVITIES.find(a => a.id === id)!;
+}
+
+function pickFrom(ids: string[], count: number): string[] {
+  const shuffled = [...ids].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count);
+}
+
+function pickActivities(strategy: Strategy, state: { pressureAxes: Record<string, { value: number }> }) {
+  const p = (id: string) => state.pressureAxes[id].value;
+
+  let ids: string[];
+
+  switch (strategy) {
+    case 'suppress_jiancheng': {
+      const pool = ['meet_officials', 'contact_insiders', 'summon_spy', 'counsel_xuanling'];
+      ids = pickFrom(pool, 2);
+      if (p('jiancheng_hostility') > 60 && !ids.includes('inspect_guards')) {
+        ids[1] = 'inspect_guards';
+      }
+      break;
+    }
+    case 'suppress_emperor': {
+      const pool = ['contact_insiders', 'train_troops', 'meet_officials', 'summon_spy'];
+      ids = pickFrom(pool, 2);
+      if (p('imperial_suspicion') > 50) {
+        ids[1] = 'counsel_wuji';
+      }
+      break;
+    }
+    case 'military_prep': {
+      const pool = ['train_troops', 'inspect_guards', 'reassure_jingde', 'contact_insiders'];
+      ids = pickFrom(pool, 2);
+      if (p('military_readiness') > 70) {
+        ids[1] = randomPick(['counsel_wuji', 'counsel_xuanling']);
+      }
+      break;
+    }
+    case 'reactive_defense': {
+      if (p('imperial_suspicion') > 50) {
+        ids = pickFrom(['study', 'family_time', 'review_memorials'], 2);
+      } else if (p('jiancheng_hostility') > 55) {
+        ids = pickFrom(['inspect_guards', 'reassure_jingde', 'counsel_wuji'], 2);
+      } else if (p('qinwangfu_desperation') > 50) {
+        ids = pickFrom(['counsel_xuanling', 'reassure_jingde', 'family_time'], 2);
+      } else {
+        ids = pickFrom(['review_memorials', 'meet_officials', 'study'], 1);
+      }
+      break;
+    }
+    case 'diplomacy': {
+      const pool = ['meet_officials', 'review_memorials', 'counsel_wuji', 'counsel_xuanling'];
+      ids = pickFrom(pool, 2);
+      if (p('imperial_suspicion') > 40) {
+        ids = pickFrom(['review_memorials', 'study', 'meet_officials'], 2);
+      } else if (p('imperial_suspicion') < 25) {
+        ids[1] = 'contact_insiders';
+      }
+      break;
+    }
+    case 'endure': {
+      const pool = ['study', 'family_time', 'review_memorials'];
+      ids = pickFrom(pool, 2);
+      if (p('qinwangfu_desperation') > 40) {
+        ids[1] = 'counsel_xuanling';
+      }
+      break;
+    }
+    case 'abandon': {
+      ids = pickFrom(['study', 'family_time'], 1);
+      break;
+    }
+  }
+
+  return ids.map(actById);
 }
 
 // --- 配置 ---
@@ -129,7 +238,7 @@ describe('autoplay', () => {
       baseUrl: process.env.VITE_LLM_BASE_URL || undefined,
     };
     if (!config.apiKey) throw new Error('需要设置 VITE_LLM_API_KEY 环境变量');
-    provider = rateLimitedProvider(createLLMProvider(config));
+    provider = loggingProvider(rateLimitedProvider(createLLMProvider(config)));
   });
 
   it('runs automated playthrough', async () => {
@@ -139,16 +248,16 @@ describe('autoplay', () => {
     let currentMode = 'title_screen' as string;
     simulator.subscribe((_state, mode) => { currentMode = mode; });
     simulator.startGame();
+    log(0, '', 'config', { strategy: STRATEGY, maxDays: MAX_DAYS });
 
     for (let day = 0; day < MAX_DAYS; day++) {
       const state = simulator.getState();
       const cal = state.calendar;
       const dateStr = `武德九年${cal.month}月${cal.day}日`;
 
-      // 1. 选活动（随机 1-2 个）
-      const actCount = 1 + Math.floor(Math.random() * 2);
-      for (let a = 0; a < actCount; a++) {
-        const activity = randomPick(ALL_ACTIVITIES);
+      // 1. 策略化选活动
+      const activities = pickActivities(STRATEGY, state);
+      for (const activity of activities) {
         const flavor = simulator.applyActivity(activity);
         log(day, dateStr, 'activity', { id: activity.id, name: activity.name, flavor });
       }
@@ -182,6 +291,8 @@ describe('autoplay', () => {
       if (currentMode === 'event_scene') {
         const sceneConfig = simulator.getEventSceneConfig();
         if (sceneConfig) {
+          const memBefore: Record<string, unknown[]> = JSON.parse(JSON.stringify(simulator.getState().characterMemories));
+
           const sceneNpcs = npcs.filter(c => sceneConfig.activeNpcIds?.includes(c.id));
           const sm = new SceneManager(provider, sceneConfig, sceneNpcs, player);
           await sm.startGame();
@@ -222,7 +333,23 @@ describe('autoplay', () => {
           // 获取结束文本
           const finalState = sm.getState();
           const summary = finalState.endingText || '场景结束，未获得结局文本。';
-          simulator.handleEventEnd(summary);
+          await simulator.handleEventEnd(summary);
+
+          // 记忆 diff
+          const memAfter = simulator.getState().characterMemories as Record<string, unknown[]>;
+          const memAdded: Record<string, unknown[]> = {};
+          for (const [charId, mems] of Object.entries(memAfter)) {
+            const prevLen = (memBefore[charId] || []).length;
+            const newMems = (mems as unknown[]).slice(prevLen);
+            if (newMems.length > 0) memAdded[charId] = newMems;
+          }
+          log(day, dateStr, 'memory_diff', {
+            beforeCounts: Object.fromEntries(Object.entries(memBefore).map(([k, v]) => [k, v.length])),
+            afterCounts: Object.fromEntries(Object.entries(memAfter).map(([k, v]) => [k, v.length])),
+            added: Object.fromEntries(
+              Object.entries(memAdded).map(([k, v]) => [k, v.map((m: any) => ({ event: m.event, emotionalTag: m.emotionalTag }))])
+            ),
+          });
 
           log(day, dateStr, 'event_end', {
             summary: summary.slice(0, 300),
@@ -231,11 +358,6 @@ describe('autoplay', () => {
               day: e.day,
               summary: e.summary.slice(0, 200),
             })),
-            characterMemories: Object.fromEntries(
-              Object.entries(simulator.getState().characterMemories).map(
-                ([k, v]) => [k, v.map(m => ({ event: m.event.slice(0, 100), emotionalTag: m.emotionalTag }))]
-              )
-            ),
           });
         }
       }
