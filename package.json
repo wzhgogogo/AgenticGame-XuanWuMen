@@ -12,6 +12,11 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@pixi/particle-emitter": "^5.0.10",
+    "@pixi/react": "^8.0.5",
+    "@pixi/sound": "^6.0.1",
+    "pixi-filters": "^6.1.5",
+    "pixi.js": "^8.18.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },

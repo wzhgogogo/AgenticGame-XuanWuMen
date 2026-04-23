@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import type { LLMConfig, SceneConfig, Character, ISceneManager } from './types';
 import type { WorldState, GameMode, WorldTickResult } from './types/world';
+import type { DeskCanvasState } from './renderer/GameCanvasContext';
 import { createLLMProvider } from './engine/llm';
 import type { LLMProvider } from './engine/llm';
 import { SceneManager } from './engine/sceneManager';
@@ -14,7 +15,9 @@ import EndingScreen from './components/EndingScreen';
 import DailyActivityScreen from './components/DailyActivityScreen';
 import DailyBriefingScreen from './components/DailyBriefingScreen';
 import DebugPanel from './components/DebugPanel';
-import SceneBackground from './components/SceneBackground';
+import { GameCanvas } from './renderer/GameCanvas';
+import { GameCanvasContext } from './renderer/GameCanvasContext';
+import type { SceneType, CanvasEvent } from './renderer/GameCanvasContext';
 
 function loadEnvConfig(): LLMConfig {
   // 安全检查：非 localhost 环境下不暴露 API Key
@@ -38,6 +41,14 @@ function loadEnvConfig(): LLMConfig {
   };
 }
 
+const GAME_MODE_TO_SCENE: Record<GameMode, SceneType> = {
+  title_screen: 'title',
+  daily_activities: 'desk',
+  daily_briefing: 'briefing',
+  event_scene: 'scene',
+  game_over: 'ending',
+};
+
 export default function App() {
   const [worldState, setWorldState] = useState<WorldState | null>(null);
   const [gameMode, setGameMode] = useState<GameMode>('title_screen');
@@ -46,6 +57,7 @@ export default function App() {
   const [sceneManager, setSceneManager] = useState<ISceneManager | null>(null);
   const [currentSceneConfig, setCurrentSceneConfig] = useState<SceneConfig | null>(null);
   const [loading, setLoading] = useState<string | null>(null);
+  const [deskCanvasState, setDeskCanvasState] = useState<DeskCanvasState | null>(null);
 
   const simulatorRef = useRef<WorldSimulator | null>(null);
   const llmProviderRef = useRef<LLMProvider | null>(null);
@@ -197,6 +209,27 @@ export default function App() {
     setCurrentSceneConfig(null);
   }, []);
 
+  const handleCanvasEvent = useCallback((event: CanvasEvent) => {
+    // Will be used by DailyActivityScreen to handle desk object clicks
+    void event;
+  }, []);
+
+  const sceneType = loading ? 'loading' as SceneType : GAME_MODE_TO_SCENE[gameMode] || 'title';
+
+  const canvasCtx = {
+    sceneType,
+    deskState: deskCanvasState,
+    scenePhase: 0,
+    onCanvasEvent: handleCanvasEvent,
+  };
+
+  const wrapWithCanvas = (children: React.ReactNode) => (
+    <GameCanvasContext.Provider value={canvasCtx}>
+      <GameCanvas />
+      {children}
+    </GameCanvasContext.Provider>
+  );
+
   const debugPanel = import.meta.env.DEV && debugOpen ? (
     <DebugPanel
       worldState={worldState}
@@ -208,10 +241,9 @@ export default function App() {
 
   // 加载过渡画面
   if (loading) {
-    return (
+    return wrapWithCanvas(
       <>
         <div className="h-screen relative flex flex-col items-center justify-center px-4">
-          <SceneBackground />
           <p
             className="relative z-10 font-game text-sm animate-fade-in"
             style={{ color: '#8a8070' }}
@@ -227,10 +259,9 @@ export default function App() {
 
   // 错误画面
   if (error) {
-    return (
+    return wrapWithCanvas(
       <>
         <div className="h-screen relative flex flex-col items-center justify-center px-4">
-          <SceneBackground />
           <p className="relative z-10 text-sm mb-4" style={{ color: '#E24B4A' }}>{error}</p>
           <button
             onClick={handleStart}
@@ -255,10 +286,9 @@ export default function App() {
   // 开屏
   if (gameMode === 'title_screen') {
     const hasSave = !!loadWorldState();
-    return (
+    return wrapWithCanvas(
       <>
         <div className="h-screen relative flex flex-col items-center justify-center px-4 overflow-hidden">
-          <SceneBackground />
 
           {/* 标题 */}
           <div className="relative z-10 stagger-1">
@@ -344,12 +374,13 @@ export default function App() {
 
   // 日常活动
   if (gameMode === 'daily_activities' && worldState) {
-    return (
+    return wrapWithCanvas(
       <>
         <DailyActivityScreen
           state={worldState}
           onSelectActivity={handleSelectActivity}
           onEndDay={handleEndDay}
+          onDeskStateChange={setDeskCanvasState}
         />
         {debugPanel}
       </>
@@ -358,7 +389,7 @@ export default function App() {
 
   // 日报
   if (gameMode === 'daily_briefing' && worldState && tickResult) {
-    return (
+    return wrapWithCanvas(
       <>
         <DailyBriefingScreen
           state={worldState}
@@ -374,7 +405,7 @@ export default function App() {
   // 事件场景
   if (gameMode === 'event_scene' && sceneManager && currentSceneConfig) {
     const sceneNpcs = npcs.filter((c) => currentSceneConfig.activeNpcIds?.includes(c.id));
-    return (
+    return wrapWithCanvas(
       <>
         <EventSceneWrapper
           sceneManager={sceneManager}
@@ -391,7 +422,7 @@ export default function App() {
   if (gameMode === 'game_over') {
     const simulator = simulatorRef.current;
     const ending = simulator?.getEndingType() || 'deposed';
-    return (
+    return wrapWithCanvas(
       <>
         <EndingScreen
           endingType={ending}
@@ -402,7 +433,7 @@ export default function App() {
     );
   }
 
-  return <>{debugPanel}</>;
+  return wrapWithCanvas(<>{debugPanel}</>);
 }
 
 // 事件场景包装组件：监听 SceneManager 的 ending 状态，通知父级

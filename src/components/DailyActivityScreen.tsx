@@ -1,8 +1,8 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import type { WorldState, DailyActivity, TimeOfDay, ActivityCategory } from '../types/world';
+import type { DeskCanvasState, DeskObjectState } from '../renderer/GameCanvasContext';
 import { getActivitiesForTimeSlot } from '../engine/world/activities';
 import WorldStateHud from './WorldStateHud';
-import SceneBackground from './SceneBackground';
 import ImperialDesk from './desk/ImperialDesk';
 import DeskObject from './desk/DeskObject';
 import FlavorTextOverlay from './desk/FlavorTextOverlay';
@@ -11,6 +11,7 @@ interface DailyActivityScreenProps {
   state: WorldState;
   onSelectActivity: (activity: DailyActivity) => string;
   onEndDay: () => void;
+  onDeskStateChange?: (deskState: DeskCanvasState) => void;
 }
 
 const TIME_SLOTS: { key: 'morning' | 'afternoon' | 'evening'; label: string; icon: string }[] = [
@@ -38,6 +39,7 @@ export default function DailyActivityScreen({
   state,
   onSelectActivity,
   onEndDay,
+  onDeskStateChange,
 }: DailyActivityScreenProps) {
   const [currentSlotIndex, setCurrentSlotIndex] = useState(
     () => getTimeSlotIndex(state.calendar.timeOfDay),
@@ -64,9 +66,20 @@ export default function DailyActivityScreen({
 
   const allSlotsFilled = TIME_SLOTS.every((slot) => selectedActivities[slot.key]);
 
+  const categoriesKey = Object.keys(grouped).join(',');
+  useEffect(() => {
+    if (!onDeskStateChange) return;
+    const cats = Object.keys(grouped) as ActivityCategory[];
+    const objects: DeskObjectState[] = cats.map((cat) => ({
+      category: cat,
+      isFocused: focusedCategory === cat,
+      isDimmed: focusedCategory !== null && focusedCategory !== cat,
+    }));
+    onDeskStateChange({ timeSlot: currentSlot.key, objects });
+  }, [currentSlot.key, focusedCategory, categoriesKey, onDeskStateChange, grouped]);
+
   return (
     <div className="h-screen relative flex flex-col">
-      <SceneBackground />
       <div className="relative z-10">
         <WorldStateHud state={state} />
       </div>

@@ -4,10 +4,51 @@
 
 ---
 
-## P0 · 玩法核心（优先级最高）
+## P0 · UI 视觉完善
+
+> 当前视觉粗糙，游戏感弱；art-direction.md 已定义电影叙事风设计系统，尚未完全落地。
+
+- [ ] **日报/活动/事件场景视觉打磨** — 按 art-direction 的配色、字体、节奏应用到 DailyBriefingScreen / DailyActivityScreen / GameScene
+- [ ] **压力轴可视化** — 七条压力轴当前仅文字呈现，需要更直观的可视化（条形/环形/氛围色调映射）
+- [ ] **对话打字机效果** — 解析完 JSON 后逐字/逐条动画显示，而非一次性全部出现
+- [ ] **过场与状态切换动画** — title→daily→briefing→scene 之间的转场过渡，避免硬切
+- [ ] **音效/氛围** — 背景音乐、按钮音效、关键事件音效
+
+---
+
+## P0 · 扩充幕后 NPC 为 Agent（李渊 / 建成 / 元吉）
+
+> 当前三人只在 `offstageAgents.ts` 里做确定性压力贡献，跑局里决策全部来自秦王府 3 人，对手方没有"脑子"。
+
+- [ ] **建成（li_jiancheng）加入 npc agent 管线** — 写 `npcDecisionRules.ts` 条目，给出 4-5 档紧迫度 stance（保守/拉拢/设局/强硬/摊牌）；场景里作为可出场对手 NPC
+- [ ] **元吉（li_yuanji）加入 npc agent 管线** — 冒进/挑衅/谗言型 stance 谱系；和建成形成"主谋+激进"组合
+- [ ] **李渊（li_yuan）加入 npc agent 管线** — 特殊：作为皇帝，stance 偏向平衡/压制双方/召见/下诏，pressure cap 更严
+- [ ] **角色数据补全** — `src/data/characters/` 下确保三人 profile、memory 目录完整；eval 的称谓规则相应更新
+- [ ] **删除或重构 offstageAgents.ts** — 功能被 npcDecisionRules 取代后，保留确定性基线 tick 或整体移除
+- [ ] **跑局验证** — 三种新 NPC 上线后各跑 2 局 autoplay，确认 stance 分布和事件触发节奏不被打崩
+
+---
+
+## P0 · 等待时间优化
+
+> LLM 等待是最大体验问题。事件触发串行 + 整体等待偏长，体验被切碎。
+
+- [ ] **#4 事件加载慢 + 过场单调** — 多层优化，综合降低单日 40-80 秒的等待：
+  - **事件并行预生成**：`runWorldTick` 在发现新事件时**后台** kick `resolveEventInstance`，存为 `preloadedEventInstance`。玩家看日报的 2-3 秒就能预热完成，`enterEvent` 直接取用，跳过 LLM 阻塞。涉及：worldSimulator.ts, App.tsx
+  - **超时兜底**：事件生成超过 20 秒直接用 skeleton fallback 变体（CLAUDE.md 里标注的"骨架 fallback 变体尚未实现"也要一并做），不再等 res2 重试
+  - **SceneManager 启动预热**：同样模式，进入日报时后台 kick `SceneManager.startGame()` 的第一轮 LLM
+  - **过场文案多样化**：按 `skeleton.category` 选不同 loading 文案（"有人匆匆来报……""步入宴厅，灯火辉煌……"等）
+- [ ] **NPC 决策 prompt 合并** — 当前每个 NPC 每日独立调用一次 LLM（3 NPC = 3 次，加上新三个幕后会到 6 次），合并为一次调用让 LLM 一次性输出所有 NPC 的决策 JSON 数组，减少 ~80% 调用次数
+- [ ] **精简 system prompt** — 角色描述压缩到关键信息（性格关键词+语言风格+核心目标），去掉详细技能分值、完整记忆列表、关系信任度数值等，预计减少 ~60% 输入 tokens
+- [ ] **流式渲染** — 当前等完整响应才显示，后续可做流式 JSON 增量解析，先显示旁白再逐条显示 NPC 对话
+- [ ] **#7 "夜幕降临"增加文本多样性** — App.tsx handleEndDay 的 loading 文案换成通用文案池随机选取。涉及：App.tsx
+- [ ] **免费 API 慢** — Gemini Flash Preview 免费层延迟高，切到付费 API（DeepSeek、Claude 等）
+
+---
+
+## P1 · 玩法核心（选项化交互）
 
 > 核心问题：当前纯阅读+自由输入的交互门槛高、参与感弱。
-> "玩法 > 扩故事线 > 扩人物"——内容量已够验证体验，玩法不好玩加再多内容也没用。
 
 ### 策略选项按钮化
 
@@ -34,20 +75,6 @@
 
 ---
 
-## P1 · 等待时间与加载体验
-
-> 2026-04-20 用户反馈：事件触发串行 + 整体等待偏长，体验被切碎。
-
-- [ ] **#4 事件加载慢 + 过场单调（扩写）** — 多层优化，综合降低单日 40-80 秒的等待：
-  - **事件并行预生成**：`runWorldTick` 在发现新事件时**后台** kick `resolveEventInstance`，存为 `preloadedEventInstance`。玩家看日报的 2-3 秒就能预热完成，`enterEvent` 直接取用，跳过 LLM 阻塞。涉及：worldSimulator.ts, App.tsx
-  - **超时兜底**：事件生成超过 20 秒直接用 skeleton fallback 变体（CLAUDE.md 里标注的"骨架 fallback 变体尚未实现"也要一并做），不再等 res2 重试
-  - **SceneManager 启动预热**：同样模式，进入日报时后台 kick `SceneManager.startGame()` 的第一轮 LLM
-  - **过场文案多样化**：按 `skeleton.category` 选不同 loading 文案（"有人匆匆来报……""步入宴厅，灯火辉煌……"等）
-- [ ] **#7 "夜幕降临"增加文本多样性** — App.tsx handleEndDay 的 loading 文案换成通用文案池随机选取（"长安城的喧嚣渐渐远去……""今日之事暂告一段落……""暮鼓已响，坊门将闭……"）。涉及：App.tsx
-- [ ] **免费 API 慢** — Gemini Flash Preview 免费层延迟高，切到付费 API（DeepSeek、Claude 等）速度会好很多
-
----
-
 ## P1 · 叙事质量与事件触发
 
 - [ ] **#3 事态可选择不处理** — DailyBriefingScreen 加"按下不表"按钮，跳过事件但施加惩罚压力（+5 qinwangfu_desperation, +3 相关轴）。涉及：DailyBriefingScreen.tsx, worldSimulator.ts, App.tsx
@@ -58,12 +85,10 @@
 
 ## P2 · 性能 / Token 消耗
 
-- [ ] **精简 system prompt** — 角色描述压缩到关键信息（性格关键词+语言风格+核心目标），去掉详细技能分值、完整记忆列表、关系信任度数值等，预计减少 ~60% 输入 tokens
 - [ ] **对话历史滑窗** — 只保留最近 N 轮原文（如 5 轮），更早的替换为摘要，避免 context 线性增长（当前 `llmMessages` 全量发送，无裁剪）
 - [ ] **摘要压缩** — 每隔几轮用小模型将旧对话压缩成 200 字前情摘要，替换原始对话记录
 - [ ] **角色信息按需注入** — system prompt 只放最小角色卡，某角色被提及/参与时再动态附带其详细背景
 - [ ] **maxTokens 动态调整** — 结局阶段需要更多输出 token，普通回合可以用更少的
-- [ ] **NPC 决策 prompt 合并** — 当前每个 NPC 每日独立调用一次 LLM（3 NPC = 3 次），可考虑合并为一次调用，让 LLM 一次性输出所有 NPC 的决策 JSON 数组，减少 2/3 的调用次数
 - [ ] **promptBuilder.ts 输出审计** — `buildSystemPrompt` 有 1200+ 行代码，需要实测最终生成的 system prompt 字符数/token 数，建立基线，针对性裁剪冗余段落
 
 ---
@@ -87,8 +112,6 @@
 
 - [ ] **前后端分离** — 当前前后端耦合，上线前拆为独立前端（React SPA）+ 后端（API 服务），便于独立部署、扩缩容和 CDN 加速
 - [ ] **移动端适配** — 检查小屏幕下的布局、字体大小、触控交互
-- [ ] **对话打字机效果** — 解析完 JSON 后逐字/逐条动画显示，而非一次性全部出现
-- [ ] **音效/氛围** — 背景音乐、按钮音效等沉浸感增强
 
 ---
 

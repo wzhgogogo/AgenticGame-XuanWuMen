@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-import ChangAnMap from './ChangAnMap';
 
 interface ImperialDeskProps {
   timeSlot: 'morning' | 'afternoon' | 'evening';
@@ -7,14 +6,13 @@ interface ImperialDeskProps {
   children: ReactNode;
 }
 
-export default function ImperialDesk({ timeSlot, onClickBackground, children }: ImperialDeskProps) {
+export default function ImperialDesk({ onClickBackground, children }: ImperialDeskProps) {
   return (
     <div
-      className={`imperial-desk imperial-desk--${timeSlot}`}
+      className="imperial-desk"
       onClick={onClickBackground}
+      style={{ position: 'relative', width: '75%', height: '65%' }}
     >
-      <ChangAnMap />
-      <div className="imperial-desk-light" />
       {children}
     </div>
   );
