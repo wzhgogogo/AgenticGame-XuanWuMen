@@ -15,7 +15,10 @@ function makeInstance(overrides: Partial<EventInstance> = {}): EventInstance {
     ],
     resolution: {
       coreConflict: '能否安全脱身',
-      resolutionSignals: ['秦王离开宴席', '冲突爆发'],
+      resolutionSignals: [
+        { outcome: 'success', description: '秦王离开宴席' },
+        { outcome: 'failure', description: '冲突爆发' },
+      ],
       softCap: 10,
       hardCap: 13,
     },

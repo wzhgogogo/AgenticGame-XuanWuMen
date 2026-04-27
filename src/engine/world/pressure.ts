@@ -7,7 +7,11 @@ import type {
   PendingEvent,
   EventPrecondition,
   PressureTrigger,
+  OutcomeEffect,
+  NpcAgentState,
+  PlayerOffice,
 } from '../../types/world';
+import { isValidFlagKey } from '../../data/flags';
 
 // ===== 压力轴初始配置 =====
 
@@ -121,6 +125,144 @@ export function applyPressureModifiers(
     };
   }
 
+  return result;
+}
+
+// ===== 应用 Outcome（v3.4.4 单一入口） =====
+
+/**
+ * 应用一组 OutcomeEffect 到完整 WorldState（纯函数）。
+ * 单一入口取代散落的 setter——事件结束、骨架触发、未来扩展（活动 outcome）都走它。
+ *
+ * pressure 分支复用既有 applyPressureModifiers，其他分支按 kind 分派各自处理函数。
+ * 未知 kind 不会抛错（前向兼容旧存档），只在控制台 warn。
+ */
+export function applyOutcomeEffects(state: WorldState, effects: OutcomeEffect[]): WorldState {
+  let next = state;
+  for (const effect of effects) {
+    next = applySingleOutcome(next, effect);
+  }
+  return next;
+}
+
+function applySingleOutcome(state: WorldState, effect: OutcomeEffect): WorldState {
+  switch (effect.kind) {
+    case 'pressure':
+      return {
+        ...state,
+        pressureAxes: applyPressureModifiers(state.pressureAxes, [effect.modifier]),
+      };
+    case 'loseNpc':
+      return applyLoseNpc(state, effect.characterId, effect.status, effect.reason);
+    case 'injureNpc':
+      return applyInjureNpc(
+        state,
+        effect.characterId,
+        effect.commitmentDelta,
+        effect.patienceDelta ?? 0,
+      );
+    case 'loseOffice':
+      return applyLoseOffice(state, effect.officeId, effect.reason);
+    case 'confiscateMilitary':
+      return applyConfiscateMilitary(state, effect.ceilingDelta);
+    case 'flag':
+      if (!isValidFlagKey(effect.key)) {
+        console.warn(`[outcome] flag key not in whitelist: ${effect.key}`);
+        return state;
+      }
+      return {
+        ...state,
+        globalFlags: { ...state.globalFlags, [effect.key]: effect.value },
+      };
+    default: {
+      const _exhaustive: never = effect;
+      void _exhaustive;
+      return state;
+    }
+  }
+}
+
+function applyLoseNpc(
+  state: WorldState,
+  characterId: string,
+  status: NpcAgentState['status'],
+  reason: string,
+): WorldState {
+  const agent = state.npcAgents[characterId];
+  if (!agent) return state;
+  return {
+    ...state,
+    npcAgents: {
+      ...state.npcAgents,
+      [characterId]: {
+        ...agent,
+        status,
+        statusSince: state.calendar.daysSinceStart,
+        statusReason: reason,
+      },
+    },
+  };
+}
+
+function applyInjureNpc(
+  state: WorldState,
+  characterId: string,
+  commitmentDelta: number,
+  patienceDelta: number,
+): WorldState {
+  const agent = state.npcAgents[characterId];
+  if (!agent) return state;
+  return {
+    ...state,
+    npcAgents: {
+      ...state.npcAgents,
+      [characterId]: {
+        ...agent,
+        commitment: clamp(agent.commitment + commitmentDelta, 0, 100),
+        patience: clamp(agent.patience + patienceDelta, 0, 100),
+      },
+    },
+  };
+}
+
+function applyLoseOffice(state: WorldState, officeId: PlayerOffice['id'], _reason: string): WorldState {
+  const offices = state.playerOffices ?? [];
+  let ceilingPenalty = 0;
+  const updatedOffices = offices.map((o) => {
+    if (o.id !== officeId || o.lostDay !== undefined) return o;
+    ceilingPenalty += o.militaryCeilingContribution ?? 0;
+    return { ...o, lostDay: state.calendar.daysSinceStart };
+  });
+
+  let next: WorldState = { ...state, playerOffices: updatedOffices };
+  if (ceilingPenalty > 0) {
+    next = applyConfiscateMilitary(next, -ceilingPenalty);
+  }
+  return next;
+}
+
+function applyConfiscateMilitary(state: WorldState, ceilingDelta: number): WorldState {
+  const axis = state.pressureAxes.military_readiness;
+  if (!axis) return state;
+  const newCeiling = clamp(axis.ceiling + ceilingDelta, axis.floor, 100);
+  const newValue = Math.min(axis.value, newCeiling);
+  return {
+    ...state,
+    pressureAxes: {
+      ...state.pressureAxes,
+      military_readiness: { ...axis, ceiling: newCeiling, value: newValue },
+    },
+  };
+}
+
+/**
+ * 从 OutcomeEffect 数组提取 PressureModifier 子集，用于 eventLog.pressureEffects 兼容字段。
+ */
+export function extractPressureModifiers(effects: OutcomeEffect[]): PressureModifier[] {
+  const result: PressureModifier[] = [];
+  for (const e of effects) {
+    if (e.kind === 'pressure') result.push(e.modifier);
+  }
   return result;
 }
 

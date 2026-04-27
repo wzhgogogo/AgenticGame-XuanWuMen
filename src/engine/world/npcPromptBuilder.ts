@@ -1,9 +1,10 @@
-import type { NpcAgentState, NpcStance, WorldState } from '../../types/world';
+import type { NpcAgentState, NpcStance, WorldState, ResolutionSignal } from '../../types/world';
 import type { CharacterCore } from '../../types';
-import { PRESSURE_AXIS_LABELS, getPressureLabel } from './worldState';
+import { PRESSURE_AXIS_LABELS, getPressureLabel, getEffectiveTrust } from './worldState';
 import { formatDate } from './calendar';
 import { getNarrativeIntensity } from './pressure';
 import { buildConstraintBlock } from '../../data/promptConstraints';
+import { selectMemories } from './memoryExtractor';
 import type { PressureAxisId } from '../../types/world';
 
 const STANCE_GUIDE: Record<NpcStance, { name: string; examples: string }> = {
@@ -88,13 +89,40 @@ export function buildNpcDecisionPrompt(
   }
 
   // 角色近期记忆
-  const memories = worldState.characterMemories?.[characterId];
-  if (memories && memories.length > 0) {
+  const memories = selectMemories(worldState.characterMemories?.[characterId], { topK: 5, recentGuaranteed: 1 });
+  const longTermSummary = worldState.characterLongTermSummary?.[characterId];
+  if (longTermSummary) {
+    lines.push('你的长期记忆（提炼）：');
+    lines.push(`  ${longTermSummary}`);
+    lines.push('');
+  }
+  if (memories.length > 0) {
     lines.push('你的近期记忆：');
-    for (const mem of memories.slice(-5)) {
+    for (const mem of memories) {
       lines.push(`  [${mem.emotionalTag}] ${mem.event}`);
     }
     lines.push('');
+  }
+
+  // 你当前对关键人物的态度（静态 trust + 运行时 delta）
+  if (options.character) {
+    const relIds = Object.keys(options.character.relationships);
+    const attitudeLines: string[] = [];
+    for (const relId of relIds) {
+      const rel = options.character.relationships[relId];
+      const eff = getEffectiveTrust(worldState, characterId, relId, rel.trust);
+      if (eff.delta === 0 && eff.recentEvents.length === 0) continue;   // 没变化的不浪费 token
+      const deltaStr = eff.delta > 0 ? `+${eff.delta}` : `${eff.delta}`;
+      const recent = eff.recentEvents.length > 0
+        ? `（${eff.recentEvents.slice(-2).join('；')}）`
+        : '';
+      attitudeLines.push(`  对${rel.role}：信任${eff.value}/100（较初始${deltaStr}）${recent}`);
+    }
+    if (attitudeLines.length > 0) {
+      lines.push('你当前的态度变化：');
+      lines.push(...attitudeLines);
+      lines.push('');
+    }
   }
 
   // 最近事件
@@ -103,6 +131,19 @@ export function buildNpcDecisionPrompt(
     lines.push('近期发生：');
     for (const evt of recentEvents) {
       lines.push(`  ${evt.name}：${evt.summary}`);
+    }
+    lines.push('');
+  }
+
+  // 秦王近期行为（日常活动 + 事件结局）——给 NPC 直接可见的"殿下在做什么"
+  const recentActions = (worldState.playerActionLog ?? [])
+    .filter((a) => a.day >= worldState.calendar.daysSinceStart - 5)
+    .slice(-6);
+  if (recentActions.length > 0) {
+    lines.push('秦王近日行踪：');
+    for (const a of recentActions) {
+      const tag = a.type === 'activity' ? '' : a.type === 'event_skipped' ? '[未处置]' : '[事件]';
+      lines.push(`  [${a.date}] ${tag}${a.name}${a.summary ? `：${a.summary}` : ''}`);
     }
     lines.push('');
   }
@@ -166,7 +207,7 @@ export function buildEventGenerationPrompt(
   possibleLocations: string[],
   requiredRoles: string[],
   phaseSkeletons: Array<{ role: string; description: string; turnRange: [number, number] }>,
-  resolution: { coreConflict: string; resolutionSignals: string[] },
+  resolution: { coreConflict: string; resolutionSignals: ResolutionSignal[] },
   worldState: WorldState,
   availableNpcIds: string[],
 ): string {
@@ -223,7 +264,15 @@ export function buildEventGenerationPrompt(
 
   // 收束
   lines.push(`核心悬念：${resolution.coreConflict}`);
-  lines.push('收束信号：' + resolution.resolutionSignals.join('；'));
+  lines.push('可能的收束方向（按 outcome 标签分组）：');
+  const grouped: Record<string, string[]> = { success: [], partial: [], failure: [], disaster: [] };
+  for (const sig of resolution.resolutionSignals) {
+    grouped[sig.outcome]?.push(sig.description);
+  }
+  if (grouped.success.length) lines.push(`  success（成功）：${grouped.success.join('；')}`);
+  if (grouped.partial.length) lines.push(`  partial（折中）：${grouped.partial.join('；')}`);
+  if (grouped.failure.length) lines.push(`  failure（失败）：${grouped.failure.join('；')}`);
+  if (grouped.disaster.length) lines.push(`  disaster（灾难）：${grouped.disaster.join('；')}`);
   lines.push('');
 
   lines.push('请输出JSON格式：');

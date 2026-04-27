@@ -1,10 +1,10 @@
 import type { EventSkeleton } from '../../types/world';
 
-/** 军事冲突：兵权争夺、军队调动、公开武力对抗 */
+/** 军事冲突：兵权争夺、军队调动、公开武力对抗——这是终局事件，按 chosenOutcome 直接对应 E1/E3/F5 */
 export const militaryConflict: EventSkeleton = {
   id: 'skeleton_military_conflict',
   category: '军事冲突',
-  description: '局势发展到公开武力阶段—',
+  description: '局势发展到公开武力阶段——玄武门式摊牌',
 
   preconditions: [
     { type: 'pressure_above', params: { axisId: 'military_readiness', value: 40 } },
@@ -31,10 +31,10 @@ export const militaryConflict: EventSkeleton = {
   resolution: {
     coreConflict: '这场武力冲突的胜负和代价',
     resolutionSignals: [
-      '一方取得明确军事胜利',
-      '对方投降或被俘',
-      '双方妥协停战',
-      '第三方力量介入终止冲突',
+      { outcome: 'success', description: '玄武门一击得手，建成元吉殒命，秦王全胜' },
+      { outcome: 'partial', description: '武力胜利但代价沉重，核心臂膀战死' },
+      { outcome: 'failure', description: '伏击被识破或兵力不足，秦王及亲信尽被擒' },
+      { outcome: 'disaster', description: '彻底败亡，秦王战死或自尽' },
     ],
     softCap: 13,
     hardCap: 16,
@@ -49,6 +49,37 @@ export const militaryConflict: EventSkeleton = {
   requiredRoles: ['指挥者', '武将（执行者）', '谋士（参谋）'],
 
   baseOutcomeEffects: [
-    { axisId: 'succession_crisis', delta: 30, reason: '公开武力对抗彻底改变格局', source: 'event' },
+    {
+      id: 'mil_success_pressure',
+      tag: 'success',
+      kind: 'pressure',
+      modifier: { axisId: 'succession_crisis', delta: 30, reason: '武力一击决出胜负', source: 'event' },
+    },
+    {
+      id: 'mil_partial_npc',
+      tag: 'partial',
+      kind: 'loseNpc',
+      characterId: 'changsun_wuji',
+      status: 'deceased',
+      reason: '玄武门激战中战死',
+    },
+    {
+      id: 'mil_partial_pressure',
+      tag: 'partial',
+      kind: 'pressure',
+      modifier: { axisId: 'succession_crisis', delta: 40, reason: '惨烈胜利', source: 'event' },
+    },
+    {
+      id: 'mil_failure_pressure',
+      tag: 'failure',
+      kind: 'pressure',
+      modifier: { axisId: 'imperial_suspicion', delta: 50, reason: '秦王被识破伏击', source: 'event' },
+    },
+    {
+      id: 'mil_disaster_pressure',
+      tag: 'disaster',
+      kind: 'pressure',
+      modifier: { axisId: 'succession_crisis', delta: 50, reason: '武力路线彻底败亡', source: 'event' },
+    },
   ],
 };

@@ -1,12 +1,12 @@
 # 玄武门之变 — LLM 驱动的历史互动叙事游戏
 
-v3.4.2
+v3.4.4
 
 ## 简介
 
-武德九年，正月至六月。玩家扮演秦王李世民，在涌现式世界模拟中经历从暗流涌动到最终摊牌的半年博弈。长孙无忌、尉迟敬德、房玄龄等核心幕僚随侍左右，每一个决策都将改变大唐命运的走向。
+武德九年，正月至六月。玩家扮演秦王李世民，在涌现式世界模拟中经历从暗流涌动到最终摊牌的半年博弈。秦王府三人（长孙无忌、尉迟敬德、房玄龄）与对立方三人（太子建成、齐王元吉、皇帝李渊）皆为完整 NPC，每日自主决策。
 
-没有固定剧情线——7 条压力轴驱动世界运转，NPC 作为自主 Agent 每日决策，事件从利益冲突的压力积累中自然涌现。即便是玄武门之变本身，也可能因为玩家的选择而不发生。
+没有固定剧情线——7 条压力轴驱动世界运转，6 个核心 NPC 作为自主 Agent 每日决策，事件从利益冲突的压力积累中自然涌现。即便是玄武门之变本身，也可能因为玩家的选择而不发生。
 
 ## 技术栈
 
@@ -40,7 +40,7 @@ VITE_LLM_BASE_URL=                # 自定义 API 地址（留空则使用 provi
 
 ## 事件骨架
 
-v3.0 不再有固定场景序列。以下 8 种事件骨架由压力系统驱动涌现：
+v3.0 起不再有固定场景序列。以下 11 种事件骨架由压力系统驱动涌现，每条骨架支持 4 档 outcome（success / partial / failure / disaster），LLM 在场景结束时选定 outcome，对应剥夺 NPC / 官职 / 兵权 / 置 flag 等：
 
 | 骨架 | 触发条件举例 | 说明 |
 |------|-------------|------|
@@ -52,6 +52,9 @@ v3.0 不再有固定场景序列。以下 8 种事件骨架由压力系统驱动
 | 情报事件 | 储位危机 ≥ 45（day ≥ 5） | 密报传来、间谍暴露 |
 | 盟友离心 | NPC 信任低 + 急迫感高 | 关键人物动摇或叛离 |
 | 军事冲突 | 军事准备 ≥ 40 且储位危机 ≥ 85 | 最终武力对抗（游戏高潮） |
+| 朝堂构陷罢黜 | 建成敌意 ≥ 60 + 朝堂舆论 ≥ 50 | 太子奏请罢免秦王府属官，灾难掉多职 |
+| 朝堂主动反击 | 已被严重弹劾 + 秦王府急迫 ≥ 55 | 玄龄/无忌密议反击三路（正面/外援/后宫），失败反成把柄 |
+| 夺兵权请缨 | 突厥犯边 + 元吉野心 ≥ 60 | 元吉奏请代北征调走秦王府精兵，失败兵权 ceiling -30 |
 
 ## 人物
 
@@ -125,9 +128,13 @@ src/
 ├── components/
 │   ├── SceneBackground.tsx      # 5层电影感场景背景（渐变+色调+烛光+噪点+暗角）
 │   ├── DialoguePanel.tsx        # 单条对话展示面板（毛玻璃+翻页）
-│   ├── DailyActivityScreen.tsx   # 日常活动选择界面
+│   ├── DailyActivityScreen.tsx   # 日常活动选择界面（书桌风格布局）
 │   ├── DailyBriefingScreen.tsx   # 当日汇报界面
 │   ├── WorldStateHud.tsx         # 压力定性展示
+│   ├── desk/
+│   │   ├── DeskLayout.tsx        # 案台视觉容器（背景/暗角/烛光/地图/压力面板/时段按钮）
+│   │   ├── DeskObject.tsx        # 案台物件交互（点击展开活动卡片）
+│   │   └── FlavorTextOverlay.tsx  # 活动文案浮层
 │   ├── NarratorPanel.tsx         # 顶部场景信息栏（已不再被 GameScene 引用）
 │   ├── DialogueFlow.tsx          # 滚动消息流（已被 DialoguePanel 替代）
 │   ├── ActionPanel.tsx           # 底部操作面板（2列卡片式）
@@ -451,6 +458,124 @@ NPC stance 精细化 + Eval 检测强化 + 自动跑局策略化。
 **自动跑局策略化**
 - autoplay 新增 `AUTOPLAY_STRATEGY` 环境变量，支持切换策略（suppress_emperor / suppress_jiancheng / balanced 等）
 - RPM 限制支持 `AUTOPLAY_RPM` 环境变量动态配置
+
+
+### v3.4.3 — 2026-04-24
+
+记忆系统升级 + 玩家行为日志 + Prompt 增强 + 事件预取 + LLM 缓存 + 早中晚光照 + Demo 视觉合并。
+
+**记忆系统升级**
+- memoryExtractor 新增 `relationshipDeltas` 输出：场景结束后提取角色间信任度变化（-10~+10）
+- WorldState 新增 `characterLongTermSummary`：短期记忆超 15 条时 LLM 提炼旧记忆为浓缩摘要，永久累加
+- WorldState 新增 `relationshipOverrides`：运行时信任度修正（累计 clamp -60~+60），与静态 trust 叠加后 clamp 0-100
+- `selectMemories()` 按 importance 排序 + 最近 N 条保底，避免无差别堆砌
+- 超阈值自动压缩：importance 排序截断 + LLM 摘要淘汰部分
+
+**玩家行为日志**
+- 新增 `PlayerAction` 类型：记录活动选择 / 事件结局 / 按下不表（滑窗 30 条）
+- NPC 决策 prompt 注入"秦王近日行踪"（最近 5 天行为），让 NPC 感知玩家做过什么
+- 场景对话 prompt 也注入玩家近期行为
+
+**Prompt 增强**
+- NPC 决策注入长期记忆摘要 + 态度变化（有效信任度 = 静态 + delta + 近期原因）
+- 场景对话中角色关系段合并 relationshipOverrides，显示信任变化和原因
+- SceneManager 传递 relationshipOverrides / recentPlayerActions 给 promptBuilder
+
+**事件生成优化**
+- eventGenerator 改用 `callLLMWithRetry` + 禁用词校验 + JSON 结构校验（替代手动重试）
+- worldSimulator 新增事件变体预取：briefing 期间后台启动生成，进入事件场景时直接 await
+
+**LLM 接口增强**
+- LLMMessage 新增 `cacheBoundary` 字段
+- Anthropic provider 支持 prompt cache：系统 prompt 前缀注入 `cache_control: { type: 'ephemeral' }`
+
+**PixiJS 渲染层：早中晚光照区分**
+- BackgroundLayer 新增 `setTimeSlot()`：案台 overlay 颜色和暗角强度按时段变化（晨-冷蓝淡 / 午-暖棕中 / 夜-深暗浓）
+- AtmosphereLayer 新增 `setTimeSlot()`：烛光和光束颜色、位置、亮度按时段区分（晨-自然光束亮烛光暗 / 午-均衡 / 夜-烛光亮光束消）
+- DeskContentLayer 光斑差异增大：晨-冷蓝右上 / 午-暖黄正上 / 夜-暖橙左侧
+- GameCanvas 将 timeSlot 传递给所有渲染层
+
+**Demo 视觉风格合并到正式游戏**
+- 新建 DeskLayout.tsx：从 VisualDemoScreen 提取视觉组件（desk.png 桌面背景、暗角层、烛光层、长安地图+秦王印章、石碑式时段按钮、真实压力数据面板）
+- DailyActivityScreen 完全重写布局：绝对定位 + 深色卡片式活动面板 + 中央地图 + 底部石碑按钮，保留全部交互逻辑
+- CSS 层 TIME_LIGHTING 三时段配置驱动暗角/烛光/色调变化
+
+**入口清理**
+- main.tsx 移除 VisualDemoScreen 和 DeskDemo 分支，统一走 App
+- 废弃：VisualDemoScreen.tsx、DeskDemo.tsx、ImperialDesk.tsx、ChangAnMap.tsx（SVG 版）
+
+
+### v3.4.4 — 2026-04-26
+
+三 NPC 升级：建成 / 元吉 / 李渊从幕后 Agent 升级为完整 NPC，可在事件场景中作为对话角色出场。
+
+**升级动机**
+- 原三人作为 offstageAgents 仅贡献确定性每日压力，无法在 banquetCrisis / imperialSummons / assassinationCrisis 等骨架场景中作为活跃 NPC 出场
+- 升级后三人与秦王府三人享有同等的 LLM 决策与对话能力，世界更动态
+
+**新增数据**
+- src/data/characters/{liJianCheng,liYuanJi,liYuan}.ts — 完整 Character（Big Five / speechStyle / relationships / goals）
+- src/data/characters/memories/{li_jiancheng,li_yuanji,li_yuan}/foundational.md — 各 6 条历史基线记忆
+- 李元吉 internalConflict 显式刻画"表面助大哥实则二虎相争"动机
+- 李渊 longTerm 显式刻画"挑动诸子相争以坐稳帝位"的帝王心术
+
+**决策规则**
+- 李建成：daily / active (jiancheng_hostility ≥50) / aggressive (succession_crisis ≥60) / decisive (succession_crisis ≥80, assassinate)
+- 李元吉：daily / active / aggressive / assassin / **fishing**（jiancheng_hostility ≥70 且 qinwangfu_desperation ≥60 启动二虎相争）
+- 李渊：daily / balance / suspicious / imperial / **balance_act**（双方压力都高时挑动较弱方，避免一方独大）
+
+**配套变更**
+- offstageAgents.ts 改为空数组，文件保留作占位，等待补充秦叔宝 / 程咬金 / 魏征等其他历史人物
+- promptConstraints.ts 紧凑版称谓规则补齐：建成称世民"二郎/秦王"、元吉称"二哥/秦王"，禁用"殿下"
+- worldState.ts DEFAULT_NPC_AGENT_CONFIGS 新增三人初始 patience / alertness / commitment
+
+**影响**
+- 每日 LLM 调用从 3 次增至 6 次（Promise.all 并行）；付费档延迟 +30-50%，免费档因 RPM 限制可能 3-4×
+- prompt token 增加，建议保持 v3.4.3 的 Anthropic prompt cache
+- 302 单测全过
+
+---
+
+**结局系统重写**
+
+锁定 5 结局光谱（保留原 EndingType 字面量，不重命名），玩家终于"输得起"——事件 outcome 不再仅改压力数值，可真正剥夺 NPC、官职、兵权。
+
+- E1 玄武门成功 / E3 惨胜 / F1 政治终局失败 / F5 武力发动失败 / N1 时光流逝
+- 优先级链 F5 → E3 → E1 → F1 → 第 180 天 N1，在 src/engine/world/endingResolver.ts 中判定，**直接替换** 旧 checkGameOver
+- 新类型 `OutcomeEffect`（discriminated union）：pressure / loseNpc / injureNpc / loseOffice / confiscateMilitary / flag。原 `PressureModifier` 保留不动以兼容
+- `NpcAgentState.status`：'active' | 'exiled' | 'imprisoned' | 'deceased' | 'dispatched'，worldSimulator 在决策阶段统一过滤
+- `WorldState.playerOffices`：5 官职（天策上将 / 尚书令 / 司空 / 雍州牧 / 左武卫大将军）。loseOffice 通过 militaryCeilingContribution 反向改写 military_readiness ceiling
+- `src/data/flags.ts` FlagKey 白名单 + applyOutcomeEffects 强制校验
+- `src/data/endings.ts` ENDING_LABELS 映射 EndingType → {code, name, description}，UI 与 evalPlaythrough 消费
+- 存档兼容：migrateWorldState 自动补 status='active' / playerOffices / 旧 outcomeEffects wrap
+
+**事件骨架结构化 + 新增 3**
+
+让所有骨架支持多 outcome 分支。LLM 在场景结束 JSON 返回 `chosenOutcome ∈ {success, partial, failure, disaster}`，applyOutcomeEffects 据此筛 tagged outcome 全部生效。
+
+- `SceneResolution.resolutionSignals` 改为 `ResolutionSignal[] = { outcome, description }`
+- `EventSkeleton.baseOutcomeEffects` 升级为 `TaggedOutcomeEffect[]`，每条带 id + tag
+- 改造现有 8 骨架：banquet / political / assassination / subordinate / imperial / intelligence / ally / military，每个补 1-2 条 failure/disaster 出口
+- 新增 3 骨架：
+  - **courtImpeachment**（朝堂构陷罢黜）：失败掉天策上将，灾难连掉尚书令+雍州牧+种 impeached_severely flag
+  - **courtCounterstrike**（朝堂主动反击）：以 impeached_severely 为前置；成功伤建成、灾难致玄龄入狱
+  - **seizeMilitaryCommand**（夺兵权请缨）：突厥犯边时元吉奏请代北征；失败夺兵权 ceiling -30、灾难再削左武卫
+- npcPromptBuilder 按 outcome tag 分组渲染信号、追加 chosenOutcome 枚举提示
+
+**时间窗 flag 触发器**
+
+worldSimulator.runWorldTick 在 `isAfterDate(cal, 3, 15)` 后种入 `tujue_invasion` flag（约第 70 天，对应武德九年三月中），仅触发一次，作为 seizeMilitaryCommand 的 precondition。
+
+**快进机制**
+
+让玩家跳过无事件的日常循环，遇到事件触发自动停下。
+
+- src/engine/world/fastForward.ts → planFastForward(state, days) 纯只读判定
+- WorldSimulator.fastForward(maxDays) 循环 endDay+proceedFromBriefing，**每天重 plan**（NPC velocity 可能变），任一停止信号或 mode 切换为 event_scene/game_over 立刻退出
+- DailyActivityScreen 在结束今日按钮旁加 [快进 3 日] [快进 7 日]
+
+
+
 
 ## 后续重点
 

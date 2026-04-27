@@ -79,12 +79,13 @@ describe('generateEventInstance', () => {
     expect(result!.phases[0].id).toBe('phase_1');
   });
 
-  it('retries once then returns null on garbage response', async () => {
+  it('retries on garbage response and eventually returns null', async () => {
     const state = createInitialWorldState();
     const llm = makeGarbageLlm();
     const result = await generateEventInstance(banquetCrisis, state, AVAILABLE_NPCS, llm);
     expect(result).toBeNull();
-    expect(llm.chat).toHaveBeenCalledTimes(2);
+    // callLLMWithRetry 默认 maxRetries=3，validator 拒绝后耗尽重试
+    expect(llm.chat).toHaveBeenCalledTimes(3);
   });
 
   it('returns null on LLM exception', async () => {

@@ -29,10 +29,9 @@ export const allyWavering: EventSkeleton = {
   resolution: {
     coreConflict: '能否稳住动摇的盟友',
     resolutionSignals: [
-      '盟友被说服，重新坚定',
-      '盟友离去或暗中叛变',
-      '暂时稳住但裂痕已生',
-      '发现是误会或敌方离间计',
+      { outcome: 'success', description: '盟友被说服，重新坚定' },
+      { outcome: 'partial', description: '暂时稳住但裂痕已生' },
+      { outcome: 'failure', description: '盟友离去或暗中叛变' },
     ],
     softCap: 10,
     hardCap: 13,
@@ -47,6 +46,31 @@ export const allyWavering: EventSkeleton = {
   requiredRoles: ['动摇者', '秦王', '另一谋士（旁观或劝说）'],
 
   baseOutcomeEffects: [
-    { axisId: 'qinwangfu_desperation', delta: 8, reason: '内部出现裂痕', source: 'event' },
+    {
+      id: 'ally_success_pressure',
+      tag: 'success',
+      kind: 'pressure',
+      modifier: { axisId: 'qinwangfu_desperation', delta: -5, reason: '盟友重坚，府中信心回升', source: 'event' },
+    },
+    {
+      id: 'ally_partial_pressure',
+      tag: 'partial',
+      kind: 'pressure',
+      modifier: { axisId: 'qinwangfu_desperation', delta: 8, reason: '内部裂痕已生', source: 'event' },
+    },
+    {
+      id: 'ally_failure_npc',
+      tag: 'failure',
+      kind: 'loseNpc',
+      characterId: 'fang_xuanling',
+      status: 'exiled',
+      reason: '盟友被建成奏请逐出府',
+    },
+    {
+      id: 'ally_failure_pressure',
+      tag: 'failure',
+      kind: 'pressure',
+      modifier: { axisId: 'qinwangfu_desperation', delta: 18, reason: '关键谋士离散', source: 'event' },
+    },
   ],
 };

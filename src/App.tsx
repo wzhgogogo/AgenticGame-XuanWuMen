@@ -6,7 +6,7 @@ import { createLLMProvider } from './engine/llm';
 import type { LLMProvider } from './engine/llm';
 import { SceneManager } from './engine/sceneManager';
 import { WorldSimulator } from './engine/world/worldSimulator';
-import { loadWorldState } from './engine/world/worldState';
+import { loadWorldState, getRecentPlayerActions } from './engine/world/worldState';
 import { getNarrativeIntensity } from './engine/world/pressure';
 import { getDebugEntries, subscribeDebugLog, clearDebugLog } from './engine/debugLog';
 import { characters, getPlayerCharacter, getNpcCharacters } from './data/characters';
@@ -164,6 +164,21 @@ export default function App() {
     }
   }, []);
 
+  // 快进 N 天
+  const handleFastForward = useCallback(async (days: number) => {
+    const simulator = simulatorRef.current;
+    if (!simulator) return;
+    setLoading(`推演中……正在快进 ${days} 天`);
+    try {
+      const result = await simulator.fastForward(days);
+      console.info(`快进结束：推进 ${result.daysAdvanced} 天，原因：${result.stopReason}`);
+    } catch (e) {
+      console.error('fastForward failed:', e);
+    } finally {
+      setLoading(null);
+    }
+  }, []);
+
   // 从日报继续
   const handleProceedFromBriefing = useCallback(async () => {
     const simulator = simulatorRef.current;
@@ -187,6 +202,9 @@ export default function App() {
             sceneConfig,
             sceneNpcs,
             player,
+            undefined,
+            simulator.getState().relationshipOverrides,
+            getRecentPlayerActions(simulator.getState(), 7),
           );
           setSceneManager(sm);
           setCurrentSceneConfig(sceneConfig);
@@ -201,10 +219,10 @@ export default function App() {
   }, [npcs, player]);
 
   // 事件场景结束
-  const handleSceneEnd = useCallback((summary: string) => {
+  const handleSceneEnd = useCallback((summary: string, chosenOutcome?: 'success' | 'partial' | 'failure' | 'disaster') => {
     const simulator = simulatorRef.current;
     if (!simulator) return;
-    simulator.handleEventEnd(summary);
+    simulator.handleEventEnd(summary, chosenOutcome);
     setSceneManager(null);
     setCurrentSceneConfig(null);
   }, []);
@@ -380,6 +398,7 @@ export default function App() {
           state={worldState}
           onSelectActivity={handleSelectActivity}
           onEndDay={handleEndDay}
+          onFastForward={handleFastForward}
           onDeskStateChange={setDeskCanvasState}
         />
         {debugPanel}
@@ -446,7 +465,7 @@ function EventSceneWrapper({
   sceneManager: ISceneManager;
   scene: SceneConfig;
   npcs: Character[];
-  onEnd: (summary: string) => void;
+  onEnd: (summary: string, chosenOutcome?: 'success' | 'partial' | 'failure' | 'disaster') => void;
 }) {
   const endedRef = useRef(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -457,7 +476,7 @@ function EventSceneWrapper({
       if (state.status === 'ending' && state.endingText && !endedRef.current) {
         endedRef.current = true;
         timerRef.current = setTimeout(() => {
-          onEnd(state.endingText || '事件结束。');
+          onEnd(state.endingText || '事件结束。', state.chosenOutcome);
         }, 5000);
       }
     });

@@ -55,7 +55,7 @@ export function buildConstraintBlock(
   if (detailed) {
     parts.push(NAMING_RULES);
   } else {
-    parts.push('称呼规则：NPC称皇帝为"陛下"或"圣上"，称太子为"太子"，称秦王为"殿下"或"秦王"。');
+    parts.push('称呼规则：NPC称皇帝为"陛下"或"圣上"，称太子为"太子"，秦王府属下称秦王李世民为"殿下"或"秦王"；李建成称李世民为"二郎"或"秦王"，李元吉称李世民为"二哥"或"秦王"（不可用"殿下"，那是下属称呼）。');
   }
 
   parts.push(`当前日期：${dateStr}。${intensityConstraint}禁止时间跳跃。`);

@@ -11,6 +11,16 @@ export const NPC_IMPACT_PROFILES: Record<string, NpcImpactProfile> = {
   fang_xuanling: {
     whitelist: ['succession_crisis', 'qinwangfu_desperation', 'court_opinion'],
   },
+  // ===== 敌对方与皇帝（v3.4.4 升级为 NPC）=====
+  li_jiancheng: {
+    whitelist: ['jiancheng_hostility', 'court_opinion', 'succession_crisis', 'qinwangfu_desperation'],
+  },
+  li_yuanji: {
+    whitelist: ['yuanji_ambition', 'jiancheng_hostility', 'military_readiness', 'qinwangfu_desperation'],
+  },
+  li_yuan: {
+    whitelist: ['imperial_suspicion', 'succession_crisis', 'court_opinion'],
+  },
 };
 
 // ===== 长孙无忌：谨慎谋士 =====
@@ -114,12 +124,112 @@ export const fangXuanLingRules: NpcDecisionRule[] = [
   },
 ];
 
+// ===== 李建成：东宫太子，持续政治打压 =====
+export const liJianChengRules: NpcDecisionRule[] = [
+  {
+    id: 'lijc_daily',
+    conditions: {},
+    allowedStances: ['observe', 'lobby', 'scheme', 'analyze'],
+  },
+  {
+    id: 'lijc_active',
+    conditions: { pressureAbove: { jiancheng_hostility: 50 } },
+    allowedStances: ['lobby', 'scheme', 'coordinate', 'plant_spy'],
+    escalationHint: '太子在朝堂主动散布对秦王不利的舆论，并暗中收买秦王部将',
+  },
+  {
+    id: 'lijc_aggressive',
+    conditions: { pressureAbove: { succession_crisis: 60 } },
+    allowedStances: ['plant_spy', 'pressure', 'scheme', 'lobby'],
+    escalationHint: '太子加紧监视秦王府，并向父皇请求处置秦王',
+  },
+  {
+    id: 'lijc_decisive',
+    conditions: { pressureAbove: { succession_crisis: 80 } },
+    allowedStances: ['assassinate', 'capture', 'pressure'],
+    escalationHint: '太子已下定决心，可设宴鸩酒、伏弓暗杀，宁负骨肉之名也要先除秦王',
+  },
+];
+
+// ===== 李元吉：齐王，表面助大哥实欲二虎相争 =====
+export const liYuanJiRules: NpcDecisionRule[] = [
+  {
+    id: 'lyj_daily',
+    conditions: {},
+    allowedStances: ['observe', 'drill', 'pressure'],
+  },
+  {
+    id: 'lyj_active',
+    conditions: { pressureAbove: { yuanji_ambition: 50 } },
+    allowedStances: ['lobby', 'scheme', 'pressure', 'rally'],
+    escalationHint: '元吉怂恿大哥加大力度，同时操练自家齐王府兵马',
+  },
+  {
+    id: 'lyj_aggressive',
+    conditions: { pressureAbove: { yuanji_ambition: 65 } },
+    allowedStances: ['capture', 'pressure', 'defy', 'scheme'],
+    escalationHint: '元吉欲借突厥之机夺秦王精兵，奏请代秦王北征',
+  },
+  {
+    id: 'lyj_assassin',
+    conditions: { pressureAbove: { yuanji_ambition: 75 } },
+    allowedStances: ['assassinate', 'capture', 'pressure'],
+    escalationHint: '元吉性烈手狠，可借猎场伏弓、宴会暗算等极端方式直取秦王',
+  },
+  {
+    id: 'lyj_fishing',
+    conditions: {
+      pressureAbove: { jiancheng_hostility: 70, qinwangfu_desperation: 60 },
+    },
+    allowedStances: ['scheme', 'pressure', 'plant_spy'],
+    escalationHint: '元吉表面与大哥同心，实则盼二虎相争两败俱伤——既怂恿建成下狠手，又暗中加重秦王府危机感',
+  },
+];
+
+// ===== 李渊：开国皇帝，挑动诸子相争维持自身帝位 =====
+export const liYuanRules: NpcDecisionRule[] = [
+  {
+    id: 'lyy_daily',
+    conditions: {},
+    allowedStances: ['observe', 'advise'],
+  },
+  {
+    id: 'lyy_balance',
+    conditions: { pressureAbove: { succession_crisis: 60 } },
+    allowedStances: ['advise', 'lobby', 'strategize'],
+    escalationHint: '陛下名为调和兄弟，实为压一方抬另一方——保持三角平衡，不让任一方坐大',
+  },
+  {
+    id: 'lyy_suspicious',
+    conditions: { pressureAbove: { imperial_suspicion: 70 } },
+    allowedStances: ['pressure', 'capture', 'lobby'],
+    escalationHint: '陛下对秦王的猜疑已重，可借机削其兵权或调离京师',
+  },
+  {
+    id: 'lyy_imperial',
+    conditions: { pressureAbove: { court_opinion: 70 } },
+    allowedStances: ['strategize', 'lobby', 'advise'],
+    escalationHint: '朝堂舆论一边倒，陛下被裹挟其中，需以帝王手腕从中调控',
+  },
+  {
+    id: 'lyy_balance_act',
+    conditions: {
+      pressureAbove: { jiancheng_hostility: 60, qinwangfu_desperation: 60 },
+    },
+    allowedStances: ['strategize', 'lobby'],
+    escalationHint: '陛下挑动兄弟相争的真正目的是保住自己的皇位——任何一方独大都不可接受',
+  },
+];
+
 // ===== NPC 耐心衰减速率 =====
 
 export const NPC_PATIENCE_DECAY: Record<string, number> = {
   changsun_wuji: 0.5,
   weichi_jingde: 2.0,
   fang_xuanling: 0.3,
+  li_jiancheng: 0.4,
+  li_yuanji: 1.5,
+  li_yuan: 0.2,
 };
 
 // ===== 汇总 =====
@@ -128,4 +238,7 @@ export const NPC_DECISION_RULES: Record<string, NpcDecisionRule[]> = {
   changsun_wuji: changSunWujiRules,
   weichi_jingde: weiChiJingDeRules,
   fang_xuanling: fangXuanLingRules,
+  li_jiancheng: liJianChengRules,
+  li_yuanji: liYuanJiRules,
+  li_yuan: liYuanRules,
 };

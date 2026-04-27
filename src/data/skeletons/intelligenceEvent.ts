@@ -28,9 +28,9 @@ export const intelligenceEvent: EventSkeleton = {
   resolution: {
     coreConflict: '如何利用或应对这条情报',
     resolutionSignals: [
-      '做出了基于情报的明确决策',
-      '判断情报为假，选择忽略',
-      '情报指向紧急威胁，需要立即行动',
+      { outcome: 'success', description: '正确判断情报真伪，做出有利决策' },
+      { outcome: 'partial', description: '判断不明，暂时观望' },
+      { outcome: 'failure', description: '依据假情报行动，造成战备损耗' },
     ],
     softCap: 9,
     hardCap: 12,
@@ -45,6 +45,31 @@ export const intelligenceEvent: EventSkeleton = {
   requiredRoles: ['送信者/报告者', '秦王', '谋士（分析研判）'],
 
   baseOutcomeEffects: [
-    { axisId: 'military_readiness', delta: 3, reason: '情报有助于准备', source: 'event' },
+    {
+      id: 'intel_success_military',
+      tag: 'success',
+      kind: 'pressure',
+      modifier: { axisId: 'military_readiness', delta: 5, reason: '情报有助于备战', source: 'event' },
+    },
+    {
+      id: 'intel_partial_neutral',
+      tag: 'partial',
+      kind: 'pressure',
+      modifier: { axisId: 'qinwangfu_desperation', delta: 3, reason: '情报模糊增加焦虑', source: 'event' },
+    },
+    {
+      id: 'intel_failure_flag',
+      tag: 'failure',
+      kind: 'flag',
+      key: 'false_intel_acted_on',
+      value: true,
+      reason: '依据假情报行动',
+    },
+    {
+      id: 'intel_failure_military',
+      tag: 'failure',
+      kind: 'pressure',
+      modifier: { axisId: 'military_readiness', delta: -10, reason: '假情报误导战备', source: 'event' },
+    },
   ],
 };

@@ -3,6 +3,9 @@ import { liShimin } from './liShimin';
 import { changSunWuji } from './changSunWuji';
 import { weiChiJingDe } from './weiChiJingDe';
 import { fangXuanLing } from './fangXuanLing';
+import { liJianCheng } from './liJianCheng';
+import { liYuanJi } from './liYuanJi';
+import { liYuan } from './liYuan';
 import { assembleCharacter } from './memoryLoader';
 
 export const characters: Character[] = [
@@ -10,6 +13,9 @@ export const characters: Character[] = [
   assembleCharacter(changSunWuji),
   assembleCharacter(weiChiJingDe),
   assembleCharacter(fangXuanLing),
+  assembleCharacter(liJianCheng),
+  assembleCharacter(liYuanJi),
+  assembleCharacter(liYuan),
 ];
 
 export function getCharacterById(id: string): Character | undefined {

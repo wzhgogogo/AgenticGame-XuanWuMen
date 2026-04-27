@@ -30,10 +30,10 @@ export const subordinateUltimatum: EventSkeleton = {
   resolution: {
     coreConflict: '秦王是否被部下说服采取行动',
     resolutionSignals: [
-      '秦王明确表态要行动',
-      '秦王成功安抚部下暂时隐忍',
-      '部下失望离去（可能影响忠诚度）',
-      '双方达成折中方案',
+      { outcome: 'success', description: '秦王明确表态要行动，部下重燃信心' },
+      { outcome: 'partial', description: '秦王成功安抚部下暂时隐忍，达成折中方案' },
+      { outcome: 'failure', description: '部下失望离去，敬德愤而出走' },
+      { outcome: 'disaster', description: '逼宫失败导致府中信心彻底崩盘' },
     ],
     softCap: 10,
     hardCap: 13,
@@ -48,6 +48,45 @@ export const subordinateUltimatum: EventSkeleton = {
   requiredRoles: ['逼宫者', '秦王', '在场谋士（劝和或助攻）'],
 
   baseOutcomeEffects: [
-    { axisId: 'qinwangfu_desperation', delta: 10, reason: '内部压力公开化', source: 'event' },
+    {
+      id: 'ult_success_pressure',
+      tag: 'success',
+      kind: 'pressure',
+      modifier: { axisId: 'qinwangfu_desperation', delta: -5, reason: '主公定调，府中士气回升', source: 'event' },
+    },
+    {
+      id: 'ult_success_military',
+      tag: 'success',
+      kind: 'pressure',
+      modifier: { axisId: 'military_readiness', delta: 8, reason: '决意行动，备战加紧', source: 'event' },
+    },
+    {
+      id: 'ult_partial_pressure',
+      tag: 'partial',
+      kind: 'pressure',
+      modifier: { axisId: 'qinwangfu_desperation', delta: 10, reason: '内部压力公开化', source: 'event' },
+    },
+    {
+      id: 'ult_failure_npc',
+      tag: 'failure',
+      kind: 'loseNpc',
+      characterId: 'weichi_jingde',
+      status: 'exiled',
+      reason: '敬德愤而出走，半年不归',
+    },
+    {
+      id: 'ult_failure_pressure',
+      tag: 'failure',
+      kind: 'pressure',
+      modifier: { axisId: 'qinwangfu_desperation', delta: 25, reason: '核心武将出走，府中震动', source: 'event' },
+    },
+    {
+      id: 'ult_disaster_flag',
+      tag: 'disaster',
+      kind: 'flag',
+      key: 'commitment_collapse',
+      value: true,
+      reason: '府中信心彻底崩盘',
+    },
   ],
 };

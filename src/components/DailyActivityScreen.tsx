@@ -1,9 +1,9 @@
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import type { WorldState, DailyActivity, TimeOfDay, ActivityCategory } from '../types/world';
 import type { DeskCanvasState, DeskObjectState } from '../renderer/GameCanvasContext';
 import { getActivitiesForTimeSlot } from '../engine/world/activities';
 import WorldStateHud from './WorldStateHud';
-import ImperialDesk from './desk/ImperialDesk';
+import DeskLayout, { ChangAnMap, TimeSlotTablet } from './desk/DeskLayout';
 import DeskObject from './desk/DeskObject';
 import FlavorTextOverlay from './desk/FlavorTextOverlay';
 
@@ -11,13 +11,14 @@ interface DailyActivityScreenProps {
   state: WorldState;
   onSelectActivity: (activity: DailyActivity) => string;
   onEndDay: () => void;
+  onFastForward?: (days: number) => void;
   onDeskStateChange?: (deskState: DeskCanvasState) => void;
 }
 
-const TIME_SLOTS: { key: 'morning' | 'afternoon' | 'evening'; label: string; icon: string }[] = [
-  { key: 'morning', label: '晨', icon: '☀' },
-  { key: 'afternoon', label: '午', icon: '◑' },
-  { key: 'evening', label: '夜', icon: '☽' },
+const TIME_SLOTS: { key: 'morning' | 'afternoon' | 'evening'; label: string; tabletLabel: string }[] = [
+  { key: 'morning', label: '晨', tabletLabel: '晨时' },
+  { key: 'afternoon', label: '午', tabletLabel: '午时' },
+  { key: 'evening', label: '夜', tabletLabel: '夜时' },
 ];
 
 function getTimeSlotIndex(timeOfDay: TimeOfDay): number {
@@ -35,10 +36,24 @@ function groupByCategory(activities: DailyActivity[]): Record<string, DailyActiv
   return groups;
 }
 
+const fastForwardButtonStyle: React.CSSProperties = {
+  padding: '10px 24px',
+  background: 'linear-gradient(180deg, #2a1f12 0%, #15100a 100%)',
+  border: '1px solid rgba(139,100,50,0.45)',
+  borderRadius: 2,
+  color: '#c9a84c',
+  fontFamily: 'Noto Serif SC, serif',
+  fontSize: 13,
+  letterSpacing: '0.15em',
+  cursor: 'pointer',
+  boxShadow: 'inset 0 1px 0 rgba(232,200,150,0.06)',
+};
+
 export default function DailyActivityScreen({
   state,
   onSelectActivity,
   onEndDay,
+  onFastForward,
   onDeskStateChange,
 }: DailyActivityScreenProps) {
   const [currentSlotIndex, setCurrentSlotIndex] = useState(
@@ -79,35 +94,26 @@ export default function DailyActivityScreen({
   }, [currentSlot.key, focusedCategory, categoriesKey, onDeskStateChange, grouped]);
 
   return (
-    <div className="h-screen relative flex flex-col">
-      <div className="relative z-10">
-        <WorldStateHud state={state} />
-      </div>
-
-      {/* 时间段墨印指示器 */}
-      <div className="desk-time-bar relative z-10">
-        {TIME_SLOTS.map((slot, idx) => {
-          const done = !!selectedActivities[slot.key];
-          const active = idx === currentSlotIndex;
-          return (
-            <div
-              key={slot.key}
-              className={`desk-time-stamp ${active ? 'desk-time-stamp--active' : ''} ${done ? 'desk-time-stamp--done' : ''}`}
-            >
-              <span className="desk-time-icon">{slot.icon}</span>
-              <span className="desk-time-label">{slot.label}</span>
-              {done && <span className="desk-time-check">✓</span>}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* 案台主体 */}
-      <div className="flex-1 relative z-10 flex items-center justify-center">
-        <ImperialDesk
-          timeSlot={currentSlot.key}
-          onClickBackground={() => setFocusedCategory(null)}
-        >
+    <DeskLayout
+      timeSlot={currentSlot.key}
+      state={state}
+      hudSlot={<WorldStateHud state={state} />}
+      activityPanel={
+        <ActivityPanelShell timeLabel={currentSlot.tabletLabel}>
+          {Object.entries(grouped).map(([cat, acts]) => (
+            <ActivityCategoryGroup
+              key={cat}
+              category={cat as ActivityCategory}
+              activities={acts}
+              selected={selectedActivities[currentSlot.key]}
+              onSelect={handleSelectActivity}
+            />
+          ))}
+        </ActivityPanelShell>
+      }
+      centerContent={
+        <div style={{ position: 'relative', width: '100%', height: '100%' }} onClick={() => setFocusedCategory(null)}>
+          <ChangAnMap />
           {flavorText ? (
             <FlavorTextOverlay text={flavorText} />
           ) : (
@@ -123,34 +129,142 @@ export default function DailyActivityScreen({
               />
             ))
           )}
-        </ImperialDesk>
-      </div>
+        </div>
+      }
+      timeSlotBar={
+        <>
+          {TIME_SLOTS.map((slot, idx) => {
+            const done = !!selectedActivities[slot.key];
+            return (
+              <TimeSlotTablet
+                key={slot.key}
+                label={`${slot.tabletLabel}${done ? ' ✓' : ''}`}
+                active={idx === currentSlotIndex}
+                onClick={() => {}}
+              />
+            );
+          })}
+        </>
+      }
+      endDayButton={
+        allSlotsFilled && !flavorText ? (
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <button
+              onClick={onEndDay}
+              style={{
+                padding: '10px 40px',
+                background: 'linear-gradient(180deg, #3a2818 0%, #1a0f08 100%)',
+                border: '1px solid rgba(201,168,76,0.6)',
+                borderRadius: 2,
+                color: '#e8d4a8',
+                fontFamily: 'Noto Serif SC, serif',
+                fontSize: 14,
+                letterSpacing: '0.2em',
+                cursor: 'pointer',
+                boxShadow: '0 0 16px rgba(201,168,76,0.2), inset 0 1px 0 rgba(232,200,150,0.1)',
+              }}
+            >
+              结束今日
+            </button>
+            {onFastForward && (
+              <>
+                <button
+                  onClick={() => onFastForward(3)}
+                  style={fastForwardButtonStyle}
+                  title="若期间触发事件或到达终局，将自动停下"
+                >
+                  快进 3 日
+                </button>
+                <button
+                  onClick={() => onFastForward(7)}
+                  style={fastForwardButtonStyle}
+                  title="若期间触发事件或到达终局，将自动停下"
+                >
+                  快进 7 日
+                </button>
+              </>
+            )}
+          </div>
+        ) : <></>
+      }
+    />
+  );
+}
 
-      {/* 结束今日按钮 */}
-      {allSlotsFilled && !flavorText && (
-        <div className="relative z-10 px-4 py-4 flex justify-center" style={{ borderTop: '1px solid rgba(201, 168, 76, 0.1)' }}>
+/* ---- Activity panel shell (demo visual style) ---- */
+
+function ActivityPanelShell({ timeLabel, children }: { timeLabel: string; children: React.ReactNode }) {
+  return (
+    <div
+      style={{
+        padding: '14px 14px 16px',
+        background: 'linear-gradient(180deg, rgba(22,14,8,0.92) 0%, rgba(14,8,4,0.95) 100%)',
+        border: '1px solid rgba(139,100,50,0.25)',
+        borderTop: '2px solid rgba(180,130,70,0.3)',
+        borderRadius: 4,
+        boxShadow: '0 6px 20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(232,224,208,0.04)',
+      }}
+    >
+      <div style={{ fontFamily: 'Noto Serif SC, serif', fontSize: 13, color: '#d4b878', letterSpacing: '0.1em', marginBottom: 12 }}>
+        选择今日活动（{timeLabel}）
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+const CATEGORY_LABELS: Record<string, string> = {
+  governance: '治政',
+  military: '军务',
+  intelligence: '情报',
+  social: '社交',
+  personal: '个人',
+};
+
+function ActivityCategoryGroup({
+  category,
+  activities,
+  selected,
+  onSelect,
+}: {
+  category: ActivityCategory;
+  activities: DailyActivity[];
+  selected?: string;
+  onSelect: (a: DailyActivity) => void;
+}) {
+  const label = CATEGORY_LABELS[category] || category;
+  return (
+    <div style={{ marginBottom: 4 }}>
+      <div style={{ fontSize: 10, color: '#8a7050', fontFamily: 'Noto Serif SC, serif', marginBottom: 4 }}>{label}</div>
+      {activities.map((a) => {
+        const isSelected = selected === a.id;
+        return (
           <button
-            onClick={onEndDay}
-            className="px-10 py-2.5 rounded text-sm font-ui cursor-pointer"
+            key={a.id}
+            onClick={() => !isSelected && onSelect(a)}
             style={{
-              backgroundColor: 'transparent',
-              color: '#e8e0d0',
-              border: '1px solid rgba(201, 168, 76, 0.4)',
-              transition: 'all 0.2s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.7)';
-              e.currentTarget.style.boxShadow = '0 0 20px rgba(201, 168, 76, 0.1)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.4)';
-              e.currentTarget.style.boxShadow = 'none';
+              display: 'block',
+              width: '100%',
+              textAlign: 'left',
+              padding: '6px 10px',
+              marginBottom: 2,
+              background: isSelected ? 'rgba(201,168,76,0.12)' : 'transparent',
+              border: `1px solid ${isSelected ? 'rgba(201,168,76,0.3)' : 'transparent'}`,
+              borderRadius: 2,
+              color: isSelected ? '#c9a84c' : '#c0b8a0',
+              fontSize: 12,
+              fontFamily: 'Noto Serif SC, serif',
+              cursor: isSelected ? 'default' : 'pointer',
+              opacity: isSelected ? 0.6 : 1,
             }}
           >
-            结束今日
+            {a.name}
+            <span style={{ fontSize: 10, color: '#8a7050', marginLeft: 8 }}>{a.description}</span>
           </button>
-        </div>
-      )}
+        );
+      })}
     </div>
   );
 }

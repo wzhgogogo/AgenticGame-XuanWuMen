@@ -15,15 +15,38 @@ export class AnthropicProvider implements LLMProvider {
 
   async chat(messages: LLMMessage[], onChunk?: (text: string) => void, signal?: AbortSignal): Promise<LLMResponse> {
     // Anthropic 要求 system 单独传，从 messages 中提取
-    const systemParts: string[] = [];
+    // 同时处理 cacheBoundary：把前缀打包为一个 text block 并标 cache_control
+    const systemMessages: LLMMessage[] = [];
     const chatMessages: Array<{ role: string; content: string }> = [];
 
     for (const msg of messages) {
       if (msg.role === "system") {
-        systemParts.push(msg.content);
+        systemMessages.push(msg);
       } else {
         chatMessages.push({ role: msg.role, content: msg.content });
       }
+    }
+
+    // 找到最后一个带 cacheBoundary 的 system message 索引
+    let lastBoundary = -1;
+    for (let i = 0; i < systemMessages.length; i++) {
+      if (systemMessages[i].cacheBoundary) lastBoundary = i;
+    }
+
+    // system 字段：有 boundary 时用 block 数组，否则用字符串
+    let systemField: unknown;
+    if (systemMessages.length === 0) {
+      systemField = undefined;
+    } else if (lastBoundary < 0) {
+      systemField = systemMessages.map((m) => m.content).join("\n\n");
+    } else {
+      const cachedText = systemMessages.slice(0, lastBoundary + 1).map((m) => m.content).join("\n\n");
+      const tailText = systemMessages.slice(lastBoundary + 1).map((m) => m.content).join("\n\n");
+      const blocks: Array<Record<string, unknown>> = [
+        { type: "text", text: cachedText, cache_control: { type: "ephemeral" } },
+      ];
+      if (tailText) blocks.push({ type: "text", text: tailText });
+      systemField = blocks;
     }
 
     let response: Response;
@@ -40,7 +63,7 @@ export class AnthropicProvider implements LLMProvider {
           model: this.model,
           max_tokens: this.maxTokens,
           stream: true,
-          ...(systemParts.length > 0 ? { system: systemParts.join("\n\n") } : {}),
+          ...(systemField !== undefined ? { system: systemField } : {}),
           messages: chatMessages,
         }),
         signal,

@@ -1,4 +1,5 @@
 import type { CharacterCore } from '../../types';
+import type { PlayerOffice } from '../../types/world';
 
 export const liShimin: CharacterCore = {
   id: 'li_shimin',
@@ -63,3 +64,38 @@ export const liShimin: CharacterCore = {
     internalConflict: '骨肉相残违背人伦，但不动手则死的是自己和追随者。',
   },
 };
+
+/**
+ * 武德九年正月，李世民实际所任官职。
+ * militaryCeilingContribution 累加为 military_readiness 有效上限的关键贡献——
+ * 同时失去天策上将与左武卫大将军，可用兵力 ceiling 直接砍 50。
+ */
+export const LI_SHIMIN_INITIAL_OFFICES: PlayerOffice[] = [
+  {
+    id: 'tiance_shangjiang',
+    name: '天策上将',
+    grantedDay: 0,
+    militaryCeilingContribution: 30,
+  },
+  {
+    id: 'shangshu_ling',
+    name: '尚书令',
+    grantedDay: 0,
+  },
+  {
+    id: 'sikong',
+    name: '司空',
+    grantedDay: 0,
+  },
+  {
+    id: 'yongzhou_mu',
+    name: '雍州牧',
+    grantedDay: 0,
+  },
+  {
+    id: 'zuo_wuwei_dajiangjun',
+    name: '左武卫大将军',
+    grantedDay: 0,
+    militaryCeilingContribution: 20,
+  },
+];

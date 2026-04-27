@@ -12,10 +12,10 @@ import type {
   DailyActivity,
   PressureAxisId,
 } from '../../types/world';
-import type { Character, ISceneManager, SceneConfig } from '../../types';
+import type { Character, ISceneManager, SceneConfig, MemoryEntry } from '../../types';
 import type { LLMProvider } from '../llm/types';
-import { tickPressure, applyPressureModifiers, checkEventTriggers, snapshotPressure } from './pressure';
-import { advanceDay, formatDate } from './calendar';
+import { tickPressure, applyPressureModifiers, applyOutcomeEffects, extractPressureModifiers, checkEventTriggers, snapshotPressure } from './pressure';
+import { advanceDay, formatDate, isAfterDate } from './calendar';
 import { tickNpcAgent, filterPlausibleActions, recordNpcAction, consumeOnceRule } from './npcAgent';
 import { NPC_DECISION_RULES, NPC_PATIENCE_DECAY, NPC_IMPACT_PROFILES } from '../../data/agents/npcDecisionRules';
 import { OFFSTAGE_AGENTS } from '../../data/agents/offstageAgents';
@@ -24,9 +24,11 @@ import { resolveEventInstance } from './eventGenerator';
 import { eventInstanceToSceneConfig, buildResolutionPromptSection } from './eventRunner';
 import { applyActivityEffects, getFlavorText } from './activities';
 import { buildNpcDecisionPrompt } from './npcPromptBuilder';
-import { createInitialWorldState, saveWorldState, loadWorldState, clearSavedWorldState } from './worldState';
+import { createInitialWorldState, saveWorldState, loadWorldState, clearSavedWorldState, appendPlayerAction } from './worldState';
 import { extractJson } from '../jsonExtractor';
-import { extractSceneMemories } from './memoryExtractor';
+import { extractSceneMemories, summarizeOldMemories } from './memoryExtractor';
+import { resolveEnding, type EndingDecision } from './endingResolver';
+import { planFastForward } from './fastForward';
 import { debugLog } from '../debugLog';
 
 export function detectNarrativeEnding(summary: string): EndingType | null {
@@ -50,6 +52,7 @@ export class WorldSimulator {
   private state: WorldState;
   private mode: GameMode = 'title_screen';
   private endingType: EndingType | null = null;
+  private endingDecision: EndingDecision | null = null;
   private listeners: Set<WorldListener> = new Set();
 
   private llmProvider: LLMProvider;
@@ -60,6 +63,10 @@ export class WorldSimulator {
   private currentSceneManager: ISceneManager | null = null;
   private backgroundTickPromise: Promise<WorldTickResult> | null = null;
   private latestTickResult: WorldTickResult | null = null;
+  /** briefing 期间后台预取的事件变体 Promise */
+  private backgroundEventPromise: Promise<EventInstance> | null = null;
+  /** 预取的是哪个 skeleton，用于匹配确认 */
+  private backgroundEventSkeletonId: string | null = null;
 
   /** tick 启动时的 pressureAxes 快照，用于计算 tick 增量 */
   private tickBaselinePressure: WorldState['pressureAxes'] | null = null;
@@ -82,6 +89,7 @@ export class WorldSimulator {
   getState(): WorldState { return this.state; }
   getMode(): GameMode { return this.mode; }
   getEndingType(): EndingType | null { return this.endingType; }
+  getEndingDecision(): EndingDecision | null { return this.endingDecision; }
   getPlayer(): Character { return this.player; }
   getCurrentEventInstance(): EventInstance | null { return this.currentEventInstance; }
   getCurrentSceneManager(): ISceneManager | null { return this.currentSceneManager; }
@@ -108,6 +116,9 @@ export class WorldSimulator {
     const saved = loadWorldState();
     if (!saved) return false;
     if (!saved.characterMemories) saved.characterMemories = {};
+    if (!saved.characterLongTermSummary) saved.characterLongTermSummary = {};
+    if (!saved.relationshipOverrides) saved.relationshipOverrides = {};
+    if (!saved.playerActionLog) saved.playerActionLog = [];
     this.state = saved;
     this.syncMemoriesToCharacters();
     this.setMode('daily_activities');
@@ -131,6 +142,14 @@ export class WorldSimulator {
     this.state = {
       ...state,
       pressureAxes: applyPressureModifiers(state.pressureAxes, pressureChanges),
+      playerActionLog: appendPlayerAction(state.playerActionLog, {
+        day: state.calendar.daysSinceStart,
+        date: formatDate(state.calendar),
+        type: 'activity',
+        id: activity.id,
+        name: activity.name,
+        category: activity.category,
+      }),
     };
     this.notify();
 
@@ -164,10 +183,52 @@ export class WorldSimulator {
       this.setMode('game_over');
     } else {
       this.setMode('daily_briefing');
+
+      // 如果 tick 产生了 pendingEvent，briefing 期间后台先生成事件变体，
+      // 避免玩家从 briefing → event_scene 之间再等一次 LLM。
+      this.startEventPrefetchIfPending();
     }
 
     this.notify();
     return this.latestTickResult;
+  }
+
+  /**
+   * 若当前存在 pendingEvents[0]，在后台启动事件变体生成。
+   * 幂等：已有预取在跑则不重复启动；skeleton 变化则丢弃旧的。
+   */
+  private startEventPrefetchIfPending(): void {
+    const pending = this.state.pendingEvents[0];
+    if (!pending) return;
+    if (this.backgroundEventPromise && this.backgroundEventSkeletonId === pending.skeletonId) {
+      return; // 已在跑，且匹配
+    }
+    const skeleton = ALL_SKELETONS.find((s) => s.id === pending.skeletonId);
+    if (!skeleton) return;
+
+    const npcIds = this.characters
+      .filter((c) => c.role !== 'player_character')
+      .filter((c) => {
+        const agent = this.state.npcAgents[c.id];
+        return !agent || !agent.status || agent.status === 'active';
+      })
+      .map((c) => c.id);
+
+    debugLog('event_trigger', `后台预取事件变体: ${pending.skeletonId}`);
+    this.backgroundEventSkeletonId = pending.skeletonId;
+    this.backgroundEventPromise = resolveEventInstance(
+      pending,
+      skeleton,
+      this.state,
+      npcIds,
+      this.llmProvider,
+    ).catch((err) => {
+      // 预取失败也不抛错，让 enterEvent 自己再试一次
+      debugLog('event_trigger', `事件变体预取失败`, String(err));
+      this.backgroundEventPromise = null;
+      this.backgroundEventSkeletonId = null;
+      throw err;
+    });
   }
 
   /**
@@ -188,6 +249,43 @@ export class WorldSimulator {
   }
 
   /**
+   * 快进 N 天：循环跑 endDay + proceedFromBriefing。
+   * 任一停止信号（事件触发 / mode 切换为 event_scene / game_over）立刻退出。
+   * 返回实际推进的天数。
+   */
+  async fastForward(maxDays: number): Promise<{ daysAdvanced: number; stopReason: string }> {
+    if (this.getMode() !== 'daily_activities') {
+      return { daysAdvanced: 0, stopReason: '当前不在日常活动状态' };
+    }
+
+    let daysAdvanced = 0;
+    for (let i = 0; i < maxDays; i++) {
+      const plan = planFastForward(this.state, 1);
+      if (!plan.canForward) {
+        return { daysAdvanced, stopReason: plan.stopReasons.join('；') || '无法继续快进' };
+      }
+
+      await this.endDay();
+      if (this.getMode() === 'game_over') {
+        return { daysAdvanced, stopReason: '游戏结束' };
+      }
+
+      await this.proceedFromBriefing();
+      daysAdvanced++;
+
+      const m = this.getMode();
+      if (m === 'event_scene') {
+        return { daysAdvanced, stopReason: '触发事件，已进入场景' };
+      }
+      if (m === 'game_over') {
+        return { daysAdvanced, stopReason: '游戏结束' };
+      }
+    }
+
+    return { daysAdvanced, stopReason: '已快进完成' };
+  }
+
+  /**
    * 进入事件场景
    */
   async enterEvent(pending: PendingEvent): Promise<void> {
@@ -205,16 +303,29 @@ export class WorldSimulator {
 
     const npcIds = this.characters
       .filter((c) => c.role !== 'player_character')
+      .filter((c) => {
+        const agent = this.state.npcAgents[c.id];
+        return !agent || !agent.status || agent.status === 'active';
+      })
       .map((c) => c.id);
 
-    // 生成事件实例
-    const instance = await resolveEventInstance(
-      pending,
-      skeleton,
-      this.state,
-      npcIds,
-      this.llmProvider,
-    );
+    // 若 briefing 期间已在后台预取并匹配，直接 await；否则同步生成
+    let instance: EventInstance;
+    if (
+      this.backgroundEventPromise &&
+      this.backgroundEventSkeletonId === pending.skeletonId
+    ) {
+      try {
+        instance = await this.backgroundEventPromise;
+      } catch {
+        // 预取失败则 fallback 同步生成
+        instance = await resolveEventInstance(pending, skeleton, this.state, npcIds, this.llmProvider);
+      }
+    } else {
+      instance = await resolveEventInstance(pending, skeleton, this.state, npcIds, this.llmProvider);
+    }
+    this.backgroundEventPromise = null;
+    this.backgroundEventSkeletonId = null;
 
     this.currentEventInstance = instance;
 
@@ -232,16 +343,23 @@ export class WorldSimulator {
 
   /**
    * 事件场景结束后的处理
+   * @param chosenOutcome  LLM 在结局中选择的 ResolutionTag。未提供则按 'success' 兜底。
    */
-  handleEventEnd(summary: string): Promise<void> {
+  handleEventEnd(summary: string, chosenOutcome: 'success' | 'partial' | 'failure' | 'disaster' = 'success'): Promise<void> {
     if (!this.currentEventInstance) return Promise.resolve();
 
     const npcIds = [...this.currentEventInstance.activeNpcIds];
     const sceneId = this.currentEventInstance.skeletonId;
     const dateStr = formatDate(this.state.calendar);
 
-    // 记录事件
-    this.state = {
+    // 按 chosenOutcome 过滤候选 outcome 池
+    const effectiveOutcomes = this.currentEventInstance.outcomeEffects.filter(
+      (e) => e.tag === chosenOutcome,
+    );
+    const pressureModifiers = extractPressureModifiers(effectiveOutcomes);
+
+    // 记录事件（pressureEffects 字段保留 PressureModifier[] 兼容旧调试/eval）
+    let nextState: WorldState = {
       ...this.state,
       eventLog: [
         ...this.state.eventLog,
@@ -251,15 +369,22 @@ export class WorldSimulator {
           name: this.currentEventInstance.name,
           day: this.state.calendar.daysSinceStart,
           summary,
-          pressureEffects: this.currentEventInstance.outcomeEffects,
+          pressureEffects: pressureModifiers,
         },
       ],
-      // 应用事件后效果
-      pressureAxes: applyPressureModifiers(
-        this.state.pressureAxes,
-        this.currentEventInstance.outcomeEffects,
-      ),
+      playerActionLog: appendPlayerAction(this.state.playerActionLog, {
+        day: this.state.calendar.daysSinceStart,
+        date: dateStr,
+        type: 'event_resolved',
+        id: this.currentEventInstance.skeletonId,
+        name: this.currentEventInstance.name,
+        summary: summary.length > 60 ? summary.slice(0, 60) + '…' : summary,
+      }),
     };
+
+    // 应用 outcome 走单一入口（v3.4.4）
+    nextState = applyOutcomeEffects(nextState, effectiveOutcomes);
+    this.state = nextState;
 
     // 事件反馈 NPC 状态：参与事件的 NPC 耐心下降（紧迫感），未参与的不受影响
     const updatedAgents = { ...this.state.npcAgents };
@@ -305,16 +430,35 @@ export class WorldSimulator {
     summary: string, npcIds: string[], sceneId: string, dateStr: string,
   ): Promise<void> {
     try {
-      const newMemories = await extractSceneMemories(
+      const extraction = await extractSceneMemories(
         this.llmProvider, summary, npcIds, this.characters, sceneId, dateStr,
       );
+      const newMemories = extraction.memories;
       const merged = { ...this.state.characterMemories };
+      const summaryMap = { ...(this.state.characterLongTermSummary || {}) };
+
+      // 每角色独立处理：合并 → 检查上限 → 必要时摘要旧记忆
       for (const [charId, entries] of Object.entries(newMemories)) {
         const existing = merged[charId] || [];
-        merged[charId] = [...existing, ...entries].slice(-10);
+        const combined = [...existing, ...entries];
+        merged[charId] = await this.compactMemoriesForCharacter(
+          charId, combined, summaryMap,
+        );
       }
-      debugLog('memory', `记忆提取完成`, JSON.stringify(newMemories, null, 2));
-      this.state = { ...this.state, characterMemories: merged };
+
+      // 关系 delta 合并到 relationshipOverrides
+      const overrides = this.mergeRelationshipDeltas(
+        this.state.relationshipOverrides || {},
+        extraction.relationshipDeltas,
+      );
+
+      debugLog('memory', `记忆提取完成`, JSON.stringify(extraction, null, 2));
+      this.state = {
+        ...this.state,
+        characterMemories: merged,
+        characterLongTermSummary: summaryMap,
+        relationshipOverrides: overrides,
+      };
       this.syncMemoriesToCharacters();
       saveWorldState(this.state);
       this.notify();
@@ -323,9 +467,84 @@ export class WorldSimulator {
     }
   }
 
+  /** 把一批 relationshipDeltas 合并进 overrides 映射；同方向累加，recentEvents 保留最新 5 条 */
+  private mergeRelationshipDeltas(
+    existing: Record<string, Record<string, { trustDelta: number; recentEvents: string[] }>>,
+    deltas: { from: string; to: string; trustDelta: number; reason: string }[],
+  ): Record<string, Record<string, { trustDelta: number; recentEvents: string[] }>> {
+    if (deltas.length === 0) return existing;
+    const next = { ...existing };
+    for (const d of deltas) {
+      if (!next[d.from]) next[d.from] = { ...(existing[d.from] || {}) };
+      const prev = next[d.from][d.to] || { trustDelta: 0, recentEvents: [] };
+      const newEvents = d.reason
+        ? [...prev.recentEvents, d.reason].slice(-5)
+        : prev.recentEvents;
+      next[d.from][d.to] = {
+        // clamp 累计在 -60..+60 之间，防止无限漂移
+        trustDelta: Math.max(-60, Math.min(60, prev.trustDelta + d.trustDelta)),
+        recentEvents: newEvents,
+      };
+    }
+    return next;
+  }
+
+  /**
+   * 压缩单个角色的记忆数组：未超上限直接返回；超上限时 LLM 摘要被淘汰的那批，
+   * 写入 summaryMap，保留高重要度 + 最新共 MEMORY_SOFT_CAP 条。
+   */
+  private async compactMemoriesForCharacter(
+    charId: string,
+    combined: MemoryEntry[],
+    summaryMap: Record<string, string>,
+  ): Promise<MemoryEntry[]> {
+    const SOFT_CAP = 10;
+    const SUMMARIZE_THRESHOLD = 15;
+
+    if (combined.length <= SOFT_CAP) {
+      return combined;
+    }
+
+    // 10 < length <= 15：按 importance + 最新保底截到 SOFT_CAP，被淘汰的暂不摘要（避免频繁 LLM）
+    if (combined.length < SUMMARIZE_THRESHOLD) {
+      return this.rankAndKeepTop(combined, SOFT_CAP);
+    }
+
+    // length >= SUMMARIZE_THRESHOLD：被淘汰的那批送去 LLM 摘要
+    const kept = this.rankAndKeepTop(combined, SOFT_CAP);
+    const keptIds = new Set(kept.map((m) => m.id));
+    const dropped = combined.filter((m) => !keptIds.has(m.id));
+
+    if (dropped.length > 0) {
+      const charName = this.characters.find((c) => c.id === charId)?.name || charId;
+      const existingSummary = summaryMap[charId] || '';
+      const updatedSummary = await summarizeOldMemories(
+        this.llmProvider, charName, dropped, existingSummary,
+      );
+      summaryMap[charId] = updatedSummary;
+      debugLog('memory', `长期记忆摘要更新：${charName}`, updatedSummary);
+    }
+
+    return kept;
+  }
+
+  /** 从记忆数组中保留 top N：最新 2 条保底 + 剩余按 importance 降序 */
+  private rankAndKeepTop(memories: MemoryEntry[], n: number): MemoryEntry[] {
+    if (memories.length <= n) return memories;
+    const recentGuaranteed = Math.min(2, n);
+    const recent = memories.slice(-recentGuaranteed);
+    const recentIds = new Set(recent.map((m) => m.id));
+    const rest = memories
+      .filter((m) => !recentIds.has(m.id))
+      .sort((a, b) => (b.importance - a.importance) || b.date.localeCompare(a.date));
+    const picked = [...recent, ...rest.slice(0, n - recent.length)];
+    return picked.sort((a, b) => a.date.localeCompare(b.date));
+  }
+
   private syncMemoriesToCharacters(): void {
     for (const char of this.characters) {
       char.shortTermMemory = this.state.characterMemories[char.id] || [];
+      char.longTermSummary = this.state.characterLongTermSummary?.[char.id];
     }
   }
 
@@ -381,6 +600,19 @@ export class WorldSimulator {
       allPressureChanges.push(...effects);
     }
 
+    // 1b. 时间窗 flag 触发器（确定性历史背景事件）
+    // 突厥犯边：约三月中旬之后种入，触发一次后不再重复
+    if (
+      !tickState.globalFlags['tujue_invasion'] &&
+      isAfterDate(tickState.calendar, 3, 15)
+    ) {
+      tickState = {
+        ...tickState,
+        globalFlags: { ...tickState.globalFlags, tujue_invasion: true },
+      };
+      debugLog('event_trigger', '时间窗 flag 触发: tujue_invasion');
+    }
+
     // 2. NPC Agent 决策（确定性阶段 + 并行 LLM 调用）
 
     // 2a. 确定性阶段：耐心衰减 + 规则过滤（串行，无 LLM）
@@ -400,6 +632,8 @@ export class WorldSimulator {
       const rules = NPC_DECISION_RULES[charId];
       const character = this.characters.find((c) => c.id === charId);
       if (!rules || !character) continue;
+      // v3.4.4：非 active 的 NPC（流放/下狱/死亡/远征）跳过决策
+      if (agentState.status && agentState.status !== 'active') continue;
 
       const decayRate = NPC_PATIENCE_DECAY[charId] ?? 1;
       const tickedAgent = tickNpcAgent(agentState, decayRate);
@@ -727,36 +961,13 @@ export class WorldSimulator {
     return lines.join('\n');
   }
 
-  // --- 游戏结束检查 ---
+  // --- 游戏结束检查（v3.4.4 委托给 endingResolver） ---
 
   private checkGameOver(): EndingType | null {
-    // 兵变路线：军事冲突事件已完成
-    if (this.state.eventLog.some((e) => e.skeletonId === 'skeleton_military_conflict')) {
-      const readiness = this.state.pressureAxes.military_readiness.value;
-      if (readiness >= 50) return 'coup_success';
-      if (readiness >= 30) return 'coup_fail_civil_war_win';
-      return 'coup_fail_captured';
-    }
-
-    // 时间到（六月底，约 120 天）
-    if (this.state.calendar.month > 6) {
-      const hostility = this.state.pressureAxes.jiancheng_hostility.value;
-      const crisis = this.state.pressureAxes.succession_crisis.value;
-
-      // 和平结局：建成敌意和储位危机都很低（极难达成）
-      if (hostility < 30 && crisis < 40) return 'peace';
-
-      // 否则被废
-      return 'deposed';
-    }
-
-    // 压力爆表提前结束：任一关键轴 ≥ 95 且未触发军事冲突
-    const { jiancheng_hostility, imperial_suspicion } = this.state.pressureAxes;
-    if (jiancheng_hostility.value >= 95 || imperial_suspicion.value >= 95) {
-      return 'deposed';
-    }
-
-    return null;
+    const decision = resolveEnding(this.state);
+    if (!decision) return null;
+    this.endingDecision = decision;
+    return decision.ending;
   }
 
   // --- 状态管理 ---

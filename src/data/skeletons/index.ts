@@ -7,6 +7,9 @@ import { imperialSummons } from './imperialSummons';
 import { intelligenceEvent } from './intelligenceEvent';
 import { allyWavering } from './allyWavering';
 import { militaryConflict } from './militaryConflict';
+import { courtImpeachment } from './courtImpeachment';
+import { courtCounterstrike } from './courtCounterstrike';
+import { seizeMilitaryCommand } from './seizeMilitaryCommand';
 
 export const ALL_SKELETONS: EventSkeleton[] = [
   banquetCrisis,
@@ -17,6 +20,9 @@ export const ALL_SKELETONS: EventSkeleton[] = [
   intelligenceEvent,
   allyWavering,
   militaryConflict,
+  courtImpeachment,
+  courtCounterstrike,
+  seizeMilitaryCommand,
 ];
 
 export {
@@ -28,4 +34,7 @@ export {
   intelligenceEvent,
   allyWavering,
   militaryConflict,
+  courtImpeachment,
+  courtCounterstrike,
+  seizeMilitaryCommand,
 };
