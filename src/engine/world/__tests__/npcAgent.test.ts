@@ -253,6 +253,43 @@ describe('filterPlausibleActions', () => {
     const result = filterPlausibleActions(agent, rules, createInitialWorldState(), makeCharacter());
     expect(result.onceRuleIds).toEqual(['r_once']);
   });
+
+  it('matches alertnessAbove condition', () => {
+    const agent = makeAgent({ alertness: 40 });
+    const rules: NpcDecisionRule[] = [
+      { id: 'r1', conditions: { alertnessAbove: 30 }, allowedStances: ['analyze', 'scheme'] },
+    ];
+    const result = filterPlausibleActions(agent, rules, createInitialWorldState(), makeCharacter());
+    expect(result.allowedStances).toContain('analyze');
+    expect(result.allowedStances).toContain('scheme');
+  });
+
+  it('does not match alertnessAbove when below threshold', () => {
+    const agent = makeAgent({ alertness: 20 });
+    const rules: NpcDecisionRule[] = [
+      { id: 'r1', conditions: { alertnessAbove: 30 }, allowedStances: ['scheme'] },
+    ];
+    const result = filterPlausibleActions(agent, rules, createInitialWorldState(), makeCharacter());
+    expect(result.allowedStances).toEqual(['observe']);
+  });
+
+  it('matches alertnessBelow condition', () => {
+    const agent = makeAgent({ alertness: 10 });
+    const rules: NpcDecisionRule[] = [
+      { id: 'r1', conditions: { alertnessBelow: 30 }, allowedStances: ['observe', 'advise'] },
+    ];
+    const result = filterPlausibleActions(agent, rules, createInitialWorldState(), makeCharacter());
+    expect(result.allowedStances).toContain('advise');
+  });
+
+  it('does not match alertnessBelow when at or above threshold', () => {
+    const agent = makeAgent({ alertness: 30 });
+    const rules: NpcDecisionRule[] = [
+      { id: 'r1', conditions: { alertnessBelow: 30 }, allowedStances: ['advise'] },
+    ];
+    const result = filterPlausibleActions(agent, rules, createInitialWorldState(), makeCharacter());
+    expect(result.allowedStances).toEqual(['observe']);
+  });
 });
 
 // --- consumeOnceRule ---

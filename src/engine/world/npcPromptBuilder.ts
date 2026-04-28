@@ -73,7 +73,7 @@ export function buildNpcDecisionPrompt(
   lines.push('');
 
   // NPC 自身状态
-  lines.push(`你的状态：耐心 ${Math.round(agentState.patience)}/100，承诺 ${Math.round(agentState.commitment)}/100`);
+  lines.push(`你的状态：耐心 ${Math.round(agentState.patience)}/100，警觉 ${Math.round(agentState.alertness)}/100，承诺 ${Math.round(agentState.commitment)}/100`);
   if (agentState.currentPlan) {
     lines.push(`当前计划：${agentState.currentPlan}`);
   }
@@ -210,6 +210,7 @@ export function buildEventGenerationPrompt(
   resolution: { coreConflict: string; resolutionSignals: ResolutionSignal[] },
   worldState: WorldState,
   availableNpcIds: string[],
+  lockedNpcIds: string[] = [],
 ): string {
   const lines: string[] = [];
 
@@ -253,6 +254,9 @@ export function buildEventGenerationPrompt(
   lines.push(`可选地点：${possibleLocations.join('、')}`);
   lines.push(`必须角色：${requiredRoles.join('、')}`);
   lines.push(`可用NPC ID：${availableNpcIds.join('、')}`);
+  if (lockedNpcIds.length > 0) {
+    lines.push(`已锁定NPC（必须出现在 activeNpcIds 中）：${lockedNpcIds.join('、')}`);
+  }
   lines.push('');
 
   // 阶段骨架

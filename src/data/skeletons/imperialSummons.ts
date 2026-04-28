@@ -47,6 +47,7 @@ export const imperialSummons: EventSkeleton = {
   ],
   possibleLocations: ['两仪殿', '甘露殿', '太极宫·御书房'],
   requiredRoles: ['皇帝（李渊）', '秦王', '谋士（事后商议）'],
+  requiredNpcIds: ['li_yuan'],
 
   baseOutcomeEffects: [
     {

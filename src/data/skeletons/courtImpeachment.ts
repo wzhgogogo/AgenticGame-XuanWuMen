@@ -46,6 +46,7 @@ export const courtImpeachment: EventSkeleton = {
   ],
   possibleLocations: ['太极宫·朝堂', '两仪殿'],
   requiredRoles: ['弹劾发起者（建成）', '秦王（被弹劾方）', '中立朝臣', '陛下'],
+  requiredNpcIds: ['li_jiancheng'],
 
   baseOutcomeEffects: [
     {

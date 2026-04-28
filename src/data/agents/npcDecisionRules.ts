@@ -55,6 +55,12 @@ export const changSunWujiRules: NpcDecisionRule[] = [
     escalationHint: '若秦王仍犹豫，无忌可能挂冠或另投',
     once: true,
   },
+  {
+    id: 'csw_alert',
+    conditions: { alertnessAbove: 30 },
+    allowedStances: ['analyze', 'counterspy', 'scheme'],
+    escalationHint: '近日事端频发，无忌警觉大增，须主动刺探敌情、谋划应对',
+  },
 ];
 
 // ===== 尉迟敬德：暴烈武将 =====
@@ -98,6 +104,12 @@ export const weiChiJingDeRules: NpcDecisionRule[] = [
     once: true,
     triggerEvent: 'skeleton_subordinate_ultimatum',
   },
+  {
+    id: 'wcj_alert',
+    conditions: { alertnessAbove: 30 },
+    allowedStances: ['patrol', 'rally', 'analyze'],
+    escalationHint: '敬德已闻风声，日夜巡防府邸，整备亲兵',
+  },
 ];
 
 // ===== 房玄龄：稳健谋士 =====
@@ -121,6 +133,12 @@ export const fangXuanLingRules: NpcDecisionRule[] = [
     },
     allowedStances: ['advise', 'remonstrate', 'lobby', 'coordinate', 'strategize', 'pressure'],
     escalationHint: '玄龄须联无忌共谏秦王',
+  },
+  {
+    id: 'fxl_alert',
+    conditions: { alertnessAbove: 30 },
+    allowedStances: ['analyze', 'coordinate'],
+    escalationHint: '玄龄察觉局势骤变，须核实情报、协调各方',
   },
 ];
 
@@ -148,6 +166,12 @@ export const liJianChengRules: NpcDecisionRule[] = [
     conditions: { pressureAbove: { succession_crisis: 80 } },
     allowedStances: ['assassinate', 'capture', 'pressure'],
     escalationHint: '太子已下定决心，可设宴鸩酒、伏弓暗杀，宁负骨肉之名也要先除秦王',
+  },
+  {
+    id: 'lijc_alert',
+    conditions: { alertnessAbove: 30 },
+    allowedStances: ['plant_spy', 'scheme', 'analyze'],
+    escalationHint: '太子嗅到异动，加紧安插眼线、监控秦王府一举一动',
   },
 ];
 
@@ -184,6 +208,12 @@ export const liYuanJiRules: NpcDecisionRule[] = [
     allowedStances: ['scheme', 'pressure', 'plant_spy'],
     escalationHint: '元吉表面与大哥同心，实则盼二虎相争两败俱伤——既怂恿建成下狠手，又暗中加重秦王府危机感',
   },
+  {
+    id: 'lyj_alert',
+    conditions: { alertnessAbove: 30 },
+    allowedStances: ['rally', 'pressure', 'capture'],
+    escalationHint: '元吉闻讯而动，立即整兵施压，趁乱扩大优势',
+  },
 ];
 
 // ===== 李渊：开国皇帝，挑动诸子相争维持自身帝位 =====
@@ -218,6 +248,12 @@ export const liYuanRules: NpcDecisionRule[] = [
     },
     allowedStances: ['strategize', 'lobby'],
     escalationHint: '陛下挑动兄弟相争的真正目的是保住自己的皇位——任何一方独大都不可接受',
+  },
+  {
+    id: 'lyy_alert',
+    conditions: { alertnessAbove: 30 },
+    allowedStances: ['strategize', 'lobby'],
+    escalationHint: '陛下察知事端，着人查探虚实、召重臣商议对策',
   },
 ];
 

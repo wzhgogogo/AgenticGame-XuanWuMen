@@ -223,6 +223,14 @@ const CATEGORY_LABELS: Record<string, string> = {
   personal: '个人',
 };
 
+const CATEGORY_ICONS: Record<string, string> = {
+  governance: '/images/icon-governance.png',
+  military: '/images/icon-military.png',
+  intelligence: '/images/icon-intelligence.png',
+  social: '/images/icon-social.png',
+  personal: '/images/icon-personal.png',
+};
+
 function ActivityCategoryGroup({
   category,
   activities,
@@ -235,9 +243,13 @@ function ActivityCategoryGroup({
   onSelect: (a: DailyActivity) => void;
 }) {
   const label = CATEGORY_LABELS[category] || category;
+  const icon = CATEGORY_ICONS[category];
   return (
     <div style={{ marginBottom: 4 }}>
-      <div style={{ fontSize: 10, color: '#8a7050', fontFamily: 'Noto Serif SC, serif', marginBottom: 4 }}>{label}</div>
+      <div style={{ fontSize: 10, color: '#8a7050', fontFamily: 'Noto Serif SC, serif', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+        {icon && <img src={icon} alt={label} style={{ width: 20, height: 20 }} />}
+        {label}
+      </div>
       {activities.map((a) => {
         const isSelected = selected === a.id;
         return (

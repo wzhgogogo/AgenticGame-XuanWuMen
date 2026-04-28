@@ -45,6 +45,7 @@ export const banquetCrisis: EventSkeleton = {
   ],
   possibleLocations: ['东宫·宴厅', '齐王府·正堂', '太极宫·御花园'],
   requiredRoles: ['设局者', '秦王（目标）', '随行护卫', '旁观皇族'],
+  requiredNpcIds: ['li_jiancheng'],
 
   baseOutcomeEffects: [
     {

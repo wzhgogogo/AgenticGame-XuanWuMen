@@ -1,6 +1,6 @@
 # 玄武门之变 — LLM 驱动的历史互动叙事游戏
 
-v3.4.4
+v3.4.5
 
 ## 简介
 
@@ -574,7 +574,22 @@ worldSimulator.runWorldTick 在 `isAfterDate(cal, 3, 15)` 后种入 `tujue_invas
 - WorldSimulator.fastForward(maxDays) 循环 endDay+proceedFromBriefing，**每天重 plan**（NPC velocity 可能变），任一停止信号或 mode 切换为 event_scene/game_over 立刻退出
 - DailyActivityScreen 在结束今日按钮旁加 [快进 3 日] [快进 7 日]
 
+### v3.4.5 — 2026-04-28
 
+NPC 涌现优化：alertness 接入决策系统 + 敌方 NPC 锁定出场。
+
+**alertness 驱动事件反应**
+- `NpcDecisionRule.conditions` 新增 `alertnessAbove/Below`，`matchConditions` 加 2 行 guard
+- 6 个 NPC 各加 `_alert` 规则（alertnessAbove: 30）：事件后解锁反应 stance（谋士→情报反应，武将→巡防，太子→监控，元吉→施压，皇帝→平衡）
+- handleEventEnd 广播：failure/disaster → 非参与 NPC +5；含阵亡/被擒 → +10
+- NPC 决策 prompt 显示警觉值
+
+**骨架 requiredNpcIds**
+- EventSkeleton 新增 `requiredNpcIds?: string[]`，eventGenerator 合并锁定 NPC + LLM 选择（去重、过滤非 active）
+- 6 个骨架锁定敌方 NPC：暗杀/军事冲突(建成+元吉)、宴会/弹劾(建成)、御前召见(李渊)、夺兵权(元吉)
+
+**测试**
+- 320 单测全过（+18）
 
 
 ## 后续重点

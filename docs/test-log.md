@@ -1,5 +1,44 @@
 # 测试日志 — 玄武门之变 v3
 
+## 2026-04-28 v3.4.5: NPC 涌现优化 — 新增 18 用例
+
+### 单测
+
+```
+ Test Files  15 passed (15)
+      Tests  320 passed (320)
+   Duration  22.28s
+
+ tsc -b  通过（仅 DeskLayout 预存错误）
+```
+
+新增/修改的测试：
+
+| 文件 | 改动 | 新增用例数 |
+|------|------|-----------|
+| `src/engine/world/__tests__/npcAgent.test.ts` | alertnessAbove/Below 条件匹配 4 个用例 | +4 (23→27) |
+| `src/data/skeletons/skeletons.test.ts` | requiredNpcIds 校验（11 骨架结构 + 3 骨架锁定断言） | +14 (98→112) |
+
+### 新增测试覆盖
+
+**alertness 条件（npcAgent.test.ts）：**
+- `alertnessAbove: 30` 命中（alertness=40）→ 解锁 stance
+- `alertnessAbove: 30` 不命中（alertness=20）→ fallback observe
+- `alertnessBelow: 30` 命中（alertness=10）→ 解锁 stance
+- `alertnessBelow: 30` 不命中（alertness=30）→ fallback observe
+
+**requiredNpcIds（skeletons.test.ts）：**
+- 11 骨架结构校验：requiredNpcIds（如有）中每个 ID 必须是 6 个合法 NPC ID 之一
+- assassinationCrisis 锁定 `['li_jiancheng', 'li_yuanji']`
+- imperialSummons 锁定 `['li_yuan']`
+- militaryConflict 锁定 `['li_jiancheng', 'li_yuanji']`
+
+### 无新坑
+
+本次改动纯粹扩展（新增条件类型 + 可选字段），未触发任何已有测试回归。
+
+---
+
 ## 2026-04-27 v3.4.4: 全量单测 + 冒烟测试 + 冒烟脚本修复
 
 ### 单测

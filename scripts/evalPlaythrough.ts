@@ -225,7 +225,7 @@ const BANNED_WORDS = [
   '即位', '登基', '入继大统', '弑父', '政变成功',
   '继位', '登极', '新君', '践祚', '大业已成', '功成名就',
   '天策上将府', '凌烟阁', '贞观之治', '明君', '圣君',
-  '杀兄夺位', '杀弟夺位', '鸩酒', '兵变成功', '夺位成功',
+  '杀兄夺位', '杀弟夺位', '兵变成功', '夺位成功',
 ];
 
 const NAMING_VIOLATIONS: Array<{ pattern: RegExp; detail: string; sceneOnly?: boolean }> = [
@@ -280,6 +280,9 @@ function stripThinking(text: string): string {
     .replace(/<think>[\s\S]*?<\/think>/g, '')
     .replace(/<thought>[\s\S]*?<\/thought>/g, '')
     .replace(/<thinking>[\s\S]*?<\/thinking>/g, '')
+    .replace(/<think>[\s\S]*$/g, '')
+    .replace(/<thought>[\s\S]*$/g, '')
+    .replace(/<thinking>[\s\S]*$/g, '')
     .trim();
 }
 
@@ -365,7 +368,12 @@ function ruleBasedChecks(records: PromptRecord[], entries: LogEntry[]): RuleIssu
     }
   }
 
-  // 4. 记忆注入但未体现
+  // 4. 记忆注入但未体现（只检测核心实体：人名/地名/事件，时间不参与判定）
+  const CORE_ENTITY_PATTERNS = [
+    /(?:李世民|李建成|李元吉|李渊|长孙无忌|尉迟敬德|房玄龄|魏征|秦叔宝|程咬金|侯君集|张公谨|段志玄|屈突通|杜如晦|高士廉|封德彝|裴寂|萧瑀|陈叔达)/g,
+    /(?:玄武门|太极宫|两仪殿|东宫|秦王府|天策府|长安|洛阳|昆明池|武功|雍州|突厥)/g,
+    /(?:刺杀|暗杀|伏击|兵变|密议|弹劾|夺权|逼宫|投毒|中毒|下毒|离间|叛变|出征|请缨|抗旨|禅让|废黜|罢黜)/g,
+  ];
   for (let i = 0; i < records.length; i++) {
     const r = records[i];
     const systemMsg = r.messages.find(m => m.role === 'system');
@@ -375,16 +383,21 @@ function ruleBasedChecks(records: PromptRecord[], entries: LogEntry[]): RuleIssu
     const memText = memMatch[1].trim();
     if (memText.length < 10) continue;
 
-    const memKeywords = memText.match(/[\u4e00-\u9fff]{2,6}/g) || [];
-    const uniqueKeywords = [...new Set(memKeywords)].filter(k => k.length >= 3);
-    if (uniqueKeywords.length === 0) continue;
+    const entities: string[] = [];
+    for (const pat of CORE_ENTITY_PATTERNS) {
+      pat.lastIndex = 0;
+      const matches = memText.match(pat);
+      if (matches) entities.push(...matches);
+    }
+    const uniqueEntities = [...new Set(entities)];
+    if (uniqueEntities.length < 2) continue;
 
     const stripped = stripThinking(r.response);
-    const hits = uniqueKeywords.filter(k => stripped.includes(k)).length;
-    if (hits === 0 && uniqueKeywords.length >= 3) {
+    const hits = uniqueEntities.filter(k => stripped.includes(k));
+    if (hits.length === 0) {
       issues.push({
         type: 'memory_not_used',
-        detail: `系统 prompt 注入了 ${uniqueKeywords.length} 个记忆关键词但 response 无一体现`,
+        detail: `记忆注入 ${uniqueEntities.length} 个实体(${uniqueEntities.slice(0, 4).join('/')})但 response 无一体现`,
         recordIndex: i,
       });
     }

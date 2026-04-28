@@ -46,6 +46,7 @@ export const assassinationCrisis: EventSkeleton = {
   ],
   possibleLocations: ['长安街道', '猎场', '秦王府外', '昆明池畔'],
   requiredRoles: ['策划者', '执行者（刺客/伏兵）', '秦王（目标）', '护卫'],
+  requiredNpcIds: ['li_jiancheng', 'li_yuanji'],
 
   baseOutcomeEffects: [
     {

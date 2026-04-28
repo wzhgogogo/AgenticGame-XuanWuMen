@@ -69,6 +69,8 @@ function matchConditions(
 ): boolean {
   if (conditions.patienceBelow !== undefined && agent.patience >= conditions.patienceBelow) return false;
   if (conditions.patienceAbove !== undefined && agent.patience < conditions.patienceAbove) return false;
+  if (conditions.alertnessAbove !== undefined && agent.alertness < conditions.alertnessAbove) return false;
+  if (conditions.alertnessBelow !== undefined && agent.alertness >= conditions.alertnessBelow) return false;
 
   if (conditions.daysSinceLastActionAbove !== undefined &&
     agent.daysSinceLastAction <= conditions.daysSinceLastActionAbove) return false;

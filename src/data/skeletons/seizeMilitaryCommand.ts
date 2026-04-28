@@ -46,6 +46,7 @@ export const seizeMilitaryCommand: EventSkeleton = {
   ],
   possibleLocations: ['太极宫·朝堂', '两仪殿', '秦王府·书房'],
   requiredRoles: ['元吉（奏请者）', '秦王（被剥夺方）', '陛下', '武将（被点名调走）'],
+  requiredNpcIds: ['li_yuanji'],
 
   baseOutcomeEffects: [
     {

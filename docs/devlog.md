@@ -6,6 +6,24 @@
 
 ---
 
+## 2026-04-28
+
+### NPC 涌现优化：alertness 接入决策 + 敌方 NPC 锁定出场
+
+**为什么**：autoplay 分析发现两个涌现问题——(1) 事件后 NPC 行为不变（"沉默→沉默"），因为 `alertness` 字段被 handleEventEnd 写入但决策规则从不读取，压力变化（5-18点）也不够跨越规则阈值（50-80）；(2) 敌方 NPC 几乎不出场，因为 `activeNpcIds` 完全由 LLM 选择，大多数骨架 `requiredRoles` 描述己方角色。
+
+**改动**：
+- `NpcDecisionRule.conditions` 新增 `alertnessAbove/Below`，`matchConditions` 加 2 行 guard
+- 6 个 NPC 各加一条 `alertnessAbove: 30` 规则，事件后解锁更积极的 stance（谋士→情报反应，武将→巡防，太子→监控，元吉→施压，皇帝→平衡）
+- `handleEventEnd` 新增 alertness 广播：failure/disaster 非参与者 +5，含阵亡/被擒则 +10
+- NPC 决策 prompt 显示警觉值
+- `EventSkeleton` 新增 `requiredNpcIds?: string[]`，eventGenerator 合并锁定 NPC 与 LLM 选择
+- 6 个骨架硬绑定敌方 NPC：暗杀/军事冲突锁建成+元吉，宴会/弹劾锁建成，御前召见锁李渊，夺兵权锁元吉
+
+**影响**：事件后 NPC 应当在 1-3 次事件后（alertness 累积 ≥30）解锁新 stance，不再停留在 observe。敌方 NPC 在对应事件中必定出场。320 测试全过。
+
+---
+
 ## 2026-04-27
 
 ### Eval 检测规则修复

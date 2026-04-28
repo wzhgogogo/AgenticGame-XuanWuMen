@@ -103,6 +103,18 @@ describe('ALL_SKELETONS structural integrity', () => {
         expect(skeleton.maxOccurrences).toBeGreaterThanOrEqual(1);
         expect(skeleton.priority).toBeGreaterThan(0);
       });
+
+      it('requiredNpcIds (if present) are valid NPC IDs', () => {
+        const VALID_NPC_IDS = [
+          'changsun_wuji', 'weichi_jingde', 'fang_xuanling',
+          'li_jiancheng', 'li_yuanji', 'li_yuan',
+        ];
+        if (skeleton.requiredNpcIds) {
+          for (const id of skeleton.requiredNpcIds) {
+            expect(VALID_NPC_IDS).toContain(id);
+          }
+        }
+      });
     });
   });
 });
@@ -162,6 +174,18 @@ describe('individual skeleton characteristics', () => {
     );
     expect(pre).toBeDefined();
     expect(pre!.params['value']).toBe(60);
+  });
+
+  it('assassinationCrisis locks li_jiancheng and li_yuanji', () => {
+    expect(assassinationCrisis.requiredNpcIds).toEqual(['li_jiancheng', 'li_yuanji']);
+  });
+
+  it('imperialSummons locks li_yuan', () => {
+    expect(imperialSummons.requiredNpcIds).toEqual(['li_yuan']);
+  });
+
+  it('militaryConflict locks li_jiancheng and li_yuanji', () => {
+    expect(militaryConflict.requiredNpcIds).toEqual(['li_jiancheng', 'li_yuanji']);
   });
 });
 

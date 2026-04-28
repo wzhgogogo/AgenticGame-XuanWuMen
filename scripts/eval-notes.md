@@ -4,6 +4,38 @@
 
 ---
 
+## 2026-04-28 · NPC 涌现优化：alertness 接入决策 + 敌方出场锁定
+
+### 发现 / 动机
+
+对 autoplay 日志分析发现两个涌现问题：
+1. **事件后 NPC 行为不变**（"沉默→沉默"）：`alertness` 字段被 handleEventEnd 写入（+10）但 `matchConditions` 从不读取——纯死数据。压力变化（5-18点）不够跨越规则阈值（50-80），globalFlags 只被骨架 precondition 读取不被 NPC 规则感知。
+2. **敌方 NPC 几乎不出场**：李渊仅 Day 23 出场 1 次，建成/元吉仅 Day 25 出场。`activeNpcIds` 完全由 LLM 选择，大多数骨架 `requiredRoles` 描述己方角色（"副谋"、"动摇者"），LLM 自然选己方人。
+
+### 改动
+
+**alertness 接入决策系统：**
+- `NpcDecisionRule.conditions` 新增 `alertnessAbove/Below`（types/world.ts）
+- `matchConditions` 加 2 行 guard（npcAgent.ts）
+- 6 个 NPC 各加 `_alert` 规则（alertnessAbove: 30）：谋士→情报反应，武将→巡防，太子→监控，元吉→施压，皇帝→平衡
+- `handleEventEnd` 广播：failure/disaster → 非参与者 +5；含阵亡/被擒 → +10
+- NPC prompt 显示警觉值
+
+**骨架 requiredNpcIds：**
+- `EventSkeleton` 新增 `requiredNpcIds?: string[]`
+- eventGenerator 合并锁定 NPC + LLM 选择（去重、过滤非 active）
+- 6 个骨架加 requiredNpcIds：暗杀/军事冲突(建成+元吉)、宴会/弹劾(建成)、御前召见(李渊)、夺兵权(元吉)
+
+### 验证
+- tsc ✅（仅 DeskLayout 预存错误）/ 单测 320/320 ✅
+
+### 待观察
+- alertness 累积速度是否合理（30 阈值 = 3 次参与事件或 6 次 failure 广播）
+- 敌方 NPC 锁定后 LLM 是否能为其生成合理对白（需 autoplay 验证）
+- alertness 是否需要每日衰减（当前只增不减，长期游戏可能全员满警觉）
+
+---
+
 ## 2026-04-22 · Eval 检测强化 + Stance 精细化
 
 ### 发现

@@ -21,6 +21,7 @@ export async function generateEventInstance(
   availableNpcIds: string[],
   llmProvider: LLMProvider,
 ): Promise<EventInstance | null> {
+  const lockedIds = (skeleton.requiredNpcIds ?? []).filter((id) => availableNpcIds.includes(id));
   const prompt = buildEventGenerationPrompt(
     skeleton.category,
     skeleton.description,
@@ -31,6 +32,7 @@ export async function generateEventInstance(
     skeleton.resolution,
     worldState,
     availableNpcIds,
+    lockedIds,
   );
 
   try {
@@ -65,7 +67,7 @@ export async function generateEventInstance(
       },
     );
     if (!fullResponse) fullResponse = res.content;
-    return tryParseEventInstance(fullResponse, skeleton, worldState, availableNpcIds);
+    return tryParseEventInstance(fullResponse, skeleton, worldState, availableNpcIds, lockedIds);
   } catch (error) {
     console.warn(`Event generation failed for ${skeleton.id}:`, error);
     return null;
@@ -77,6 +79,7 @@ function tryParseEventInstance(
   skeleton: EventSkeleton,
   worldState: WorldState,
   availableNpcIds: string[],
+  lockedNpcIds: string[] = [],
 ): EventInstance | null {
   try {
     // 提取 JSON（处理 markdown 包裹）
@@ -103,10 +106,11 @@ function tryParseEventInstance(
       });
     }
 
-    // 校验 NPC IDs（如果为空，使用前两个可用 NPC 兜底）
-    const activeNpcIds: string[] = (parsed.activeNpcIds && parsed.activeNpcIds.length > 0)
+    // 校验 NPC IDs（合并锁定 NPC + LLM 选择，去重）
+    const llmChosen: string[] = (parsed.activeNpcIds && parsed.activeNpcIds.length > 0)
       ? parsed.activeNpcIds
       : availableNpcIds.slice(0, 2);
+    const activeNpcIds = [...new Set([...lockedNpcIds, ...llmChosen])];
 
     return {
       skeletonId: skeleton.id,
@@ -148,11 +152,12 @@ export async function resolveEventInstance(
   }
 
   // 最后兜底：用骨架最小信息构建
+  const fallbackLockedIds = (skeleton.requiredNpcIds ?? []).filter((id) => availableNpcIds.includes(id));
   return {
     skeletonId: skeleton.id,
     name: skeleton.category,
     location: skeleton.possibleLocations[0] || '秦王府',
-    activeNpcIds: availableNpcIds.slice(0, 2),
+    activeNpcIds: [...new Set([...fallbackLockedIds, ...availableNpcIds.slice(0, 2)])],
     narratorIntro: `${skeleton.description}\n\n局势紧迫，事态正在发展...`,
     phases: skeleton.phaseSkeletons.map((ps, i) => ({
       id: `phase_${i + 1}`,

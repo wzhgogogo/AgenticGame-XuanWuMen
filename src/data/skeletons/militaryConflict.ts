@@ -47,6 +47,7 @@ export const militaryConflict: EventSkeleton = {
   ],
   possibleLocations: ['玄武门', '太极宫·北门', '长安城内'],
   requiredRoles: ['指挥者', '武将（执行者）', '谋士（参谋）'],
+  requiredNpcIds: ['li_jiancheng', 'li_yuanji'],
 
   baseOutcomeEffects: [
     {

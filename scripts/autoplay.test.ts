@@ -347,7 +347,8 @@ describe('autoplay', () => {
           // 获取结束文本
           const finalState = sm.getState();
           const summary = finalState.endingText || '场景结束，未获得结局文本。';
-          await simulator.handleEventEnd(summary);
+          const chosenOutcome = finalState.chosenOutcome || 'success';
+          await simulator.handleEventEnd(summary, chosenOutcome);
 
           // 记忆 diff
           const memAfter = simulator.getState().characterMemories as Record<string, unknown[]>;
@@ -367,6 +368,7 @@ describe('autoplay', () => {
 
           log(day, dateStr, 'event_end', {
             summary: summary.slice(0, 300),
+            chosenOutcome,
             eventLog: simulator.getState().eventLog.map(e => ({
               name: e.name,
               day: e.day,
@@ -388,6 +390,9 @@ describe('autoplay', () => {
         axes: Object.fromEntries(
           Object.entries(endState.pressureAxes).map(([k, v]) => [k, Math.round((v as { value: number }).value)])
         ),
+        playerActions: (endState.playerActionLog ?? []).slice(-3).map(a => ({
+          type: a.type, detail: 'detail' in a ? a.detail : undefined, day: a.day,
+        })),
       });
     }
 

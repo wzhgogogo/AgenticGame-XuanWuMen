@@ -400,6 +400,21 @@ export class WorldSimulator {
     }
     this.state = { ...this.state, npcAgents: updatedAgents };
 
+    // 事件后 alertness 广播：重大事件（failure/disaster）波及未参与 NPC
+    const isDramatic = chosenOutcome === 'failure' || chosenOutcome === 'disaster';
+    if (isDramatic) {
+      const hasDeathOrCapture = effectiveOutcomes.some(
+        (e) => (e.kind === 'loseNpc' && e.status === 'deceased') || (e.kind === 'flag' && e.key === 'player_captured'),
+      );
+      const boost = hasDeathOrCapture ? 10 : 5;
+      const broadcastAgents = { ...this.state.npcAgents };
+      for (const [npcId, agent] of Object.entries(broadcastAgents)) {
+        if (npcIds.includes(npcId)) continue;
+        broadcastAgents[npcId] = { ...agent, alertness: Math.min(100, agent.alertness + boost) };
+      }
+      this.state = { ...this.state, npcAgents: broadcastAgents };
+    }
+
     this.currentEventInstance = null;
     this.currentSceneManager = null;
 

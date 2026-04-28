@@ -168,6 +168,8 @@ export interface NpcDecisionRule {
   conditions: {
     patienceBelow?: number;
     patienceAbove?: number;
+    alertnessAbove?: number;
+    alertnessBelow?: number;
     pressureAbove?: Partial<Record<PressureAxisId, number>>;
     pressureBelow?: Partial<Record<PressureAxisId, number>>;
     daysSinceLastActionAbove?: number;
@@ -257,6 +259,7 @@ export interface EventSkeleton {
   constraints: string[];
   possibleLocations: string[];
   requiredRoles: string[];
+  requiredNpcIds?: string[];
 
   /** 候选 outcome 池：每条带 id 与 tag，结局时按 chosenOutcome 过滤生效 */
   baseOutcomeEffects: TaggedOutcomeEffect[];
