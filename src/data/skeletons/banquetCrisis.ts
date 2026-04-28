@@ -29,10 +29,10 @@ export const banquetCrisis: EventSkeleton = {
   resolution: {
     coreConflict: '秦王能否安全脱离宴局',
     resolutionSignals: [
-      '秦王成功离开宴席',
-      '冲突当场爆发、武力对抗',
-      '设局者主动收手，暂时隐忍',
-      '第三方介入打断宴局',
+      { outcome: 'success', description: '秦王成功离开宴席，无重大损伤' },
+      { outcome: 'partial', description: '冲突当场爆发但勉强脱身，敌意公开化' },
+      { outcome: 'failure', description: '随行武将护主重伤，宴局以血光收场' },
+      { outcome: 'disaster', description: '秦王中毒重伤，敬德拼死救出' },
     ],
     softCap: 10,
     hardCap: 13,
@@ -47,7 +47,61 @@ export const banquetCrisis: EventSkeleton = {
   requiredRoles: ['设局者', '秦王（目标）', '随行护卫', '旁观皇族'],
 
   baseOutcomeEffects: [
-    { axisId: 'succession_crisis', delta: 10, reason: '宴局事件加剧矛盾', source: 'event' },
-    { axisId: 'qinwangfu_desperation', delta: 12, reason: '遇险后秦王府更加紧迫', source: 'event' },
+    {
+      id: 'banquet_success_pressure',
+      tag: 'success',
+      kind: 'pressure',
+      modifier: { axisId: 'qinwangfu_desperation', delta: 8, reason: '宴局加剧紧迫', source: 'event' },
+    },
+    {
+      id: 'banquet_partial_flag',
+      tag: 'partial',
+      kind: 'flag',
+      key: 'shimin_injured',
+      value: true,
+      reason: '中毒但勉强逃离',
+    },
+    {
+      id: 'banquet_partial_pressure',
+      tag: 'partial',
+      kind: 'pressure',
+      modifier: { axisId: 'qinwangfu_desperation', delta: 10, reason: '秦王中毒逃归，府中惶恐', source: 'event' },
+    },
+    {
+      id: 'banquet_failure_npc',
+      tag: 'failure',
+      kind: 'loseNpc',
+      characterId: 'weichi_jingde',
+      status: 'deceased',
+      reason: '宴局中护主战死',
+    },
+    {
+      id: 'banquet_failure_flag',
+      tag: 'failure',
+      kind: 'flag',
+      key: 'shimin_injured',
+      value: true,
+      reason: '秦王中毒受伤',
+    },
+    {
+      id: 'banquet_failure_pressure',
+      tag: 'failure',
+      kind: 'pressure',
+      modifier: { axisId: 'qinwangfu_desperation', delta: 20, reason: '护主战死+秦王中毒，府中震动', source: 'event' },
+    },
+    {
+      id: 'banquet_disaster_flag',
+      tag: 'disaster',
+      kind: 'flag',
+      key: 'player_captured',
+      value: true,
+      reason: '秦王中毒昏迷被控制',
+    },
+    {
+      id: 'banquet_disaster_pressure',
+      tag: 'disaster',
+      kind: 'pressure',
+      modifier: { axisId: 'succession_crisis', delta: 25, reason: '秦王被擒，格局剧变', source: 'event' },
+    },
   ],
 };

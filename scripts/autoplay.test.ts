@@ -43,19 +43,33 @@ const callTimestamps: number[] = [];
 function rateLimitedProvider(base: ReturnType<typeof createLLMProvider>): ReturnType<typeof createLLMProvider> {
   return {
     chat: async (messages, onChunk?, signal?) => {
-      const now = Date.now();
-      // 清除窗口外的记录
-      while (callTimestamps.length > 0 && callTimestamps[0] < now - WINDOW_MS) {
-        callTimestamps.shift();
+      const MAX_RETRIES = 5;
+      for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+        const now = Date.now();
+        while (callTimestamps.length > 0 && callTimestamps[0] < now - WINDOW_MS) {
+          callTimestamps.shift();
+        }
+        if (callTimestamps.length >= RPM_LIMIT) {
+          const waitMs = callTimestamps[0] + WINDOW_MS - now + 500;
+          console.log(`[rate-limit] 达到 ${RPM_LIMIT} RPM，等待 ${Math.round(waitMs / 1000)}s...`);
+          await new Promise(r => setTimeout(r, waitMs));
+        }
+        callTimestamps.push(Date.now());
+        try {
+          return await base.chat(messages, onChunk, signal);
+        } catch (err: unknown) {
+          const msg = err instanceof Error ? err.message : String(err);
+          const is429 = msg.includes('429') || msg.toLowerCase().includes('rate') || msg.toLowerCase().includes('too many');
+          if (is429 && attempt < MAX_RETRIES) {
+            const backoff = Math.min(30_000, (2 ** attempt) * 5_000);
+            console.log(`[rate-limit] 429 detected, retry ${attempt + 1}/${MAX_RETRIES} after ${Math.round(backoff / 1000)}s...`);
+            await new Promise(r => setTimeout(r, backoff));
+            continue;
+          }
+          throw err;
+        }
       }
-      // 如果达到限制，等待到窗口滑过
-      if (callTimestamps.length >= RPM_LIMIT) {
-        const waitMs = callTimestamps[0] + WINDOW_MS - now + 500;
-        console.log(`[rate-limit] 达到 ${RPM_LIMIT} RPM，等待 ${Math.round(waitMs / 1000)}s...`);
-        await new Promise(r => setTimeout(r, waitMs));
-      }
-      callTimestamps.push(Date.now());
-      return base.chat(messages, onChunk, signal);
+      throw new Error('unreachable');
     },
   };
 }
@@ -241,7 +255,7 @@ describe('autoplay', () => {
     provider = loggingProvider(rateLimitedProvider(createLLMProvider(config)));
   });
 
-  it('runs automated playthrough', async () => {
+  it('runs automated playthrough', { timeout: 7_200_000 }, async () => {
     simulator = new WorldSimulator(provider, characters, player);
 
     // 监听状态

@@ -117,7 +117,7 @@ describe('buildEventGenerationPrompt', () => {
     locations: ['太极殿', '东宫'],
     roles: ['李建成'],
     phases: [{ role: '入局', description: '赴宴', turnRange: [1, 3] as [number, number] }],
-    resolution: { coreConflict: '能否安全脱身', resolutionSignals: ['秦王离开宴席'] },
+    resolution: { coreConflict: '能否安全脱身', resolutionSignals: [{ outcome: 'success' as const, description: '秦王离开宴席' }] },
     npcIds: ['weichi_jingde', 'changsun_wuji'],
   };
 

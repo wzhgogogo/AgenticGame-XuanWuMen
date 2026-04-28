@@ -1,10 +1,16 @@
 import type { Character, SceneConfig, SceneOutcome, DialogueEntry } from '../../types';
 import type { LLMMessage } from '../llm/types';
+import type { WorldState, PlayerAction } from '../../types/world';
 import { NAMING_RULES, HISTORICAL_CONTEXT } from '../../data/promptConstraints';
+import { selectMemories } from './memoryExtractor';
+import { getEffectiveTrust } from './worldState';
 
 // ===== 内部辅助：构建角色描述块（三层记忆） =====
 
-function buildCharacterBlock(character: Character): string {
+function buildCharacterBlock(
+  character: Character,
+  relationshipOverrides?: WorldState['relationshipOverrides'],
+): string {
   const lines: string[] = [];
 
   lines.push(`【${character.name}·${character.title}】`);
@@ -38,10 +44,18 @@ function buildCharacterBlock(character: Character): string {
     lines.push('');
   }
 
-  // 短期记忆（跨场景积累）
-  if (character.shortTermMemory.length > 0) {
+  // 长期记忆摘要（LLM 提炼的旧事）
+  if (character.longTermSummary) {
+    lines.push('长期记忆（提炼）:');
+    lines.push(`  ${character.longTermSummary}`);
+    lines.push('');
+  }
+
+  // 短期记忆（跨场景积累，按 importance top-k 挑选，避免无差别堆砌）
+  const shortTerm = selectMemories(character.shortTermMemory, { topK: 6, recentGuaranteed: 2 });
+  if (shortTerm.length > 0) {
     lines.push('近期记忆:');
-    for (const mem of character.shortTermMemory) {
+    for (const mem of shortTerm) {
       lines.push(`  - [${mem.date}] ${mem.event} (${mem.emotionalTag})`);
     }
     lines.push('');
@@ -56,15 +70,22 @@ function buildCharacterBlock(character: Character): string {
     lines.push('');
   }
 
-  // 人际关系
+  // 人际关系（合并静态 trust + 运行时 delta）
   const relIds = Object.keys(character.relationships);
   if (relIds.length > 0) {
     lines.push('人际关系:');
     for (const relId of relIds) {
       const rel = character.relationships[relId];
-      lines.push(`  - ${rel.role}: 信任度${rel.trust}/100 — ${rel.dynamics}`);
+      const eff = getEffectiveTrust({ relationshipOverrides }, character.id, relId, rel.trust);
+      const deltaStr = eff.delta === 0
+        ? ''
+        : ` (较初始${eff.delta > 0 ? '+' : ''}${eff.delta})`;
+      lines.push(`  - ${rel.role}: 信任度${eff.value}/100${deltaStr} — ${rel.dynamics}`);
       if (rel.tension) {
         lines.push(`    潜在张力: ${rel.tension}`);
+      }
+      if (eff.recentEvents.length > 0) {
+        lines.push(`    近期变化: ${eff.recentEvents.slice(-3).join('；')}`);
       }
     }
     lines.push('');
@@ -85,6 +106,8 @@ export function buildSystemPrompt(
   characters: Character[],
   phaseIndex: number,
   previousSceneSummary?: string,
+  relationshipOverrides?: WorldState['relationshipOverrides'],
+  recentPlayerActions?: PlayerAction[],
 ): string {
   const phase = scene.phases[phaseIndex] ?? scene.phases[0];
   const npcs = characters.filter((c) => c.role !== 'player_character');
@@ -115,14 +138,24 @@ ${NAMING_RULES}`);
   // 3. 玩家角色
   if (player) {
     sections.push(`===== 玩家角色 =====
-${buildCharacterBlock(player)}`);
+${buildCharacterBlock(player, relationshipOverrides)}`);
   }
 
   // 4. NPC角色
   sections.push('===== NPC角色 =====');
   for (const npc of npcs) {
-    sections.push(buildCharacterBlock(npc));
-    sections.push('---');
+    sections.push(buildCharacterBlock(npc, relationshipOverrides));
+   
+
+  // 4.5 秦王近期行踪（让 NPC 知道殿下最近在做什么）
+  if (recentPlayerActions && recentPlayerActions.length > 0) {
+    const lines = ['===== 秦王近期行踪 ====='];
+    for (const a of recentPlayerActions.slice(-8)) {
+      const tag = a.type === 'activity' ? '' : a.type === 'event_skipped' ? '[未处置]' : '[事件]';
+      lines.push(`[${a.date}] ${tag}${a.name}${a.summary ? `：${a.summary}` : ''}`);
+    }
+    sections.push(lines.join('\n'));
+  } sections.push('---');
   }
 
   // 5. 输出格式要求
@@ -176,7 +209,7 @@ export function buildMessages(
   currentDate?: string,
 ): LLMMessage[] {
   const messages: LLMMessage[] = [
-    { role: 'system', content: systemPrompt },
+    { role: 'system', content: systemPrompt, cacheBoundary: true },
     ...llmMessages.map((m) => ({ role: m.role as LLMMessage['role'], content: m.content })),
   ];
 

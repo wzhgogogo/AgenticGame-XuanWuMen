@@ -31,10 +31,10 @@ export const imperialSummons: EventSkeleton = {
   resolution: {
     coreConflict: '秦王能否在面圣中化解危机或争取有利地位',
     resolutionSignals: [
-      '陛下做出明确裁决',
-      '秦王成功为自己辩解',
-      '陛下提出了新的要求或安排',
-      '面圣不了了之，但关系发生了微妙变化',
+      { outcome: 'success', description: '秦王成功为自己辩解，陛下暂时释疑' },
+      { outcome: 'partial', description: '陛下提出新的要求或安排，但未削权' },
+      { outcome: 'failure', description: '陛下下诏削去尚书令一职' },
+      { outcome: 'disaster', description: '陛下命秦王出镇洛阳，名为屏藩实为流放' },
     ],
     softCap: 10,
     hardCap: 13,
@@ -49,7 +49,45 @@ export const imperialSummons: EventSkeleton = {
   requiredRoles: ['皇帝（李渊）', '秦王', '谋士（事后商议）'],
 
   baseOutcomeEffects: [
-    { axisId: 'imperial_suspicion', delta: -5, reason: '面圣后暂时释疑', source: 'event' },
-    { axisId: 'succession_crisis', delta: 3, reason: '召见本身就是局势紧张的信号', source: 'event' },
+    {
+      id: 'summons_success_suspicion',
+      tag: 'success',
+      kind: 'pressure',
+      modifier: { axisId: 'imperial_suspicion', delta: -10, reason: '面圣后陛下释疑', source: 'event' },
+    },
+    {
+      id: 'summons_partial_pressure',
+      tag: 'partial',
+      kind: 'pressure',
+      modifier: { axisId: 'succession_crisis', delta: 5, reason: '召见本身就是局势紧张的信号', source: 'event' },
+    },
+    {
+      id: 'summons_failure_office',
+      tag: 'failure',
+      kind: 'loseOffice',
+      officeId: 'shangshu_ling',
+      reason: '陛下削去尚书令',
+    },
+    {
+      id: 'summons_failure_pressure',
+      tag: 'failure',
+      kind: 'pressure',
+      modifier: { axisId: 'qinwangfu_desperation', delta: 15, reason: '核心要职被削', source: 'event' },
+    },
+    {
+      id: 'summons_disaster_flag',
+      tag: 'disaster',
+      kind: 'flag',
+      key: 'dispatch_to_luoyang',
+      value: true,
+      reason: '陛下命秦王出镇洛阳',
+    },
+    {
+      id: 'summons_disaster_office',
+      tag: 'disaster',
+      kind: 'loseOffice',
+      officeId: 'yongzhou_mu',
+      reason: '出镇外地，雍州牧自然被夺',
+    },
   ],
 };

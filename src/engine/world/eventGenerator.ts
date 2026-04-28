@@ -9,6 +9,8 @@ import type { LLMProvider } from '../llm/types';
 import { buildEventGenerationPrompt } from './npcPromptBuilder';
 import { snapshotPressure } from './pressure';
 import { extractJson } from '../jsonExtractor';
+import { callLLMWithRetry } from '../llm/retry';
+import { combineValidators, forbiddenWordsValidator, jsonValidator } from '../llm/validators';
 
 /**
  * 通过 LLM 为骨架生成具体变体
@@ -33,37 +35,44 @@ export async function generateEventInstance(
 
   try {
     let fullResponse = '';
-    const res1 = await llmProvider.chat(
+    const res = await callLLMWithRetry(
+      llmProvider,
       [
         { role: 'system', content: '你是一个历史事件编剧，专注于唐朝武德九年的宫廷政治。请严格按要求输出JSON。' },
         { role: 'user', content: prompt },
       ],
-      (chunk: string) => { fullResponse += chunk; },
+      {
+        label: `eventGen:${skeleton.id}`,
+        onChunk: (chunk: string) => { fullResponse += chunk; },
+        validator: combineValidators(
+          forbiddenWordsValidator(),
+          jsonValidator((parsed) => {
+            const p = parsed as {
+              name?: unknown; location?: unknown; narratorIntro?: unknown; phases?: unknown[];
+            };
+            if (!p.name || !p.location || !p.narratorIntro || !Array.isArray(p.phases)) {
+              return '缺少必要字段 name/location/narratorIntro/phases';
+            }
+            for (const ph of p.phases) {
+              const phase = ph as { name?: unknown; turnRange?: unknown; suggestedActions?: unknown };
+              if (!phase.name || !phase.turnRange || !phase.suggestedActions) {
+                return 'phase 缺少 name/turnRange/suggestedActions';
+              }
+            }
+            return null;
+          }),
+        ),
+      },
     );
-    if (!fullResponse) fullResponse = res1.content;
-
-    const instance = parseEventInstanceResponse(fullResponse, skeleton, worldState, availableNpcIds);
-    if (instance) return instance;
-
-    // 重试一次
-    fullResponse = '';
-    const res2 = await llmProvider.chat(
-      [
-        { role: 'system', content: '你是一个历史事件编剧。上一次的输出格式有误，请务必输出合法的JSON。' },
-        { role: 'user', content: prompt },
-      ],
-      (chunk: string) => { fullResponse += chunk; },
-    );
-    if (!fullResponse) fullResponse = res2.content;
-
-    return parseEventInstanceResponse(fullResponse, skeleton, worldState, availableNpcIds);
+    if (!fullResponse) fullResponse = res.content;
+    return tryParseEventInstance(fullResponse, skeleton, worldState, availableNpcIds);
   } catch (error) {
     console.warn(`Event generation failed for ${skeleton.id}:`, error);
     return null;
   }
 }
 
-function parseEventInstanceResponse(
+function tryParseEventInstance(
   response: string,
   skeleton: EventSkeleton,
   worldState: WorldState,

@@ -104,6 +104,27 @@ export default function DebugPanel({ worldState, narrativeIntensity, logEntries,
                 <span style={{ color: '#ce93d8' }}>{charId}</span>: {mems.length}条
               </div>
             ))}
+            <div style={{ marginTop: 8, marginBottom: 4 }}><strong>关系变化：</strong></div>
+            {Object.keys(worldState.relationshipOverrides || {}).length === 0 && (
+              <div style={{ color: '#666' }}>暂无变化</div>
+            )}
+            {Object.entries(worldState.relationshipOverrides || {}).map(([fromId, toMap]) => (
+              <div key={fromId} style={{ marginBottom: 4 }}>
+                <span style={{ color: '#ce93d8' }}>{fromId}</span>
+                {Object.entries(toMap).map(([toId, ov]) => (
+                  <div key={toId} style={{ marginLeft: 12 }}>
+                    → {toId}: <span style={{ color: ov.trustDelta > 0 ? '#81c784' : '#ff8a65' }}>
+                      {ov.trustDelta > 0 ? '+' : ''}{ov.trustDelta}
+                    </span>
+                    {ov.recentEvents.length > 0 && (
+                      <span style={{ color: '#777', marginLeft: 6 }}>
+                        {ov.recentEvents.slice(-2).join('；')}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ))}
           </div>
         )}
         {tab === 'state' && !worldState && <div style={{ color: '#666' }}>游戏未开始</div>}

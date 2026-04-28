@@ -39,8 +39,8 @@ const VALID_PRECONDITION_TYPES = [
 // ===== 结构完整性 =====
 
 describe('ALL_SKELETONS structural integrity', () => {
-  it('contains exactly 8 skeletons', () => {
-    expect(ALL_SKELETONS).toHaveLength(8);
+  it('contains exactly 11 skeletons', () => {
+    expect(ALL_SKELETONS).toHaveLength(11);
   });
 
   it('all IDs are unique', () => {
@@ -88,9 +88,13 @@ describe('ALL_SKELETONS structural integrity', () => {
         expect(skeleton.resolution.softCap).toBeLessThan(skeleton.resolution.hardCap);
       });
 
-      it('has valid baseOutcomeEffects axisIds', () => {
+      it('has valid baseOutcomeEffects (pressure modifiers reference valid axisIds)', () => {
         for (const effect of skeleton.baseOutcomeEffects) {
-          expect(VALID_AXIS_IDS).toContain(effect.axisId);
+          expect(effect.id).toBeTruthy();
+          expect(['success', 'partial', 'failure', 'disaster']).toContain(effect.tag);
+          if (effect.kind === 'pressure') {
+            expect(VALID_AXIS_IDS).toContain(effect.modifier.axisId);
+          }
         }
       });
 

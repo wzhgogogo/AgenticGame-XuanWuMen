@@ -41,6 +41,52 @@ export interface PressureModifier {
   source: string;            // 来源（NPC id、事件 id、活动 id）
 }
 
+// ===== Outcome 系统（v3.4.4） =====
+
+/**
+ * 事件结局可应用的效果（discriminated union）。
+ * 旧 PressureModifier 仍保留独立类型——NPC 行为、活动效果继续使用它。
+ * OutcomeEffect 仅用于事件结束时的资产变更（含压力变化的包装形态）。
+ */
+export type OutcomeEffect =
+  | { kind: 'pressure'; modifier: PressureModifier }
+  | { kind: 'loseNpc'; characterId: string; status: NpcStatus; reason: string }
+  | { kind: 'injureNpc'; characterId: string; commitmentDelta: number; patienceDelta?: number; reason: string }
+  | { kind: 'loseOffice'; officeId: OfficeId; reason: string }
+  | { kind: 'confiscateMilitary'; ceilingDelta: number; reason: string }
+  | { kind: 'flag'; key: string; value: boolean | number | string; reason: string };
+
+/** 骨架候选 outcome：每条带 id 与 tag，LLM 选 chosenOutcome 后按 tag 过滤生效。 */
+export type TaggedOutcomeEffect = OutcomeEffect & { id: string; tag: ResolutionTag };
+
+export type ResolutionTag = 'success' | 'partial' | 'failure' | 'disaster';
+
+// ===== 玩家官职（v3.4.4） =====
+
+/**
+ * 李世民武德九年实际所任官职 ID。
+ * 这些官职可被 imperialSummons / courtImpeachment 等事件通过 loseOffice outcome 剥夺。
+ * 官职被剥夺会影响：
+ * - 部分活动的 requirements（如"调度天策府"需要 tiance_shangjiang active）
+ * - military_readiness ceiling（militaryCeilingContribution 累加为有效上限）
+ * - 第 180 天结局判定（多职被剥夺 → F1 政治终局）
+ */
+export type OfficeId =
+  | 'tiance_shangjiang'      // 天策上将（武德四年加，开府置属）
+  | 'shangshu_ling'          // 尚书令（实际宰相）
+  | 'sikong'                 // 司空（武德八年加）
+  | 'yongzhou_mu'            // 雍州牧（关中根基）
+  | 'zuo_wuwei_dajiangjun';  // 左武卫大将军（直接兵权）
+
+export interface PlayerOffice {
+  id: OfficeId;
+  name: string;                                // 显示用中文
+  grantedDay: number;                          // 取得日，游戏开始前已有则为 0
+  lostDay?: number;                            // 被剥夺日，未剥夺为 undefined
+  /** 该官职对 military_readiness ceiling 的贡献（被剥夺时从 ceiling 中减去） */
+  militaryCeilingContribution?: number;
+}
+
 // ===== 阵营系统 =====
 
 export interface FactionState {
@@ -90,7 +136,20 @@ export interface NpcAgentState {
   recentActions: NpcAction[];
   daysSinceLastAction: number;
   consumedOnceRules?: string[]; // 已消耗的 once 规则 id（breakdown/abandon 用）
+  /** v3.4.4：NPC 资产状态。非 active 的 NPC 不参与每日决策、不进入事件场景。 */
+  status?: NpcStatus;
+  /** 进入当前 status 的天数（daysSinceStart） */
+  statusSince?: number;
+  /** 进入当前 status 的叙事原因 */
+  statusReason?: string;
 }
+
+/**
+ * NPC 资产状态。默认 'active' 可决策、可入场景。
+ * exiled / imprisoned / deceased / dispatched 均不参与决策、不被 eventGenerator 选入 activeNpcIds。
+ * dispatched 与其他状态的差别：派遣远征属于"暂时性"，未来骨架可放回 active；其他三种当前周目内不可逆。
+ */
+export type NpcStatus = 'active' | 'exiled' | 'imprisoned' | 'deceased' | 'dispatched';
 
 export interface NpcAction {
   characterId: string;
@@ -167,9 +226,16 @@ export interface PhaseSkeleton {
   turnRange: [number, number];
 }
 
+export interface ResolutionSignal {
+  /** 该信号对应的 outcome 标签——LLM 选择 chosenOutcome 时按此匹配 */
+  outcome: ResolutionTag;
+  /** 自然语言描述：什么样的结局走到这个 tag */
+  description: string;
+}
+
 export interface SceneResolution {
   coreConflict: string;          // 高层悬念
-  resolutionSignals: string[];   // 收束信号（语义描述）
+  resolutionSignals: ResolutionSignal[];  // 收束信号（带 outcome 标签）
   softCap: number;               // N 轮后加强结束引导
   hardCap: number;               // 强制结束兜底
 }
@@ -192,7 +258,8 @@ export interface EventSkeleton {
   possibleLocations: string[];
   requiredRoles: string[];
 
-  baseOutcomeEffects: PressureModifier[];
+  /** 候选 outcome 池：每条带 id 与 tag，结局时按 chosenOutcome 过滤生效 */
+  baseOutcomeEffects: TaggedOutcomeEffect[];
 }
 
 /** LLM 基于骨架和世界状态生成的具体事件实例 */
@@ -205,7 +272,7 @@ export interface EventInstance {
   phases: PhaseConfig[];
   resolution: SceneResolution;
   pressureSnapshot: Record<PressureAxisId, number>;
-  outcomeEffects: PressureModifier[];
+  outcomeEffects: TaggedOutcomeEffect[];
 }
 
 /** 已完成事件的记录 */
@@ -258,6 +325,25 @@ export interface DaySchedule {
   evening?: string;
 }
 
+// ===== 玩家行为日志 =====
+
+/**
+ * 玩家主动举动的滑窗记录。
+ * 用途三重：
+ * 1) NPC / 场景 prompt 注入——让 NPC 感知玩家做过什么
+ * 2) autoplay JSON dump 自动带出，供 evalPlaythrough 统计与因果检查
+ * 3) DebugPanel 可视化
+ */
+export interface PlayerAction {
+  day: number;              // daysSinceStart
+  date: string;             // “武德九年正月初三”
+  type: 'activity' | 'event_resolved' | 'event_skipped';
+  id: string;               // activity_id / skeleton_id
+  name: string;             // 可读名：“批阅奏折” / “元吉宴请”
+  category?: ActivityCategory;  // 仅活动有
+  summary?: string;         // 一句话摘要（事件结局 / “按下不表”）
+}
+
 // ===== 世界状态（顶层） =====
 
 export interface WorldState {
@@ -269,6 +355,21 @@ export interface WorldState {
   pendingEvents: PendingEvent[];
   globalFlags: Record<string, boolean | number | string>;
   characterMemories: Record<string, MemoryEntry[]>;
+  /** 角色长期记忆摘要：短期记忆超过阈值时，LLM 提炼旧记忆为数句浓缩文本，永久累加 */
+  characterLongTermSummary: Record<string, string>;
+  /** 关系值运行时修正：[fromId][toId] = {trustDelta, recentEvents[]}。effective_trust = static + delta，clamp 0-100 */
+  relationshipOverrides: Record<string, Record<string, RelationshipOverride>>;
+  /** 玩家主动行为滑窗（限容 ~30 条）。写入点：applyActivity / handleEventEnd / “按下不表”。 */
+  playerActionLog: PlayerAction[];
+  /** v3.4.4：玩家所任官职。被 loseOffice outcome 剥夺后写 lostDay。 */
+  playerOffices?: PlayerOffice[];
+}
+
+export interface RelationshipOverride {
+  /** 累计 trust 变化值，可正可负，应用时与静态 trust 相加后 clamp 到 0-100 */
+  trustDelta: number;
+  /** 最近导致态度变化的 3-5 条原因，每条 ≤15 字 */
+  recentEvents: string[];
 }
 
 // ===== 前端状态机 =====

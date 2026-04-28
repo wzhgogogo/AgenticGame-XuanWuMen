@@ -6,6 +6,7 @@ import type {
 } from '../../types/world';
 import { createCalendar } from './calendar';
 import { createDefaultPressureAxes } from './pressure';
+import { LI_SHIMIN_INITIAL_OFFICES } from '../../data/characters/liShimin';
 
 // ===== 阵营初始配置 =====
 
@@ -60,6 +61,24 @@ const DEFAULT_NPC_AGENT_CONFIGS: NpcAgentConfig[] = [
     initialAlertness: 55,
     initialCommitment: 70,
   },
+  {
+    characterId: 'li_jiancheng',
+    initialPatience: 60,      // 太子有正统压力，但仍有政治理性
+    initialAlertness: 75,     // 对秦王动向高度警觉
+    initialCommitment: 80,    // 已决意打压秦王
+  },
+  {
+    characterId: 'li_yuanji',
+    initialPatience: 35,      // 急躁好战
+    initialAlertness: 50,
+    initialCommitment: 95,    // 表面誓死跟随大哥
+  },
+  {
+    characterId: 'li_yuan',
+    initialPatience: 80,      // 帝王最沉稳
+    initialAlertness: 60,
+    initialCommitment: 50,    // 不偏向任何一子
+  },
 ];
 
 function createDefaultNpcAgents(): Record<string, NpcAgentState> {
@@ -73,6 +92,7 @@ function createDefaultNpcAgents(): Record<string, NpcAgentState> {
       currentPlan: null,
       recentActions: [],
       daysSinceLastAction: 0,
+      status: 'active',
     };
   }
   return agents;
@@ -90,6 +110,10 @@ export function createInitialWorldState(): WorldState {
     pendingEvents: [],
     globalFlags: {},
     characterMemories: {},
+    characterLongTermSummary: {},
+    relationshipOverrides: {},
+    playerActionLog: [],
+    playerOffices: LI_SHIMIN_INITIAL_OFFICES.map((o) => ({ ...o })),
   };
 }
 
@@ -110,15 +134,68 @@ export function loadWorldState(): WorldState | null {
   try {
     const serialized = localStorage.getItem(SAVE_KEY);
     if (!serialized) return null;
-    return JSON.parse(serialized) as WorldState;
+    const raw = JSON.parse(serialized);
+    return migrateWorldState(raw);
   } catch {
     console.warn('Failed to load world state');
     return null;
   }
 }
 
+/**
+ * 旧存档懒补全（v3.4.4）。
+ * - npcAgents[].status 缺失补 'active'
+ * - playerOffices 缺失补初始 5 官职
+ * 未来字段扩展时统一在此处补全，不让消费方处理 undefined。
+ */
+function migrateWorldState(raw: WorldState): WorldState {
+  const next: WorldState = { ...raw };
+
+  if (next.npcAgents) {
+    const updated: Record<string, NpcAgentState> = {};
+    for (const id in next.npcAgents) {
+      const agent = next.npcAgents[id];
+      updated[id] = agent.status ? agent : { ...agent, status: 'active' };
+    }
+    next.npcAgents = updated;
+  }
+
+  if (!next.playerOffices) {
+    next.playerOffices = LI_SHIMIN_INITIAL_OFFICES.map((o) => ({ ...o }));
+  }
+
+  return next;
+}
+
 export function clearSavedWorldState(): void {
   localStorage.removeItem(SAVE_KEY);
+}
+
+// ===== 玩家行为日志 =====
+
+const PLAYER_ACTION_LOG_MAX = 30;
+
+/** 向 playerActionLog 追加一条，自动滑窗到 MAX。 */
+export function appendPlayerAction(
+  log: WorldState['playerActionLog'] | undefined,
+  action: import('../../types/world').PlayerAction,
+): WorldState['playerActionLog'] {
+  const base = log ?? [];
+  const next = [...base, action];
+  if (next.length > PLAYER_ACTION_LOG_MAX) {
+    return next.slice(-PLAYER_ACTION_LOG_MAX);
+  }
+  return next;
+}
+
+/** 取最近 N 天的行为（按 day 过滤，非条数）。 */
+export function getRecentPlayerActions(
+  state: Pick<WorldState, 'playerActionLog' | 'calendar'>,
+  days: number,
+): WorldState['playerActionLog'] {
+  const log = state.playerActionLog ?? [];
+  const cutoff = state.calendar.daysSinceStart - days;
+  return log.filter((a) => a.day >= cutoff);
 }
 
 // ===== 状态查询工具 =====
@@ -126,6 +203,26 @@ export function clearSavedWorldState(): void {
 /** 获取压力值（便捷方法） */
 export function getPressure(state: WorldState, axisId: PressureAxisId): number {
   return state.pressureAxes[axisId]?.value ?? 0;
+}
+
+/**
+ * 计算 fromId 对 toId 的有效信任度。
+ * effective = staticTrust + delta，clamp 到 0-100。
+ * state 为空或 overrides 不存在时直接返回 staticTrust。
+ */
+export function getEffectiveTrust(
+  state: { relationshipOverrides?: WorldState['relationshipOverrides'] } | null | undefined,
+  fromId: string,
+  toId: string,
+  staticTrust: number,
+): { value: number; delta: number; recentEvents: string[] } {
+  const override = state?.relationshipOverrides?.[fromId]?.[toId];
+  const delta = override?.trustDelta ?? 0;
+  return {
+    value: Math.max(0, Math.min(100, staticTrust + delta)),
+    delta,
+    recentEvents: override?.recentEvents ?? [],
+  };
 }
 
 /** 获取压力轴的定性描述 */

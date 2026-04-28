@@ -1,7 +1,6 @@
-import type {
-  GameState, DialogueEntry, SceneConfig, Character, PhaseConfig,
-} from '../types';
+import type { GameState, DialogueEntry, SceneConfig, Character, PhaseConfig } from '../types';
 import type { LLMProvider } from './llm/types';
+import type { WorldState, PlayerAction } from '../types/world';
 import { buildSystemPrompt, buildMessages, buildFirstNpcMessage } from './world/promptBuilder';
 import { extractJson, stripThinkingTags } from './jsonExtractor';
 import { debugLog } from './debugLog';
@@ -27,6 +26,8 @@ export class SceneManager {
   private player: Character;
   private systemPrompt: string;
   private previousSceneSummary?: string;
+  private relationshipOverrides?: WorldState['relationshipOverrides'];
+  private recentPlayerActions?: PlayerAction[];
 
   constructor(
     llmProvider: LLMProvider,
@@ -34,12 +35,16 @@ export class SceneManager {
     npcs: Character[],
     player: Character,
     previousSceneSummary?: string,
+    relationshipOverrides?: WorldState['relationshipOverrides'],
+    recentPlayerActions?: PlayerAction[],
   ) {
     this.llmProvider = llmProvider;
     this.scene = scene;
     this.npcs = npcs;
     this.player = player;
     this.previousSceneSummary = previousSceneSummary;
+    this.relationshipOverrides = relationshipOverrides;
+    this.recentPlayerActions = recentPlayerActions;
 
     this.state = {
       status: 'intro',
@@ -56,6 +61,8 @@ export class SceneManager {
       [player, ...npcs],
       0,
       previousSceneSummary,
+      relationshipOverrides,
+      recentPlayerActions,
     );
   }
 
@@ -141,6 +148,8 @@ export class SceneManager {
             [this.player, ...this.npcs],
             i,
             this.previousSceneSummary,
+            this.relationshipOverrides,
+            this.recentPlayerActions,
           );
         }
         break;
@@ -283,6 +292,7 @@ export class SceneManager {
       this.setState({
         status: 'ending',
         endingText: parsed.ending,
+        chosenOutcome: parsed.chosenOutcome,
         isNpcThinking: false,
       });
       return;
@@ -291,9 +301,10 @@ export class SceneManager {
     this.setState({ isNpcThinking: false });
   }
 
-  private parseNpcResponse(raw: string): { entries: DialogueEntry[]; ending?: string } {
+  private parseNpcResponse(raw: string): { entries: DialogueEntry[]; ending?: string; chosenOutcome?: 'success' | 'partial' | 'failure' | 'disaster' } {
     const entries: DialogueEntry[] = [];
     let ending: string | undefined;
+    let chosenOutcome: 'success' | 'partial' | 'failure' | 'disaster' | undefined;
 
     // 尝试 JSON 解析（LLM 被要求输出 JSON 格式）
     const jsonStr = extractJson(raw);
@@ -342,7 +353,12 @@ export class SceneManager {
           });
         }
 
-        return { entries, ending };
+        // chosenOutcome（v3.4.4）：LLM 在结局时返回的 outcome 标签
+        if (parsed.chosenOutcome && ['success', 'partial', 'failure', 'disaster'].includes(parsed.chosenOutcome)) {
+          chosenOutcome = parsed.chosenOutcome;
+        }
+
+        return { entries, ending, chosenOutcome };
       } catch {
         // JSON 仍然无法解析，继续到文本回退
       }
@@ -404,6 +420,6 @@ export class SceneManager {
 
     if (currentEntry) entries.push(currentEntry);
 
-    return { entries, ending };
+    return { entries, ending, chosenOutcome };
   }
 }

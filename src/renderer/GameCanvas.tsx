@@ -84,8 +84,10 @@ export function GameCanvas() {
   }, [sceneType]);
 
   useEffect(() => {
-    if (!layersRef.current) return;
+    if (!layersRef.current || !deskState) return;
     layersRef.current.desk.setState(deskState);
+    layersRef.current.bg.setTimeSlot(deskState.timeSlot);
+    layersRef.current.atmo.setTimeSlot(deskState.timeSlot);
   }, [deskState]);
 
   useEffect(() => {

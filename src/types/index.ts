@@ -22,6 +22,8 @@ export interface Character extends CharacterCore {
   foundationalMemory: MemoryEntry[];
   shortTermMemory: MemoryEntry[];
   reflections: string[];
+  /** 长期记忆摘要（LLM 提炼），运行时由 WorldState 同步而来 */
+  longTermSummary?: string;
 }
 
 export interface CharacterIdentity {
@@ -174,6 +176,8 @@ export interface GameState {
   currentPhaseIndex: number;
   isNpcThinking: boolean;
   endingText?: string;
+  /** v3.4.4：LLM 选择的 outcome 标签，用于 worldSimulator 决定哪些 outcome 生效 */
+  chosenOutcome?: 'success' | 'partial' | 'failure' | 'disaster';
 }
 
 // ===== LLM 相关 =====

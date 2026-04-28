@@ -31,9 +31,9 @@ const LAYOUTS: Record<string, ObjLayout> = {
 };
 
 const TIME_TINTS: Record<string, { color: number; alpha: number; x: number; y: number }> = {
-  morning:   { color: 0xd4c090, alpha: 0.08, x: 0.85, y: 0.3 },
-  afternoon: { color: 0xe0c878, alpha: 0.06, x: 0.50, y: 0.1 },
-  evening:   { color: 0xc9a84c, alpha: 0.10, x: 0.30, y: 0.5 },
+  morning:   { color: 0xb0c0d8, alpha: 0.10, x: 0.85, y: 0.2 },
+  afternoon: { color: 0xe0c878, alpha: 0.12, x: 0.50, y: 0.1 },
+  evening:   { color: 0xc9a84c, alpha: 0.18, x: 0.15, y: 0.5 },
 };
 
 export class DeskContentLayer {

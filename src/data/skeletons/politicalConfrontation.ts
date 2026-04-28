@@ -29,10 +29,10 @@ export const politicalConfrontation: EventSkeleton = {
   resolution: {
     coreConflict: '秦王能否化解这轮政治攻击',
     resolutionSignals: [
-      '攻击被成功反驳或化解',
-      '秦王被迫做出妥协让步',
-      '双方暂时休战',
-      '陛下介入平息争端',
+      { outcome: 'success', description: '攻击被成功反驳或化解，朝堂局势缓和' },
+      { outcome: 'partial', description: '陛下介入平息争端，双方暂时休战' },
+      { outcome: 'failure', description: '秦王被迫做出妥协，雍州牧之位被夺' },
+      { outcome: 'disaster', description: '反将一军失利，陛下震怒，秦王进一步被孤立' },
     ],
     softCap: 10,
     hardCap: 13,
@@ -47,7 +47,50 @@ export const politicalConfrontation: EventSkeleton = {
   requiredRoles: ['发起者', '秦王（被攻击方）', '谋士（出谋划策）'],
 
   baseOutcomeEffects: [
-    { axisId: 'imperial_suspicion', delta: 5, reason: '朝堂之争引起陛下注意', source: 'event' },
-    { axisId: 'succession_crisis', delta: 5, reason: '政治对抗加剧储位矛盾', source: 'event' },
+    {
+      id: 'pol_success_court',
+      tag: 'success',
+      kind: 'pressure',
+      modifier: { axisId: 'court_opinion', delta: -10, reason: '反驳成功舆论缓和', source: 'event' },
+    },
+    {
+      id: 'pol_partial_suspicion',
+      tag: 'partial',
+      kind: 'pressure',
+      modifier: { axisId: 'imperial_suspicion', delta: 5, reason: '陛下注意到争端', source: 'event' },
+    },
+    {
+      id: 'pol_failure_office',
+      tag: 'failure',
+      kind: 'loseOffice',
+      officeId: 'yongzhou_mu',
+      reason: '朝堂博弈失利，雍州牧被夺',
+    },
+    {
+      id: 'pol_failure_pressure',
+      tag: 'failure',
+      kind: 'pressure',
+      modifier: { axisId: 'imperial_suspicion', delta: 15, reason: '陛下信任受损', source: 'event' },
+    },
+    {
+      id: 'pol_disaster_office_a',
+      tag: 'disaster',
+      kind: 'loseOffice',
+      officeId: 'yongzhou_mu',
+      reason: '朝堂大败，雍州牧被夺',
+    },
+    {
+      id: 'pol_disaster_office_b',
+      tag: 'disaster',
+      kind: 'loseOffice',
+      officeId: 'sikong',
+      reason: '连带司空亦被削',
+    },
+    {
+      id: 'pol_disaster_pressure',
+      tag: 'disaster',
+      kind: 'pressure',
+      modifier: { axisId: 'imperial_suspicion', delta: 25, reason: '反将一军失利激怒陛下', source: 'event' },
+    },
   ],
 };
