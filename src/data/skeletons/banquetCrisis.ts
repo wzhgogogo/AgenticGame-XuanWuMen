@@ -19,7 +19,7 @@ export const banquetCrisis: EventSkeleton = {
   ],
   priority: 70,
   cooldownDays: 15,
-  maxOccurrences: 2,
+  maxOccurrences: 1,
 
   phaseSkeletons: [
     { role: '入局', description: '秦王赴宴，尚未察觉异常，NPC 随行护卫或出席', turnRange: [1, 3] },

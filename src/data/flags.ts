@@ -26,7 +26,9 @@ export type FlagKey =
   // 对外妥协
   | 'dispatch_to_luoyang'       // imperialSummons 走 failure：被命出镇洛阳（直接走向 F1）
   // 情报
-  | 'false_intel_acted_on';     // intelligenceEvent 走 failure：依据假情报行动
+  | 'false_intel_acted_on'      // intelligenceEvent 走 failure：依据假情报行动
+  | 'has_recent_intel'          // summon_spy 活动：近期有可靠情报
+  | 'palace_insider_contacted'; // contact_insiders 活动：宫内线人已接触
 
 export const ALL_FLAG_KEYS: readonly FlagKey[] = [
   'impeached_severely',
@@ -39,6 +41,8 @@ export const ALL_FLAG_KEYS: readonly FlagKey[] = [
   'commitment_collapse',
   'dispatch_to_luoyang',
   'false_intel_acted_on',
+  'has_recent_intel',
+  'palace_insider_contacted',
 ] as const;
 
 export function isValidFlagKey(key: string): key is FlagKey {

@@ -143,6 +143,7 @@ export interface ISceneManager {
   getSuggestedActions(): string[];
   startGame(): Promise<void>;
   submitPlayerAction(input: string): Promise<void>;
+  setLogger?(logger: import('../engine/world/gameLogger').GameLogger, day: number, dateStr: string): void;
 }
 
 export type SceneManagerFactory = (

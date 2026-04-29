@@ -1,6 +1,7 @@
 import type { GameState, DialogueEntry, SceneConfig, Character, PhaseConfig } from '../types';
 import type { LLMProvider } from './llm/types';
 import type { WorldState, PlayerAction } from '../types/world';
+import type { GameLogger } from './world/gameLogger';
 import { buildSystemPrompt, buildMessages, buildFirstNpcMessage } from './world/promptBuilder';
 import { extractJson, stripThinkingTags } from './jsonExtractor';
 import { debugLog } from './debugLog';
@@ -28,6 +29,9 @@ export class SceneManager {
   private previousSceneSummary?: string;
   private relationshipOverrides?: WorldState['relationshipOverrides'];
   private recentPlayerActions?: PlayerAction[];
+  private logger?: GameLogger;
+  private logDay = 0;
+  private logDateStr = '';
 
   constructor(
     llmProvider: LLMProvider,
@@ -79,6 +83,12 @@ export class SceneManager {
     return () => {
       this.listeners.delete(listener);
     };
+  }
+
+  setLogger(logger: GameLogger, day: number, dateStr: string): void {
+    this.logger = logger;
+    this.logDay = day;
+    this.logDateStr = dateStr;
   }
 
   // --- 公共方法 ---
@@ -134,6 +144,9 @@ export class SceneManager {
 
     // playerTurnCount++
     this.setState({ playerTurnCount: this.state.playerTurnCount + 1 });
+    this.logger?.log(this.logDay, this.logDateStr, 'player_input', {
+      turn: this.state.playerTurnCount, input: playerInput,
+    });
 
     // 更新 currentPhaseIndex
     const turnCount = this.state.playerTurnCount;
@@ -275,6 +288,9 @@ export class SceneManager {
 
     // 解析响应
     debugLog('llm_call', `场景LLM返回`, fullResponse.slice(0, 500));
+    this.logger?.logLLMCall('scene_dialogue', {
+      sceneName: this.scene.id, turn: this.state.playerTurnCount, day: this.logDay,
+    }, fullResponse);
     const parsed = this.parseNpcResponse(fullResponse);
 
     // 添加解析后的 entries 到对话历史
@@ -284,11 +300,19 @@ export class SceneManager {
     };
     this.notifyListeners();
 
+    this.logger?.log(this.logDay, this.logDateStr, 'scene_dialogue', {
+      turn: this.state.playerTurnCount,
+      entries: parsed.entries.map(e => ({ type: e.type, speaker: e.speaker || e.speakerName, content: e.content })),
+    });
+
     // 记录到 llmMessages（去除思考标签）
     this.setState({ llmMessages: [...this.state.llmMessages, { role: 'assistant', content: stripThinkingTags(fullResponse) }] });
 
     // 检查结局
     if (parsed.ending) {
+      this.logger?.log(this.logDay, this.logDateStr, 'scene_ending', {
+        ending: parsed.ending, chosenOutcome: parsed.chosenOutcome,
+      });
       this.setState({
         status: 'ending',
         endingText: parsed.ending,

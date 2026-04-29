@@ -1,6 +1,4 @@
 import type { ReactNode } from 'react';
-import type { WorldState, PressureAxisId } from '../../types/world';
-import { PRESSURE_AXIS_LABELS, getPressureLabel } from '../../engine/world/worldState';
 
 type TimeSlot = 'morning' | 'afternoon' | 'evening';
 
@@ -10,29 +8,10 @@ const TIME_LIGHTING: Record<TimeSlot, { glowColor: string; glowOpacity: number; 
   evening:   { glowColor: '220,150,60',  glowOpacity: 0.18, vignetteStrength: 0.9,  overlayColor: 'rgba(10,6,3,0.35)' },
 };
 
-const DISPLAY_AXES: PressureAxisId[] = [
-  'succession_crisis',
-  'jiancheng_hostility',
-  'court_opinion',
-  'qinwangfu_desperation',
-  'imperial_suspicion',
-  'military_readiness',
-  'yuanji_ambition',
-];
-
-function getPressureColor(value: number): string {
-  if (value >= 80) return '#e24b4a';
-  if (value >= 60) return '#d4924b';
-  if (value >= 40) return '#b8a060';
-  if (value >= 20) return '#8a8070';
-  return '#606058';
-}
-
 /* ---- Exported layout container ---- */
 
 interface DeskLayoutProps {
   timeSlot: TimeSlot;
-  state: WorldState;
   activityPanel: ReactNode;
   centerContent: ReactNode;
   timeSlotBar: ReactNode;
@@ -42,7 +21,6 @@ interface DeskLayoutProps {
 
 export default function DeskLayout({
   timeSlot,
-  state,
   activityPanel,
   centerContent,
   timeSlotBar,
@@ -180,71 +158,5 @@ export function TimeSlotTablet({ label, active, onClick }: { label: string; acti
     >
       {label}
     </button>
-  );
-}
-
-function PressurePanel({ state }: { state: WorldState }) {
-  return (
-    <div
-      style={{
-        padding: '14px 16px',
-        background: 'linear-gradient(180deg, rgba(22,14,8,0.92) 0%, rgba(14,8,4,0.95) 100%)',
-        border: '1px solid rgba(139,100,50,0.25)',
-        borderTop: '2px solid rgba(180,130,70,0.3)',
-        borderRadius: 4,
-        boxShadow: '0 6px 20px rgba(0,0,0,0.6)',
-      }}
-    >
-      <div style={{ fontFamily: 'Noto Serif SC, serif', fontSize: 13, color: '#d4b878', letterSpacing: '0.1em', marginBottom: 10 }}>
-        当前局势
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {DISPLAY_AXES.map((axisId) => {
-          const axis = state.pressureAxes[axisId];
-          if (!axis) return null;
-          const label = PRESSURE_AXIS_LABELS[axisId];
-          const value = Math.round(axis.value);
-          const color = getPressureColor(value);
-          const levelLabel = getPressureLabel(value);
-          return <PressureRow key={axisId} name={label} value={value} label={levelLabel} color={color} />;
-        })}
-      </div>
-    </div>
-  );
-}
-
-function PressureRow({ name, value, label, color }: { name: string; value: number; label: string; color: string }) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 10 }}>
-      <span style={{ width: 76, color: '#a0907a', fontFamily: 'Noto Serif SC, serif' }}>{name}</span>
-      <div style={{ flex: 1, position: 'relative', height: 10, display: 'flex', alignItems: 'center' }}>
-        <div style={{ position: 'absolute', inset: 0, borderBottom: '1px solid rgba(139,100,50,0.2)' }} />
-        <div
-          style={{
-            position: 'absolute',
-            left: 0,
-            top: '50%',
-            transform: 'translateY(-50%)',
-            width: `${value}%`,
-            height: 2,
-            background: `linear-gradient(90deg, transparent 0%, ${color} 100%)`,
-          }}
-        />
-        <div
-          style={{
-            position: 'absolute',
-            left: `${value}%`,
-            top: '50%',
-            transform: 'translate(-50%, -50%) rotate(45deg)',
-            width: 6,
-            height: 6,
-            background: color,
-            boxShadow: `0 0 4px ${color}`,
-          }}
-        />
-      </div>
-      <span style={{ width: 32, color: '#c0a878', fontFamily: 'Noto Serif SC, serif', textAlign: 'right' }}>{label}</span>
-      <span style={{ width: 24, color, fontFamily: 'monospace', textAlign: 'right', fontWeight: 600 }}>{value}</span>
-    </div>
   );
 }

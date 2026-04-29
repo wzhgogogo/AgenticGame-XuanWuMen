@@ -96,7 +96,6 @@ export default function DailyActivityScreen({
   return (
     <DeskLayout
       timeSlot={currentSlot.key}
-      state={state}
       hudSlot={<WorldStateHud state={state} />}
       activityPanel={
         <ActivityPanelShell timeLabel={currentSlot.tabletLabel}>

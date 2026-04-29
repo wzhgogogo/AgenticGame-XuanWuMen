@@ -4,6 +4,7 @@ import SceneBackground from './SceneBackground';
 interface EndingScreenProps {
   endingType: EndingType;
   onRestart: () => void;
+  onExportLog?: () => void;
 }
 
 const ENDING_DATA: Record<EndingType, { title: string; text: string }> = {
@@ -29,7 +30,7 @@ const ENDING_DATA: Record<EndingType, { title: string; text: string }> = {
   },
 };
 
-export default function EndingScreen({ endingType, onRestart }: EndingScreenProps) {
+export default function EndingScreen({ endingType, onRestart, onExportLog }: EndingScreenProps) {
   const ending = ENDING_DATA[endingType];
 
   const handleCopy = async () => {
@@ -74,48 +75,36 @@ export default function EndingScreen({ endingType, onRestart }: EndingScreenProp
         />
 
         <div className="flex items-center justify-center gap-4 mt-10 stagger-4">
-          <button
-            onClick={onRestart}
-            className="px-8 py-2.5 rounded text-sm font-ui cursor-pointer"
-            style={{
-              backgroundColor: 'transparent',
-              color: '#e8e0d0',
-              border: '1px solid rgba(201, 168, 76, 0.4)',
-              transition: 'all 0.2s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.7)';
-              e.currentTarget.style.boxShadow = '0 0 20px rgba(201, 168, 76, 0.1)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.4)';
-              e.currentTarget.style.boxShadow = 'none';
-            }}
-          >
-            再来一局
-          </button>
-          <button
-            onClick={handleCopy}
-            className="px-8 py-2.5 rounded text-sm font-ui cursor-pointer"
-            style={{
-              backgroundColor: 'transparent',
-              color: '#8a8070',
-              border: '1px solid rgba(201, 168, 76, 0.15)',
-              transition: 'all 0.2s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.4)';
-              e.currentTarget.style.color = '#c0b8a0';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.15)';
-              e.currentTarget.style.color = '#8a8070';
-            }}
-          >
-            复制结局
-          </button>
+          <EndingButton onClick={onRestart} variant="primary">再来一局</EndingButton>
+          <EndingButton onClick={handleCopy}>复制结局</EndingButton>
+          {onExportLog && <EndingButton onClick={onExportLog}>导出日志</EndingButton>}
         </div>
       </div>
     </div>
+  );
+}
+
+function EndingButton({ onClick, variant, children }: { onClick: () => void; variant?: 'primary'; children: React.ReactNode }) {
+  const isPrimary = variant === 'primary';
+  const baseColor = isPrimary ? '#e8e0d0' : '#8a8070';
+  const baseBorder = isPrimary ? 'rgba(201, 168, 76, 0.4)' : 'rgba(201, 168, 76, 0.15)';
+  return (
+    <button
+      onClick={onClick}
+      className="px-8 py-2.5 rounded text-sm font-ui cursor-pointer"
+      style={{ backgroundColor: 'transparent', color: baseColor, border: `1px solid ${baseBorder}`, transition: 'all 0.2s ease' }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = isPrimary ? 'rgba(201, 168, 76, 0.7)' : 'rgba(201, 168, 76, 0.4)';
+        if (isPrimary) e.currentTarget.style.boxShadow = '0 0 20px rgba(201, 168, 76, 0.1)';
+        else e.currentTarget.style.color = '#c0b8a0';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = baseBorder;
+        if (isPrimary) e.currentTarget.style.boxShadow = 'none';
+        else e.currentTarget.style.color = baseColor;
+      }}
+    >
+      {children}
+    </button>
   );
 }

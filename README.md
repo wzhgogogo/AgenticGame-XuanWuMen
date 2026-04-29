@@ -1,6 +1,6 @@
 # 玄武门之变 — LLM 驱动的历史互动叙事游戏
 
-v3.4.5
+v3.4.5.1
 
 ## 简介
 
@@ -590,6 +590,17 @@ NPC 涌现优化：alertness 接入决策系统 + 敌方 NPC 锁定出场。
 
 **测试**
 - 320 单测全过（+18）
+
+**Review 修复（2026-04-29）**
+- 活动 flag 白名单补全（`has_recent_intel` / `palace_insider_contacted` 原来静默无效）
+- 尉迟 patience 衰减 2.0 → 1.5（防止行为永久单调）
+- 宴会危局限全局 1 次（被阴一次不会再赴宴），刺杀保留多次
+- 盟友离心 failure/disaster 打击目标分散（failure → 长孙无忌，disaster → 房玄龄）
+- EndingScreen 按钮样式去重、ISceneManager 类型修复、GameLogger 持久化改为批量写入
+
+### v3.4.5.1 — 2026-04-29
+
+Review 修复 + 代码质量。详见 v3.4.5 末尾 Review 修复段。
 
 
 ## 后续重点

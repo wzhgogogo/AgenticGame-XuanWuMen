@@ -30,6 +30,7 @@ import { extractSceneMemories, summarizeOldMemories } from './memoryExtractor';
 import { resolveEnding, type EndingDecision } from './endingResolver';
 import { planFastForward } from './fastForward';
 import { debugLog } from '../debugLog';
+import type { GameLogger } from './gameLogger';
 
 export function detectNarrativeEnding(summary: string): EndingType | null {
   const deathPatterns = /被.*?(?:斩首|处死|赐死|处斩|杀害|毒杀|缢死|诛杀)/;
@@ -58,6 +59,7 @@ export class WorldSimulator {
   private llmProvider: LLMProvider;
   private characters: Character[];
   private player: Character;
+  private logger?: GameLogger;
 
   private currentEventInstance: EventInstance | null = null;
   private currentSceneManager: ISceneManager | null = null;
@@ -77,10 +79,12 @@ export class WorldSimulator {
     llmProvider: LLMProvider,
     characters: Character[],
     player: Character,
+    logger?: GameLogger,
   ) {
     this.llmProvider = llmProvider;
     this.characters = characters;
     this.player = player;
+    this.logger = logger;
     this.state = createInitialWorldState();
   }
 
@@ -94,6 +98,15 @@ export class WorldSimulator {
   getCurrentEventInstance(): EventInstance | null { return this.currentEventInstance; }
   getCurrentSceneManager(): ISceneManager | null { return this.currentSceneManager; }
   getLatestTickResult(): WorldTickResult | null { return this.latestTickResult; }
+  getLogger(): GameLogger | undefined { return this.logger; }
+
+  private logGameOver(day: number, dateStr: string, ending: EndingType): void {
+    const decision = this.endingDecision;
+    this.logger?.log(day, dateStr, 'game_over', {
+      ending, reason: decision?.reason, evidence: decision?.evidence,
+    });
+    this.logger?.save();
+  }
 
   subscribe(listener: WorldListener): () => void {
     this.listeners.add(listener);
@@ -104,6 +117,9 @@ export class WorldSimulator {
 
   startGame(): void {
     this.state = createInitialWorldState();
+    this.logger?.log(0, formatDate(this.state.calendar), 'config', {
+      startedAt: new Date().toISOString(),
+    });
     this.setMode('daily_activities');
     this.notify();
   }
@@ -153,12 +169,18 @@ export class WorldSimulator {
     };
     this.notify();
 
+    // 日志
+    const flavor = getFlavorText(activity);
+    this.logger?.log(this.state.calendar.daysSinceStart, formatDate(this.state.calendar), 'activity', {
+      id: activity.id, name: activity.name, flavor,
+    });
+
     // 第一个活动时启动后台 tick
     if (!this.backgroundTickPromise) {
       this.backgroundTickPromise = this.runWorldTick();
     }
 
-    return getFlavorText(activity);
+    return flavor;
   }
 
   /**
@@ -176,10 +198,30 @@ export class WorldSimulator {
     // 日历不在这里推进——等玩家从日报继续时再推进，
     // 这样日报显示的日期和 tick 内生成的日报文本一致（都是"今天"）
 
+    const day = this.state.calendar.daysSinceStart;
+    const dateStr = formatDate(this.state.calendar);
+
+    // 日志：tick 结果
+    if (this.logger && this.latestTickResult) {
+      const tr = this.latestTickResult;
+      this.logger.log(day, dateStr, 'tick', {
+        pressureChanges: tr.pressureChanges.length,
+        npcActions: tr.npcActions.map(a => ({ npcId: a.characterId, stance: a.stance, action: a.action })),
+        triggeredEvents: tr.triggeredEvents,
+        briefing: tr.dailyBriefing,
+      });
+      const axes: Record<string, number> = {};
+      for (const [k, v] of Object.entries(this.state.pressureAxes)) {
+        axes[k] = v.value;
+      }
+      this.logger.log(day, dateStr, 'pressure_snapshot', { axes });
+    }
+
     // 检查游戏结束（时间到或压力爆表）
     const ending = this.checkGameOver();
     if (ending) {
       this.endingType = ending;
+      this.logGameOver(day, dateStr, ending);
       this.setMode('game_over');
     } else {
       this.setMode('daily_briefing');
@@ -331,6 +373,11 @@ export class WorldSimulator {
 
     debugLog('event_trigger', `进入事件: ${instance.name}`, `骨架: ${pending.skeletonId}\n地点: ${instance.location}\nNPC: ${instance.activeNpcIds.join(', ')}`);
 
+    this.logger?.log(this.state.calendar.daysSinceStart, formatDate(this.state.calendar), 'scene_start', {
+      sceneName: instance.name, skeletonId: pending.skeletonId,
+      location: instance.location, npcIds: instance.activeNpcIds,
+    });
+
     // 移除已处理的 pending
     this.state = {
       ...this.state,
@@ -415,6 +462,12 @@ export class WorldSimulator {
       this.state = { ...this.state, npcAgents: broadcastAgents };
     }
 
+    // 日志：事件结束
+    this.logger?.log(this.state.calendar.daysSinceStart, dateStr, 'event_end', {
+      skeletonId: sceneId, chosenOutcome, summary,
+      outcomeEffects: effectiveOutcomes.map(e => ({ kind: e.kind, id: e.id, tag: e.tag })),
+    });
+
     this.currentEventInstance = null;
     this.currentSceneManager = null;
 
@@ -428,6 +481,7 @@ export class WorldSimulator {
 
     if (ending) {
       this.endingType = ending;
+      this.logGameOver(this.state.calendar.daysSinceStart, dateStr, ending);
       this.setMode('game_over');
     } else {
       this.setMode('daily_activities');
@@ -468,6 +522,12 @@ export class WorldSimulator {
       );
 
       debugLog('memory', `记忆提取完成`, JSON.stringify(extraction, null, 2));
+      this.logger?.logLLMCall('memory_extraction', { sceneId, day: this.state.calendar.daysSinceStart }, JSON.stringify(extraction.memories));
+      this.logger?.log(this.state.calendar.daysSinceStart, dateStr, 'memory_diff', {
+        newMemories: Object.fromEntries(
+          Object.entries(extraction.memories).map(([k, v]) => [k, v.map(m => m.event)]),
+        ),
+      });
       this.state = {
         ...this.state,
         characterMemories: merged,
@@ -844,6 +904,7 @@ export class WorldSimulator {
       const normalized = this.normalizeIntent(parsed, charId, charName, allowedStances, impactProfile?.whitelist);
       debugLog('npc_decision', `${charName} → ${normalized.stance}: ${normalized.action}`,
         `degrade=${normalized.degradeLevel ?? 0}; deltas=${normalized.pressureEffects.map(e => `${e.axisId}${e.delta >= 0 ? '+' : ''}${e.delta}`).join(',')}`);
+      this.logger?.logLLMCall('npc_decision', { npcId: charId, day: this.state.calendar.daysSinceStart }, fullResponse);
       return normalized;
     } catch {
       return this.fallbackObserve(charId, allowedStances);

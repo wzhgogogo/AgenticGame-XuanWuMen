@@ -6,7 +6,9 @@ import { createLLMProvider } from './engine/llm';
 import type { LLMProvider } from './engine/llm';
 import { SceneManager } from './engine/sceneManager';
 import { WorldSimulator } from './engine/world/worldSimulator';
+import { GameLogger } from './engine/world/gameLogger';
 import { loadWorldState, getRecentPlayerActions } from './engine/world/worldState';
+import { formatDate } from './engine/world/calendar';
 import { getNarrativeIntensity } from './engine/world/pressure';
 import { getDebugEntries, subscribeDebugLog, clearDebugLog } from './engine/debugLog';
 import { characters, getPlayerCharacter, getNpcCharacters } from './data/characters';
@@ -61,6 +63,7 @@ export default function App() {
 
   const simulatorRef = useRef<WorldSimulator | null>(null);
   const llmProviderRef = useRef<LLMProvider | null>(null);
+  const loggerRef = useRef<GameLogger>(new GameLogger());
 
   const [debugOpen, setDebugOpen] = useState(() => import.meta.env.DEV && new URLSearchParams(window.location.search).has('debug'));
   const [debugEntries, setDebugEntries] = useState(getDebugEntries);
@@ -71,8 +74,10 @@ export default function App() {
     const onKey = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.key === 'd') { e.preventDefault(); setDebugOpen((v) => !v); }
     };
+    const onUnload = () => { loggerRef.current.save(); };
     window.addEventListener('keydown', onKey);
-    return () => { unsub(); window.removeEventListener('keydown', onKey); };
+    window.addEventListener('beforeunload', onUnload);
+    return () => { unsub(); window.removeEventListener('keydown', onKey); window.removeEventListener('beforeunload', onUnload); };
   }, []);
 
   const player = getPlayerCharacter();
@@ -95,7 +100,8 @@ export default function App() {
       const provider = createLLMProvider(config);
       llmProviderRef.current = provider;
 
-      const simulator = new WorldSimulator(provider, characters, player);
+      loggerRef.current.clear();
+      const simulator = new WorldSimulator(provider, characters, player, loggerRef.current);
       simulatorRef.current = simulator;
       simulator.subscribe(handleWorldUpdate);
       simulator.startGame();
@@ -130,7 +136,7 @@ export default function App() {
       const provider = createLLMProvider(config);
       llmProviderRef.current = provider;
 
-      const simulator = new WorldSimulator(provider, characters, player);
+      const simulator = new WorldSimulator(provider, characters, player, loggerRef.current);
       simulatorRef.current = simulator;
       simulator.subscribe(handleWorldUpdate);
 
@@ -208,6 +214,8 @@ export default function App() {
           );
           setSceneManager(sm);
           setCurrentSceneConfig(sceneConfig);
+          const state = simulator.getState();
+          sm.setLogger(loggerRef.current, state.calendar.daysSinceStart, formatDate(state.calendar));
           await sm.startGame();
         }
       }
@@ -446,6 +454,7 @@ export default function App() {
         <EndingScreen
           endingType={ending}
           onRestart={handleRestart}
+          onExportLog={() => loggerRef.current.downloadJSON()}
         />
         {debugPanel}
       </>

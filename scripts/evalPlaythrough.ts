@@ -93,6 +93,7 @@ interface EvalResult {
   emergenceMetrics?: EmergenceMetrics;
   ruleBasedIssues?: RuleIssue[];
   memoryAnalysis?: MemoryAnalysis;
+  gameplayMetrics?: GameplayMetrics;
 }
 
 // ===== Part 1: 量化指标 =====
@@ -650,6 +651,398 @@ function printEmergenceMetrics(em: EmergenceMetrics, totalDays: number): void {
   }
 }
 
+// ===== Part 5: 游戏体验指标 =====
+
+interface OutcomeDistribution {
+  total: number;
+  counts: Record<string, number>;
+  bySkeleton: Record<string, Record<string, number>>;
+  allSame: boolean;
+}
+
+interface PressureTrend {
+  axisId: string;
+  avgDailyDelta: number;
+  maxSpike: number;
+  maxDrop: number;
+  trend: 'monotonic_up' | 'monotonic_down' | 'oscillating' | 'flat';
+  cappedDays: number[];
+  bottomedDays: number[];
+}
+
+interface EndingProximity {
+  ending: string;
+  distance: string;
+  met: string[];
+  missing: string[];
+}
+
+interface NpcSurvival {
+  npcId: string;
+  firstDay: number;
+  lastDay: number;
+  totalDays: number;
+  possiblyLost: boolean;
+}
+
+interface SkeletonCoverage {
+  total: number;
+  triggered: string[];
+  missing: string[];
+  rate: number;
+}
+
+interface DialogueResponsiveness {
+  substantiveInputs: number;
+  respondedInputs: number;
+  rate: number;
+}
+
+interface GameplayMetrics {
+  outcomeDistribution: OutcomeDistribution;
+  pressureTrends: PressureTrend[];
+  endingProximity: EndingProximity[];
+  npcSurvival: NpcSurvival[];
+  skeletonCoverage: SkeletonCoverage;
+  dialogueResponsiveness: DialogueResponsiveness;
+  actualEnding: string | null;
+}
+
+const ALL_SKELETONS = [
+  'skeleton_intelligence_event', 'skeleton_imperial_summons', 'skeleton_banquet_crisis',
+  'skeleton_ally_wavering', 'skeleton_assassination_crisis', 'skeleton_military_conflict',
+  'skeleton_political_confrontation', 'skeleton_subordinate_ultimatum',
+  'skeleton_court_impeachment', 'skeleton_court_counterstrike', 'skeleton_seize_military_command',
+];
+
+const ALL_NPC_IDS = [
+  'changsun_wuji', 'weichi_jingde', 'fang_xuanling',
+  'li_jiancheng', 'li_yuanji', 'li_yuan',
+];
+
+const CORE_ALLIES = ['changsun_wuji', 'weichi_jingde', 'fang_xuanling'];
+
+const TRIVIAL_INPUTS = new Set([
+  '继续', '你怎么看', '你们怎么想', '有什么建议', '说下去', '然后呢',
+  '此事你怎么看', '诸位以为如何', '细说', '退下', '先下去吧', '容后再议',
+  '今日到此为止', '你先退下', '散了吧', '改日再议', '罢了', '算了',
+]);
+
+function computeGameplayMetrics(entries: LogEntry[], promptRecords: PromptRecord[]): GameplayMetrics {
+  // 1. Outcome distribution
+  const eventEnds = entries.filter(e => e.phase === 'event_end');
+  const ticks = entries.filter(e => e.phase === 'tick');
+  const snapshots = entries.filter(e => e.phase === 'pressure_snapshot')
+    .map(e => ({ day: e.day, axes: (e.detail as { axes: Record<string, number> }).axes }))
+    .sort((a, b) => a.day - b.day);
+  const totalDays = entries.length > 0 ? Math.max(...entries.map(e => e.day)) + 1 : 0;
+
+  const outcomeCounts: Record<string, number> = { success: 0, partial: 0, failure: 0, disaster: 0 };
+  const bySkeleton: Record<string, Record<string, number>> = {};
+
+  const triggeredSkeletonIds = new Set<string>();
+  const dayToSkeletonIds: Record<number, string[]> = {};
+  for (const t of ticks) {
+    const detail = t.detail as unknown as TickDetail;
+    for (const evt of detail.triggeredEvents || []) {
+      const sid = typeof evt === 'string' ? evt : evt.skeletonId;
+      triggeredSkeletonIds.add(sid);
+      if (!dayToSkeletonIds[t.day]) dayToSkeletonIds[t.day] = [];
+      dayToSkeletonIds[t.day].push(sid);
+    }
+  }
+
+  // Also extract skeleton IDs from scene_start sceneName (covers chained events)
+  const sceneStarts = entries.filter(e => e.phase === 'scene_start');
+  for (const ss of sceneStarts) {
+    const sceneName = (ss.detail as { sceneName?: string }).sceneName || '';
+    for (const sid of ALL_SKELETONS) {
+      const shortId = sid.replace('skeleton_', '');
+      if (sceneName.includes(shortId)) {
+        triggeredSkeletonIds.add(sid);
+        if (!dayToSkeletonIds[ss.day]) dayToSkeletonIds[ss.day] = [];
+        if (!dayToSkeletonIds[ss.day].includes(sid)) dayToSkeletonIds[ss.day].push(sid);
+      }
+    }
+  }
+
+  // Build event_end index: each event_end on a day maps to the next unused skeleton ID for that day
+  const daySkeletonCursor: Record<number, number> = {};
+  for (const e of eventEnds) {
+    const detail = e.detail as { chosenOutcome: string; eventLog: Array<{ name: string }> };
+    const outcome = detail.chosenOutcome || 'success';
+    outcomeCounts[outcome] = (outcomeCounts[outcome] || 0) + 1;
+
+    const ids = dayToSkeletonIds[e.day] || [];
+    const cursor = daySkeletonCursor[e.day] || 0;
+    const skeletonId = ids[cursor] || 'unknown';
+    daySkeletonCursor[e.day] = cursor + 1;
+
+    if (!bySkeleton[skeletonId]) bySkeleton[skeletonId] = {};
+    bySkeleton[skeletonId][outcome] = (bySkeleton[skeletonId][outcome] || 0) + 1;
+  }
+
+  const outcomeValues = Object.values(outcomeCounts).filter(v => v > 0);
+  const outcomeDistribution: OutcomeDistribution = {
+    total: eventEnds.length,
+    counts: outcomeCounts,
+    bySkeleton,
+    allSame: outcomeValues.length <= 1 && eventEnds.length > 1,
+  };
+
+  // 2. Pressure trends
+  const pressureTrends: PressureTrend[] = [];
+  if (snapshots.length >= 2) {
+    const axisIds = Object.keys(snapshots[0].axes);
+    for (const axisId of axisIds) {
+      const values = snapshots.map(s => s.axes[axisId] ?? 0);
+      const days = snapshots.map(s => s.day);
+      const deltas: number[] = [];
+      for (let i = 1; i < values.length; i++) deltas.push(values[i] - values[i - 1]);
+
+      const avgDelta = deltas.length > 0 ? deltas.reduce((a, b) => a + b, 0) / deltas.length : 0;
+      const maxSpike = deltas.length > 0 ? Math.max(...deltas) : 0;
+      const maxDrop = deltas.length > 0 ? Math.min(...deltas) : 0;
+
+      const positives = deltas.filter(d => d > 0).length;
+      const negatives = deltas.filter(d => d < 0).length;
+      const zeros = deltas.filter(d => d === 0).length;
+      let trend: PressureTrend['trend'] = 'oscillating';
+      if (deltas.length > 0) {
+        if (positives >= deltas.length * 0.8) trend = 'monotonic_up';
+        else if (negatives >= deltas.length * 0.8) trend = 'monotonic_down';
+        else if (zeros >= deltas.length * 0.8) trend = 'flat';
+      }
+
+      const cappedDays: number[] = [];
+      const bottomedDays: number[] = [];
+      for (let i = 0; i < values.length; i++) {
+        if (values[i] >= 95) cappedDays.push(days[i]);
+        if (values[i] <= 5) bottomedDays.push(days[i]);
+      }
+
+      pressureTrends.push({
+        axisId,
+        avgDailyDelta: Math.round(avgDelta * 100) / 100,
+        maxSpike: Math.round(maxSpike),
+        maxDrop: Math.round(maxDrop),
+        trend,
+        cappedDays,
+        bottomedDays,
+      });
+    }
+  }
+
+  // 3. NPC survival
+  const npcFirstDay: Record<string, number> = {};
+  const npcLastDay: Record<string, number> = {};
+  for (const t of ticks) {
+    const detail = t.detail as unknown as TickDetail;
+    for (const a of detail.npcActions || []) {
+      if (!(a.who in npcFirstDay) || t.day < npcFirstDay[a.who]) npcFirstDay[a.who] = t.day;
+      if (!(a.who in npcLastDay) || t.day > npcLastDay[a.who]) npcLastDay[a.who] = t.day;
+    }
+  }
+
+  const lastTickDay = ticks.length > 0 ? Math.max(...ticks.map(t => t.day)) : 0;
+  const npcSurvival: NpcSurvival[] = ALL_NPC_IDS.map(npcId => ({
+    npcId,
+    firstDay: npcFirstDay[npcId] ?? -1,
+    lastDay: npcLastDay[npcId] ?? -1,
+    totalDays,
+    possiblyLost: npcId in npcLastDay && npcLastDay[npcId] < lastTickDay - 2,
+  }));
+
+  // 4. Ending proximity
+  const lastSnapshot = snapshots.length > 0 ? snapshots[snapshots.length - 1] : null;
+  const militaryReadiness = lastSnapshot?.axes['military_readiness'] ?? 0;
+  const nonActiveAllies = npcSurvival.filter(n => CORE_ALLIES.includes(n.npcId) && n.possiblyLost);
+  const activeAllies = CORE_ALLIES.length - nonActiveAllies.length;
+  const hasCoupTrigger = triggeredSkeletonIds.has('skeleton_military_conflict');
+  const gameOverEntry = entries.find(e => e.phase === 'game_over');
+  const actualEnding = gameOverEntry ? String((gameOverEntry.detail as { ending: string }).ending) : null;
+
+  const endingProximity: EndingProximity[] = [
+    {
+      ending: 'E1 玄武门成功',
+      distance: hasCoupTrigger && militaryReadiness >= 60 && activeAllies >= 2 ? '✅ 已满足' :
+        !hasCoupTrigger ? '缺 coup trigger' : `军力${militaryReadiness} 盟友${activeAllies}`,
+      met: [
+        ...(hasCoupTrigger ? ['coup trigger'] : []),
+        ...(militaryReadiness >= 60 ? [`军力${militaryReadiness}≥60`] : []),
+        ...(activeAllies >= 2 ? [`盟友${activeAllies}≥2`] : []),
+      ],
+      missing: [
+        ...(!hasCoupTrigger ? ['需要 military_conflict 事件'] : []),
+        ...(militaryReadiness < 60 ? [`军力${militaryReadiness}<60`] : []),
+        ...(activeAllies < 2 ? [`盟友${activeAllies}<2`] : []),
+      ],
+    },
+    {
+      ending: 'E3 惨胜',
+      distance: hasCoupTrigger && nonActiveAllies.length >= 1 ? '可能触发' : '未满足',
+      met: [
+        ...(hasCoupTrigger ? ['coup trigger'] : []),
+        ...(nonActiveAllies.length >= 1 ? [`${nonActiveAllies.length}名盟友已损失`] : []),
+      ],
+      missing: [
+        ...(!hasCoupTrigger ? ['需要 military_conflict 事件'] : []),
+        ...(nonActiveAllies.length < 1 ? ['需要≥1名盟友非active'] : []),
+      ],
+    },
+    {
+      ending: 'F1 政治终局',
+      distance: nonActiveAllies.length >= 2 ? '⚠ 接近' : '远',
+      met: nonActiveAllies.length >= 2 ? [`${nonActiveAllies.length}名盟友已损失`] : [],
+      missing: nonActiveAllies.length < 2 ? [`需要≥2名盟友非active（当前${nonActiveAllies.length}）`] : [],
+    },
+    {
+      ending: 'F5 武力失败',
+      distance: hasCoupTrigger && militaryReadiness < 50 ? '⚠ 接近' : '远',
+      met: [
+        ...(hasCoupTrigger ? ['coup trigger'] : []),
+        ...(militaryReadiness < 50 ? [`军力${militaryReadiness}<50`] : []),
+      ],
+      missing: [
+        ...(!hasCoupTrigger ? ['需要 coup trigger'] : []),
+        ...(militaryReadiness >= 50 ? [`军力${militaryReadiness}≥50`] : []),
+      ],
+    },
+    {
+      ending: 'N1 时光流逝',
+      distance: totalDays >= 180 ? '✅ 时间到' : `还差${180 - totalDays}天`,
+      met: totalDays >= 180 ? ['已满180天'] : [],
+      missing: totalDays < 180 ? [`第${totalDays}天/180天`] : [],
+    },
+  ];
+
+  // 5. Skeleton coverage
+  const skeletonCoverage: SkeletonCoverage = {
+    total: ALL_SKELETONS.length,
+    triggered: ALL_SKELETONS.filter(s => triggeredSkeletonIds.has(s)),
+    missing: ALL_SKELETONS.filter(s => !triggeredSkeletonIds.has(s)),
+    rate: Math.round(ALL_SKELETONS.filter(s => triggeredSkeletonIds.has(s)).length / ALL_SKELETONS.length * 100) / 100,
+  };
+
+  // 6. Dialogue responsiveness
+  const sceneRecords = promptRecords.filter(r => classifyPromptRecord(r) === 'scene_dialogue');
+  let substantiveInputs = 0;
+  let respondedInputs = 0;
+
+  for (const r of sceneRecords) {
+    const userMsgs = r.messages.filter(m => m.role === 'user');
+    const lastUserMsg = userMsgs[userMsgs.length - 1];
+    if (!lastUserMsg) continue;
+
+    const input = lastUserMsg.content.trim();
+    if (input.length <= 3 || TRIVIAL_INPUTS.has(input)) continue;
+
+    substantiveInputs++;
+    const keywords = input.match(/[一-鿿]{2,}/g) || [];
+    if (keywords.length === 0) continue;
+
+    const response = stripThinking(r.response);
+    const hasResponse = keywords.some(kw => response.includes(kw));
+    if (hasResponse) respondedInputs++;
+  }
+
+  const dialogueResponsiveness: DialogueResponsiveness = {
+    substantiveInputs,
+    respondedInputs,
+    rate: substantiveInputs > 0 ? Math.round(respondedInputs / substantiveInputs * 100) / 100 : 1,
+  };
+
+  return {
+    outcomeDistribution,
+    pressureTrends,
+    endingProximity,
+    npcSurvival,
+    skeletonCoverage,
+    dialogueResponsiveness,
+    actualEnding,
+  };
+}
+
+const PRESSURE_LABELS: Record<string, string> = {
+  succession_crisis: '储位危机',
+  jiancheng_hostility: '建成敌意',
+  yuanji_ambition: '元吉冒进',
+  court_opinion: '朝堂舆论',
+  qinwangfu_desperation: '秦王府急迫',
+  imperial_suspicion: '李渊猜疑',
+  military_readiness: '军事准备',
+};
+
+function printGameplayMetrics(gm: GameplayMetrics): void {
+  console.log('\n===== 游戏体验指标 =====\n');
+
+  // Outcome distribution
+  const od = gm.outcomeDistribution;
+  console.log(`Outcome 分布 (${od.total} 次事件):`);
+  for (const [outcome, count] of Object.entries(od.counts)) {
+    if (count > 0) {
+      const pct = Math.round(count / od.total * 100);
+      console.log(`  ${outcome}: ${count}/${od.total} (${pct}%)${od.allSame && count === od.total ? ' ⚠ 全部相同' : ''}`);
+    }
+  }
+  if (Object.keys(od.bySkeleton).length > 0) {
+    console.log('  按骨架:');
+    for (const [sid, outcomes] of Object.entries(od.bySkeleton)) {
+      const parts = Object.entries(outcomes).map(([o, n]) => `${o}×${n}`).join(' ');
+      console.log(`    ${sid}: ${parts}`);
+    }
+  }
+
+  // Pressure trends
+  console.log('\n压力轴趋势:');
+  const TREND_LABELS: Record<string, string> = { monotonic_up: '↑单调', monotonic_down: '↓单调', oscillating: '↕震荡', flat: '→平' };
+  for (const pt of gm.pressureTrends) {
+    const label = PRESSURE_LABELS[pt.axisId] || pt.axisId;
+    const warnings: string[] = [];
+    if (pt.cappedDays.length > 0) warnings.push(`⚠ 撞顶 day ${pt.cappedDays[0]}-${pt.cappedDays[pt.cappedDays.length - 1]}`);
+    if (pt.bottomedDays.length > 0) warnings.push(`⚠ 归零 day ${pt.bottomedDays[0]}-${pt.bottomedDays[pt.bottomedDays.length - 1]}`);
+    console.log(`  ${label}: avg ${pt.avgDailyDelta > 0 ? '+' : ''}${pt.avgDailyDelta}/天, max spike +${pt.maxSpike}, max drop ${pt.maxDrop}, ${TREND_LABELS[pt.trend]}${warnings.length > 0 ? ' ' + warnings.join(' ') : ''}`);
+  }
+
+  // Ending proximity
+  console.log('\n结局路径分析:');
+  if (gm.actualEnding) {
+    console.log(`  实际结局: ${gm.actualEnding}`);
+  } else {
+    console.log('  未触发结局');
+  }
+  for (const ep of gm.endingProximity) {
+    const status = ep.missing.length === 0 ? '✅' : ep.missing.length <= 1 ? '⚠ 接近' : '远';
+    console.log(`  ${ep.ending}: ${status}`);
+    if (ep.met.length > 0) console.log(`    已满足: ${ep.met.join(', ')}`);
+    if (ep.missing.length > 0) console.log(`    缺少: ${ep.missing.join(', ')}`);
+  }
+
+  // NPC survival
+  console.log('\nNPC 存活状态:');
+  for (const ns of gm.npcSurvival) {
+    const status = ns.firstDay === -1 ? '从未出现' :
+      ns.possiblyLost ? `⚠ 可能已非 active（最后出现 day ${ns.lastDay}）` :
+        `active (day ${ns.firstDay}-${ns.lastDay})`;
+    console.log(`  ${ns.npcId}: ${status}`);
+  }
+  const lostCoreAllies = gm.npcSurvival.filter(n => CORE_ALLIES.includes(n.npcId) && n.possiblyLost);
+  if (lostCoreAllies.length > 0) {
+    console.log(`  ⚠ 核心盟友损失 ${lostCoreAllies.length} 人: ${lostCoreAllies.map(n => n.npcId).join(', ')}`);
+  }
+
+  // Skeleton coverage
+  const sc = gm.skeletonCoverage;
+  console.log(`\n骨架覆盖率: ${sc.triggered.length}/${sc.total} (${Math.round(sc.rate * 100)}%)${sc.rate < 0.5 ? ' ⚠' : ''}`);
+  if (sc.missing.length > 0) {
+    console.log(`  未触发: ${sc.missing.join(', ')}`);
+  }
+
+  // Dialogue responsiveness
+  const dr = gm.dialogueResponsiveness;
+  console.log(`\n对话回应度: ${dr.respondedInputs}/${dr.substantiveInputs} (${Math.round(dr.rate * 100)}%)${dr.rate < 0.5 ? ' ⚠' : ''}`);
+}
+
 // ===== Main =====
 
 const args = process.argv.slice(2);
@@ -701,6 +1094,11 @@ if (memAnalysis.totalMemoriesAdded > 0 || entries.some(e => e.phase === 'memory_
   result.memoryAnalysis = memAnalysis;
   printMemoryAnalysis(memAnalysis);
 }
+
+// Gameplay experience metrics
+const gameplayMetrics = computeGameplayMetrics(entries, promptRecords);
+result.gameplayMetrics = gameplayMetrics;
+printGameplayMetrics(gameplayMetrics);
 
 // 保存结果
 const outFile = inputFile.replace(/\.json$/, '.eval.json');

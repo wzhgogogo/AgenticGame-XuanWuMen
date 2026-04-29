@@ -2,7 +2,7 @@
 
 > 按优先级组织，同一区块内按重要性从上到下。勾选完成的条目保留一段时间以便追溯，超过两个版本再清理。
 >
-> **当前状态**：v3.4.4 已发布（结局系统重写 / 事件骨架结构化 + 11 骨架 / 快进机制）。**核心机制层冻结**——下一阶段 v3.4.5 是体验打磨（美术 + 等待时间 + UI + bug + eval），不再扩内核。
+> **当前状态**：v3.4.5.1 已发布（v3.4.5 alertness决策接入+requiredNpcIds敌方锁定 / v3.4.5.1 review修复+平衡调参+代码质量）。下一阶段继续体验打磨（美术 + 等待时间 + UI + bug + eval）。
 
 ---
 
@@ -18,6 +18,15 @@
 - [ ] **补 2-3 个历史时间窗 flag** — 当前只有 `tujue_invasion`（三月中旬）。武德九年还有"杨文干事件余波 / 太白经天 / 昆明池阅兵 / 洛阳行台争夺"等历史背景节点，至少补 2-3 个，避免快进 7 天什么也不发生。涉及：worldSimulator.ts runWorldTick 时间窗触发器段
 - [ ] **旧存档迁移实测** — `migrateWorldState` 加了 status / playerOffices / outcomeEffects wrap 三层补丁，但本地未跑过 v3.4.3 旧存档升级。准备一份 v3.4.3 时期的 localStorage dump，载入验证不崩；崩则 schema assert 出更友好提示
 - [ ] **endingResolver 优先级 freeze 测试** — F1/N1 都可能在 day 180 触发，F5/E3 都依赖军事冲突。补 endingResolver.test.ts 单测，每个结局 case 一个最小 state，防止后续改阈值时回归
+
+### P0 · NPC 涌现质量提升（Profile → 决策闭环）
+
+> Profile 数据丰富但未真正接入决策。Big Five / goals / trust 只是 LLM 对话素材，不参与行为选择。核心缺失：NPC 决策时看不到其他 NPC 在干什么，无法产生"互相反应"的涌现。路线：不增加硬规则，而是丰富 NPC 决策 prompt 的上下文，让 LLM 基于更完整信息做推理。
+
+- [ ] **注入其他 NPC 近期行动摘要** — 每个 NPC 决策时能看到其余 5 人昨日行动（1-2 句/人，~50 tokens）。这是涌现的关键缺失：长孙无忌不知道尉迟敬德昨天越级调兵，建成不知道元吉在搞小算盘。涉及：npcPromptBuilder.ts buildNpcDecisionPrompt
+- [ ] **注入 NPC 状态变化** — 谁被贬/伤/囚了、谁的官职被剥夺。当前 NPC 做决策时完全不知道阵营损失。涉及：npcPromptBuilder.ts
+- [ ] **注入玩家当前资源状态** — 官职列表、兵权上限（military_readiness.ceiling）。NPC 应该能感知秦王的实力变化。涉及：npcPromptBuilder.ts
+
 
 ### P0 · 等待时间优化
 
@@ -86,6 +95,19 @@
 
 - [ ] **前后端分离** — 当前前后端耦合，上线前拆为独立前端（React SPA）+ 后端（API 服务）
 - [ ] **移动端适配** — 检查小屏幕下的布局、字体大小、触控交互
+
+---
+
+## ✅ v3.4.5（2026-04-28）已完成
+
+### NPC 涌现优化：alertness + requiredNpcIds
+- [x] alertnessAbove/Below 条件接入 matchConditions（types/world.ts + npcAgent.ts）
+- [x] 6 个 NPC 各加 _alert 规则 alertnessAbove: 30（npcDecisionRules.ts）
+- [x] handleEventEnd alertness 广播：failure/disaster +5，死亡/被擒 +10（worldSimulator.ts）
+- [x] NPC 决策 prompt 显示警觉值（npcPromptBuilder.ts）
+- [x] EventSkeleton.requiredNpcIds + eventGenerator 合并逻辑
+- [x] 6 骨架锁定敌方 NPC（暗杀/军事冲突锁建成+元吉，宴会/弹劾锁建成，御前锁李渊，夺兵权锁元吉）
+- [x] 18 新测试（320 总计）
 
 ---
 

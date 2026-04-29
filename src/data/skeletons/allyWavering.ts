@@ -62,9 +62,9 @@ export const allyWavering: EventSkeleton = {
       id: 'ally_failure_npc',
       tag: 'failure',
       kind: 'loseNpc',
-      characterId: 'fang_xuanling',
+      characterId: 'changsun_wuji',
       status: 'exiled',
-      reason: '盟友被建成奏请逐出府',
+      reason: '动摇盟友被建成奏请逐出秦王府',
     },
     {
       id: 'ally_failure_pressure',

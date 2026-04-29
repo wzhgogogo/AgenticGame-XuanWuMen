@@ -261,7 +261,7 @@ export const liYuanRules: NpcDecisionRule[] = [
 
 export const NPC_PATIENCE_DECAY: Record<string, number> = {
   changsun_wuji: 0.5,
-  weichi_jingde: 2.0,
+  weichi_jingde: 1.5,
   fang_xuanling: 0.3,
   li_jiancheng: 0.4,
   li_yuanji: 1.5,
