@@ -1,0 +1,285 @@
+{
+  "inputFile": "scripts/logs/20260421-184542-suppress_jiancheng-autoplay.json",
+  "timestamp": "2026-04-22T05:22:30.015Z",
+  "metrics": {
+    "totalDays": 30,
+    "eventCount": 6,
+    "eventDays": [
+      2,
+      11,
+      17,
+      18,
+      20,
+      29
+    ],
+    "avgEventInterval": 5.4,
+    "eventIntervalStdDev": 3.3823069050575527,
+    "npcDecisions": {
+      "changsun_wuji": {
+        "persuade": 3,
+        "scheme": 14
+      },
+      "weichi_jingde": {
+        "mobilize": 2
+      },
+      "fang_xuanling": {
+        "scheme": 12
+      }
+    },
+    "activityChoices": {
+      "summon_spy(召见密探)": 7,
+      "meet_officials(接见朝臣)": 16,
+      "counsel_xuanling(与房玄龄议事)": 12,
+      "contact_insiders(联络宫中内应)": 6,
+      "inspect_guards(巡视府卫)": 19
+    },
+    "pressureStart": {
+      "succession_crisis": 47,
+      "jiancheng_hostility": 41,
+      "yuanji_ambition": 36,
+      "court_opinion": 30,
+      "qinwangfu_desperation": 26,
+      "imperial_suspicion": 20,
+      "military_readiness": 20
+    },
+    "pressureEnd": {
+      "succession_crisis": 99,
+      "jiancheng_hostility": 81,
+      "yuanji_ambition": 56,
+      "court_opinion": 47,
+      "qinwangfu_desperation": 20,
+      "imperial_suspicion": 29,
+      "military_readiness": 58
+    },
+    "pressureDelta": {
+      "succession_crisis": 52,
+      "jiancheng_hostility": 40,
+      "yuanji_ambition": 20,
+      "court_opinion": 17,
+      "qinwangfu_desperation": -6,
+      "imperial_suspicion": 9,
+      "military_readiness": 38
+    },
+    "totalNpcActions": 31,
+    "totalDegraded": 1,
+    "totalLlmImpliedCalls": 22
+  },
+  "emergenceMetrics": {
+    "npcStanceDiversity": {
+      "changsun_wuji": {
+        "distribution": {
+          "persuade": 3,
+          "scheme": 14
+        },
+        "shannonEntropy": 0.67,
+        "dominantStance": "scheme",
+        "dominantRatio": 0.82
+      },
+      "weichi_jingde": {
+        "distribution": {
+          "mobilize": 2
+        },
+        "shannonEntropy": 0,
+        "dominantStance": "mobilize",
+        "dominantRatio": 1
+      },
+      "fang_xuanling": {
+        "distribution": {
+          "scheme": 12
+        },
+        "shannonEntropy": 0,
+        "dominantStance": "scheme",
+        "dominantRatio": 1
+      }
+    },
+    "npcActionRepetitionRate": {
+      "changsun_wuji": 0,
+      "weichi_jingde": 0,
+      "fang_xuanling": 0.25
+    },
+    "npcSilentDays": {
+      "changsun_wuji": 13,
+      "weichi_jingde": 28,
+      "fang_xuanling": 18
+    },
+    "npcStanceTransitions": {
+      "changsun_wuji": 1,
+      "weichi_jingde": 0,
+      "fang_xuanling": 0
+    },
+    "eventBehaviorShift": [
+      {
+        "eventDay": 2,
+        "skeletonId": "skeleton_intelligence_event",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "persuade"
+            ],
+            "after": [
+              "persuade",
+              "persuade"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [],
+            "after": []
+          },
+          "fang_xuanling": {
+            "before": [],
+            "after": []
+          }
+        }
+      },
+      {
+        "eventDay": 11,
+        "skeletonId": "skeleton_intelligence_event",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "scheme"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [],
+            "after": []
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme"
+            ],
+            "after": []
+          }
+        }
+      },
+      {
+        "eventDay": 17,
+        "skeletonId": "skeleton_banquet_crisis",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [],
+            "after": [
+              "scheme"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [],
+            "after": []
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme"
+            ],
+            "after": [
+              "scheme"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 18,
+        "skeletonId": "skeleton_imperial_summons",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "scheme"
+            ],
+            "after": []
+          },
+          "weichi_jingde": {
+            "before": [],
+            "after": []
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme"
+            ],
+            "after": []
+          }
+        }
+      },
+      {
+        "eventDay": 20,
+        "skeletonId": "skeleton_intelligence_event",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "scheme"
+            ],
+            "after": []
+          },
+          "weichi_jingde": {
+            "before": [],
+            "after": []
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme"
+            ],
+            "after": [
+              "scheme"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 29,
+        "skeletonId": "skeleton_intelligence_event",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": []
+          },
+          "weichi_jingde": {
+            "before": [],
+            "after": []
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": []
+          }
+        }
+      }
+    ]
+  },
+  "ruleBasedIssues": [
+    {
+      "type": "response_repetition",
+      "detail": "scene_dialogue 输出相似度过高 (45% 5-gram overlap)，records [24] 和 [25]",
+      "recordIndex": 25
+    },
+    {
+      "type": "response_repetition",
+      "detail": "scene_dialogue 输出相似度过高 (42% 5-gram overlap)，records [25] 和 [26]",
+      "recordIndex": 26
+    },
+    {
+      "type": "response_repetition",
+      "detail": "scene_dialogue 输出相似度过高 (41% 5-gram overlap)，records [33] 和 [34]",
+      "recordIndex": 34
+    }
+  ],
+  "memoryAnalysis": {
+    "totalMemoriesAdded": 0,
+    "duplicateRate": 0,
+    "emotionalTagDiversity": 0,
+    "growthCurve": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+}

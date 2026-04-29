@@ -1,0 +1,1221 @@
+{
+  "inputFile": "scripts/logs/20260429-131630-suppress_emperor-autoplay.json",
+  "timestamp": "2026-04-29T08:32:14.269Z",
+  "metrics": {
+    "totalDays": 30,
+    "eventCount": 10,
+    "eventDays": [
+      2,
+      5,
+      6,
+      7,
+      11,
+      15,
+      21,
+      22,
+      23,
+      28
+    ],
+    "avgEventInterval": 2.888888888888889,
+    "eventIntervalStdDev": 1.8525924445036743,
+    "npcDecisions": {
+      "changsun_wuji": {
+        "plant_spy": 3,
+        "coordinate": 19,
+        "advise": 1,
+        "remonstrate": 2,
+        "strategize": 1
+      },
+      "weichi_jingde": {
+        "drill": 6,
+        "rally": 3,
+        "remonstrate": 14,
+        "pressure": 4
+      },
+      "fang_xuanling": {
+        "analyze": 1,
+        "strategize": 25,
+        "observe": 1
+      },
+      "li_jiancheng": {
+        "plant_spy": 2,
+        "coordinate": 19,
+        "lobby": 3,
+        "observe": 2,
+        "pressure": 1
+      },
+      "li_yuanji": {
+        "drill": 3,
+        "pressure": 23,
+        "lobby": 1
+      },
+      "li_yuan": {
+        "observe": 14,
+        "strategize": 12
+      }
+    },
+    "activityChoices": {
+      "train_troops(练兵演武)": 16,
+      "meet_officials(接见朝臣)": 11,
+      "contact_insiders(联络宫中内应)": 13,
+      "summon_spy(召见密探)": 11,
+      "counsel_wuji(与长孙无忌密谈)": 9
+    },
+    "pressureStart": {
+      "succession_crisis": 51,
+      "jiancheng_hostility": 46,
+      "yuanji_ambition": 37,
+      "court_opinion": 30,
+      "qinwangfu_desperation": 27,
+      "imperial_suspicion": 23,
+      "military_readiness": 28
+    },
+    "pressureEnd": {
+      "succession_crisis": 99,
+      "jiancheng_hostility": 100,
+      "yuanji_ambition": 75,
+      "court_opinion": 30,
+      "qinwangfu_desperation": 76,
+      "imperial_suspicion": 59,
+      "military_readiness": 98
+    },
+    "pressureDelta": {
+      "succession_crisis": 48,
+      "jiancheng_hostility": 54,
+      "yuanji_ambition": 38,
+      "court_opinion": 0,
+      "qinwangfu_desperation": 49,
+      "imperial_suspicion": 36,
+      "military_readiness": 70
+    },
+    "totalNpcActions": 160,
+    "totalDegraded": 34,
+    "totalLlmImpliedCalls": 30
+  },
+  "emergenceMetrics": {
+    "npcStanceDiversity": {
+      "changsun_wuji": {
+        "distribution": {
+          "plant_spy": 3,
+          "coordinate": 19,
+          "advise": 1,
+          "remonstrate": 2,
+          "strategize": 1
+        },
+        "shannonEntropy": 1.34,
+        "dominantStance": "coordinate",
+        "dominantRatio": 0.73
+      },
+      "weichi_jingde": {
+        "distribution": {
+          "drill": 6,
+          "rally": 3,
+          "remonstrate": 14,
+          "pressure": 4
+        },
+        "shannonEntropy": 1.73,
+        "dominantStance": "remonstrate",
+        "dominantRatio": 0.52
+      },
+      "fang_xuanling": {
+        "distribution": {
+          "analyze": 1,
+          "strategize": 25,
+          "observe": 1
+        },
+        "shannonEntropy": 0.46,
+        "dominantStance": "strategize",
+        "dominantRatio": 0.93
+      },
+      "li_jiancheng": {
+        "distribution": {
+          "plant_spy": 2,
+          "coordinate": 19,
+          "lobby": 3,
+          "observe": 2,
+          "pressure": 1
+        },
+        "shannonEntropy": 1.44,
+        "dominantStance": "coordinate",
+        "dominantRatio": 0.7
+      },
+      "li_yuanji": {
+        "distribution": {
+          "drill": 3,
+          "pressure": 23,
+          "lobby": 1
+        },
+        "shannonEntropy": 0.73,
+        "dominantStance": "pressure",
+        "dominantRatio": 0.85
+      },
+      "li_yuan": {
+        "distribution": {
+          "observe": 14,
+          "strategize": 12
+        },
+        "shannonEntropy": 1,
+        "dominantStance": "observe",
+        "dominantRatio": 0.54
+      }
+    },
+    "npcActionRepetitionRate": {
+      "changsun_wuji": 0.04,
+      "weichi_jingde": 0,
+      "fang_xuanling": 0,
+      "li_jiancheng": 0.04,
+      "li_yuanji": 0,
+      "li_yuan": 0.08
+    },
+    "npcSilentDays": {
+      "changsun_wuji": 4,
+      "weichi_jingde": 3,
+      "fang_xuanling": 3,
+      "li_jiancheng": 3,
+      "li_yuanji": 3,
+      "li_yuan": 4
+    },
+    "npcStanceTransitions": {
+      "changsun_wuji": 10,
+      "weichi_jingde": 13,
+      "fang_xuanling": 3,
+      "li_jiancheng": 11,
+      "li_yuanji": 7,
+      "li_yuan": 9
+    },
+    "eventBehaviorShift": [
+      {
+        "eventDay": 2,
+        "skeletonId": "skeleton_intelligence_event",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "plant_spy",
+              "plant_spy"
+            ],
+            "after": [
+              "coordinate",
+              "coordinate"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "drill",
+              "drill"
+            ],
+            "after": [
+              "rally",
+              "drill"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "analyze",
+              "strategize"
+            ],
+            "after": [
+              "strategize",
+              "strategize"
+            ]
+          },
+          "li_jiancheng": {
+            "before": [
+              "plant_spy",
+              "plant_spy"
+            ],
+            "after": [
+              "coordinate",
+              "lobby"
+            ]
+          },
+          "li_yuanji": {
+            "before": [
+              "drill",
+              "pressure"
+            ],
+            "after": [
+              "pressure",
+              "pressure"
+            ]
+          },
+          "li_yuan": {
+            "before": [
+              "observe",
+              "observe"
+            ],
+            "after": [
+              "observe",
+              "observe"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 5,
+        "skeletonId": "skeleton_imperial_summons",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "coordinate",
+              "coordinate"
+            ],
+            "after": [
+              "coordinate",
+              "coordinate"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "rally",
+              "drill"
+            ],
+            "after": [
+              "remonstrate",
+              "remonstrate"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "strategize",
+              "strategize"
+            ],
+            "after": [
+              "strategize",
+              "observe"
+            ]
+          },
+          "li_jiancheng": {
+            "before": [
+              "coordinate",
+              "lobby"
+            ],
+            "after": [
+              "coordinate",
+              "coordinate"
+            ]
+          },
+          "li_yuanji": {
+            "before": [
+              "pressure",
+              "pressure"
+            ],
+            "after": [
+              "pressure",
+              "pressure"
+            ]
+          },
+          "li_yuan": {
+            "before": [
+              "observe",
+              "observe"
+            ],
+            "after": [
+              "observe",
+              "strategize"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 6,
+        "skeletonId": "skeleton_banquet_crisis",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "coordinate",
+              "coordinate"
+            ],
+            "after": [
+              "coordinate",
+              "advise"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "drill",
+              "remonstrate"
+            ],
+            "after": [
+              "remonstrate",
+              "remonstrate"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "strategize",
+              "strategize"
+            ],
+            "after": [
+              "observe",
+              "strategize"
+            ]
+          },
+          "li_jiancheng": {
+            "before": [
+              "lobby",
+              "coordinate"
+            ],
+            "after": [
+              "coordinate",
+              "lobby"
+            ]
+          },
+          "li_yuanji": {
+            "before": [
+              "pressure",
+              "pressure"
+            ],
+            "after": [
+              "pressure",
+              "drill"
+            ]
+          },
+          "li_yuan": {
+            "before": [
+              "observe",
+              "observe"
+            ],
+            "after": [
+              "strategize",
+              "strategize"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 7,
+        "skeletonId": "skeleton_ally_wavering",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "coordinate",
+              "coordinate"
+            ],
+            "after": [
+              "advise",
+              "coordinate"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "remonstrate",
+              "remonstrate"
+            ],
+            "after": [
+              "remonstrate"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "strategize",
+              "strategize"
+            ],
+            "after": [
+              "strategize"
+            ]
+          },
+          "li_jiancheng": {
+            "before": [
+              "coordinate",
+              "coordinate"
+            ],
+            "after": [
+              "lobby",
+              "coordinate"
+            ]
+          },
+          "li_yuanji": {
+            "before": [
+              "pressure",
+              "pressure"
+            ],
+            "after": [
+              "drill",
+              "pressure"
+            ]
+          },
+          "li_yuan": {
+            "before": [
+              "observe",
+              "observe"
+            ],
+            "after": [
+              "strategize"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 11,
+        "skeletonId": "skeleton_intelligence_event",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "coordinate",
+              "coordinate"
+            ],
+            "after": [
+              "coordinate",
+              "plant_spy"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "remonstrate"
+            ],
+            "after": [
+              "drill",
+              "pressure"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "strategize"
+            ],
+            "after": [
+              "strategize",
+              "strategize"
+            ]
+          },
+          "li_jiancheng": {
+            "before": [
+              "coordinate",
+              "lobby"
+            ],
+            "after": [
+              "coordinate",
+              "coordinate"
+            ]
+          },
+          "li_yuanji": {
+            "before": [
+              "pressure",
+              "drill"
+            ],
+            "after": [
+              "pressure",
+              "pressure"
+            ]
+          },
+          "li_yuan": {
+            "before": [
+              "observe"
+            ],
+            "after": [
+              "observe",
+              "strategize"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 15,
+        "skeletonId": "skeleton_assassination_crisis",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "plant_spy",
+              "coordinate"
+            ],
+            "after": [
+              "coordinate",
+              "coordinate"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "pressure",
+              "remonstrate"
+            ],
+            "after": [
+              "pressure",
+              "pressure"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "strategize",
+              "strategize"
+            ],
+            "after": [
+              "strategize",
+              "strategize"
+            ]
+          },
+          "li_jiancheng": {
+            "before": [
+              "coordinate",
+              "coordinate"
+            ],
+            "after": [
+              "coordinate",
+              "coordinate"
+            ]
+          },
+          "li_yuanji": {
+            "before": [
+              "pressure",
+              "pressure"
+            ],
+            "after": [
+              "pressure",
+              "pressure"
+            ]
+          },
+          "li_yuan": {
+            "before": [
+              "strategize",
+              "observe"
+            ],
+            "after": [
+              "observe",
+              "observe"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 21,
+        "skeletonId": "skeleton_imperial_summons",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "coordinate",
+              "remonstrate"
+            ],
+            "after": [
+              "coordinate"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "rally",
+              "remonstrate"
+            ],
+            "after": [
+              "remonstrate"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "strategize",
+              "strategize"
+            ],
+            "after": [
+              "strategize",
+              "strategize"
+            ]
+          },
+          "li_jiancheng": {
+            "before": [
+              "coordinate",
+              "coordinate"
+            ],
+            "after": [
+              "observe",
+              "observe"
+            ]
+          },
+          "li_yuanji": {
+            "before": [
+              "pressure"
+            ],
+            "after": [
+              "pressure",
+              "pressure"
+            ]
+          },
+          "li_yuan": {
+            "before": [
+              "strategize",
+              "observe"
+            ],
+            "after": [
+              "strategize",
+              "strategize"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 22,
+        "skeletonId": "skeleton_banquet_crisis",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "remonstrate",
+              "coordinate"
+            ],
+            "after": [
+              "coordinate"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "remonstrate",
+              "remonstrate"
+            ],
+            "after": [
+              "remonstrate"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "strategize",
+              "strategize"
+            ],
+            "after": [
+              "strategize",
+              "strategize"
+            ]
+          },
+          "li_jiancheng": {
+            "before": [
+              "coordinate",
+              "coordinate"
+            ],
+            "after": [
+              "observe",
+              "coordinate"
+            ]
+          },
+          "li_yuanji": {
+            "before": [
+              "pressure"
+            ],
+            "after": [
+              "pressure",
+              "pressure"
+            ]
+          },
+          "li_yuan": {
+            "before": [
+              "observe",
+              "observe"
+            ],
+            "after": [
+              "strategize",
+              "strategize"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 23,
+        "skeletonId": "skeleton_intelligence_event",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "coordinate",
+              "coordinate"
+            ],
+            "after": [
+              "coordinate",
+              "coordinate"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "remonstrate",
+              "remonstrate"
+            ],
+            "after": [
+              "remonstrate",
+              "remonstrate"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "strategize",
+              "strategize"
+            ],
+            "after": [
+              "strategize",
+              "strategize"
+            ]
+          },
+          "li_jiancheng": {
+            "before": [
+              "coordinate",
+              "observe"
+            ],
+            "after": [
+              "coordinate",
+              "pressure"
+            ]
+          },
+          "li_yuanji": {
+            "before": [
+              "pressure",
+              "pressure"
+            ],
+            "after": [
+              "pressure",
+              "pressure"
+            ]
+          },
+          "li_yuan": {
+            "before": [
+              "observe",
+              "strategize"
+            ],
+            "after": [
+              "strategize",
+              "strategize"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 28,
+        "skeletonId": "skeleton_ally_wavering",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "coordinate"
+            ],
+            "after": []
+          },
+          "weichi_jingde": {
+            "before": [
+              "remonstrate"
+            ],
+            "after": [
+              "rally"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [],
+            "after": [
+              "strategize"
+            ]
+          },
+          "li_jiancheng": {
+            "before": [
+              "coordinate",
+              "coordinate"
+            ],
+            "after": []
+          },
+          "li_yuanji": {
+            "before": [
+              "pressure"
+            ],
+            "after": []
+          },
+          "li_yuan": {
+            "before": [
+              "strategize"
+            ],
+            "after": []
+          }
+        }
+      }
+    ]
+  },
+  "ruleBasedIssues": [
+    {
+      "type": "response_repetition",
+      "detail": "scene_dialogue 输出相似度过高 (40% 5-gram overlap)，records [44] 和 [45]",
+      "recordIndex": 45
+    },
+    {
+      "type": "response_repetition",
+      "detail": "scene_dialogue 输出相似度过高 (41% 5-gram overlap)，records [69] 和 [70]",
+      "recordIndex": 70
+    },
+    {
+      "type": "response_repetition",
+      "detail": "scene_dialogue 输出相似度过高 (55% 5-gram overlap)，records [147] 和 [148]",
+      "recordIndex": 148
+    },
+    {
+      "type": "response_repetition",
+      "detail": "scene_dialogue 输出相似度过高 (55% 5-gram overlap)，records [149] 和 [150]",
+      "recordIndex": 150
+    },
+    {
+      "type": "response_repetition",
+      "detail": "scene_dialogue 输出相似度过高 (42% 5-gram overlap)，records [225] 和 [226]",
+      "recordIndex": 226
+    },
+    {
+      "type": "response_repetition",
+      "detail": "scene_dialogue 输出相似度过高 (40% 5-gram overlap)，records [244] 和 [245]",
+      "recordIndex": 245
+    },
+    {
+      "type": "response_repetition",
+      "detail": "scene_dialogue 输出相似度过高 (41% 5-gram overlap)，records [245] 和 [246]",
+      "recordIndex": 246
+    },
+    {
+      "type": "response_repetition",
+      "detail": "scene_dialogue 输出相似度过高 (40% 5-gram overlap)，records [259] 和 [260]",
+      "recordIndex": 260
+    },
+    {
+      "type": "response_repetition",
+      "detail": "scene_dialogue 输出相似度过高 (43% 5-gram overlap)，records [292] 和 [293]",
+      "recordIndex": 293
+    },
+    {
+      "type": "response_repetition",
+      "detail": "scene_dialogue 输出相似度过高 (41% 5-gram overlap)，records [293] 和 [294]",
+      "recordIndex": 294
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "记忆注入 2 个实体(李世民/尉迟敬德)但 response 无一体现",
+      "recordIndex": 120
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "记忆注入 2 个实体(李世民/尉迟敬德)但 response 无一体现",
+      "recordIndex": 130
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "记忆注入 2 个实体(李世民/尉迟敬德)但 response 无一体现",
+      "recordIndex": 152
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "记忆注入 2 个实体(李世民/尉迟敬德)但 response 无一体现",
+      "recordIndex": 163
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "记忆注入 2 个实体(李世民/尉迟敬德)但 response 无一体现",
+      "recordIndex": 166
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "记忆注入 2 个实体(李世民/尉迟敬德)但 response 无一体现",
+      "recordIndex": 192
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "记忆注入 2 个实体(李世民/尉迟敬德)但 response 无一体现",
+      "recordIndex": 224
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "记忆注入 2 个实体(李世民/尉迟敬德)但 response 无一体现",
+      "recordIndex": 225
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "记忆注入 2 个实体(李世民/尉迟敬德)但 response 无一体现",
+      "recordIndex": 262
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "记忆注入 2 个实体(李世民/尉迟敬德)但 response 无一体现",
+      "recordIndex": 263
+    }
+  ],
+  "memoryAnalysis": {
+    "totalMemoriesAdded": 36,
+    "duplicateRate": 0.06,
+    "emotionalTagDiversity": 24,
+    "growthCurve": [
+      3,
+      1,
+      2,
+      2,
+      2,
+      0,
+      3,
+      2,
+      3,
+      2,
+      3,
+      3,
+      0,
+      3,
+      2,
+      1,
+      0,
+      2,
+      1,
+      1,
+      0,
+      0,
+      0
+    ]
+  },
+  "gameplayMetrics": {
+    "outcomeDistribution": {
+      "total": 23,
+      "counts": {
+        "success": 23,
+        "partial": 0,
+        "failure": 0,
+        "disaster": 0
+      },
+      "bySkeleton": {
+        "skeleton_intelligence_event": {
+          "success": 5
+        },
+        "skeleton_imperial_summons": {
+          "success": 2
+        },
+        "skeleton_banquet_crisis": {
+          "success": 3
+        },
+        "skeleton_ally_wavering": {
+          "success": 3
+        },
+        "skeleton_subordinate_ultimatum": {
+          "success": 8
+        },
+        "skeleton_assassination_crisis": {
+          "success": 2
+        }
+      },
+      "allSame": true
+    },
+    "pressureTrends": [
+      {
+        "axisId": "succession_crisis",
+        "avgDailyDelta": 1.66,
+        "maxSpike": 8,
+        "maxDrop": 0,
+        "trend": "oscillating",
+        "cappedDays": [
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
+        "bottomedDays": []
+      },
+      {
+        "axisId": "jiancheng_hostility",
+        "avgDailyDelta": 1.86,
+        "maxSpike": 7,
+        "maxDrop": -1,
+        "trend": "oscillating",
+        "cappedDays": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
+        "bottomedDays": []
+      },
+      {
+        "axisId": "yuanji_ambition",
+        "avgDailyDelta": 1.31,
+        "maxSpike": 3,
+        "maxDrop": -1,
+        "trend": "oscillating",
+        "cappedDays": [],
+        "bottomedDays": []
+      },
+      {
+        "axisId": "court_opinion",
+        "avgDailyDelta": 0,
+        "maxSpike": 1,
+        "maxDrop": -3,
+        "trend": "oscillating",
+        "cappedDays": [],
+        "bottomedDays": []
+      },
+      {
+        "axisId": "qinwangfu_desperation",
+        "avgDailyDelta": 1.69,
+        "maxSpike": 18,
+        "maxDrop": -7,
+        "trend": "oscillating",
+        "cappedDays": [],
+        "bottomedDays": []
+      },
+      {
+        "axisId": "imperial_suspicion",
+        "avgDailyDelta": 1.24,
+        "maxSpike": 5,
+        "maxDrop": -10,
+        "trend": "oscillating",
+        "cappedDays": [],
+        "bottomedDays": []
+      },
+      {
+        "axisId": "military_readiness",
+        "avgDailyDelta": 2.41,
+        "maxSpike": 12,
+        "maxDrop": -2,
+        "trend": "oscillating",
+        "cappedDays": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
+        "bottomedDays": []
+      }
+    ],
+    "endingProximity": [
+      {
+        "ending": "E1 玄武门成功",
+        "distance": "缺 coup trigger",
+        "met": [
+          "军力98≥60",
+          "盟友3≥2"
+        ],
+        "missing": [
+          "需要 military_conflict 事件"
+        ]
+      },
+      {
+        "ending": "E3 惨胜",
+        "distance": "未满足",
+        "met": [],
+        "missing": [
+          "需要 military_conflict 事件",
+          "需要≥1名盟友非active"
+        ]
+      },
+      {
+        "ending": "F1 政治终局",
+        "distance": "远",
+        "met": [],
+        "missing": [
+          "需要≥2名盟友非active（当前0）"
+        ]
+      },
+      {
+        "ending": "F5 武力失败",
+        "distance": "远",
+        "met": [],
+        "missing": [
+          "需要 coup trigger",
+          "军力98≥50"
+        ]
+      },
+      {
+        "ending": "N1 时光流逝",
+        "distance": "还差150天",
+        "met": [],
+        "missing": [
+          "第30天/180天"
+        ]
+      }
+    ],
+    "npcSurvival": [
+      {
+        "npcId": "changsun_wuji",
+        "firstDay": 0,
+        "lastDay": 28,
+        "totalDays": 30,
+        "possiblyLost": false
+      },
+      {
+        "npcId": "weichi_jingde",
+        "firstDay": 0,
+        "lastDay": 29,
+        "totalDays": 30,
+        "possiblyLost": false
+      },
+      {
+        "npcId": "fang_xuanling",
+        "firstDay": 0,
+        "lastDay": 29,
+        "totalDays": 30,
+        "possiblyLost": false
+      },
+      {
+        "npcId": "li_jiancheng",
+        "firstDay": 0,
+        "lastDay": 27,
+        "totalDays": 30,
+        "possiblyLost": false
+      },
+      {
+        "npcId": "li_yuanji",
+        "firstDay": 0,
+        "lastDay": 28,
+        "totalDays": 30,
+        "possiblyLost": false
+      },
+      {
+        "npcId": "li_yuan",
+        "firstDay": 0,
+        "lastDay": 28,
+        "totalDays": 30,
+        "possiblyLost": false
+      }
+    ],
+    "skeletonCoverage": {
+      "total": 11,
+      "triggered": [
+        "skeleton_intelligence_event",
+        "skeleton_imperial_summons",
+        "skeleton_banquet_crisis",
+        "skeleton_ally_wavering",
+        "skeleton_assassination_crisis",
+        "skeleton_subordinate_ultimatum"
+      ],
+      "missing": [
+        "skeleton_military_conflict",
+        "skeleton_political_confrontation",
+        "skeleton_court_impeachment",
+        "skeleton_court_counterstrike",
+        "skeleton_seize_military_command"
+      ],
+      "rate": 0.55
+    },
+    "dialogueResponsiveness": {
+      "substantiveInputs": 55,
+      "respondedInputs": 5,
+      "rate": 0.09
+    },
+    "actualEnding": null
+  }
+}

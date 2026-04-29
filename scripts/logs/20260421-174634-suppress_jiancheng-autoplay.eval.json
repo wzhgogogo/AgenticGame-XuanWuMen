@@ -1,0 +1,386 @@
+{
+  "inputFile": "scripts/logs/20260421-174634-suppress_jiancheng-autoplay.json",
+  "timestamp": "2026-04-22T05:22:27.454Z",
+  "metrics": {
+    "totalDays": 30,
+    "eventCount": 6,
+    "eventDays": [
+      2,
+      11,
+      13,
+      18,
+      20,
+      29
+    ],
+    "avgEventInterval": 5.4,
+    "eventIntervalStdDev": 3.1368774282716245,
+    "npcDecisions": {
+      "changsun_wuji": {
+        "persuade": 3,
+        "scheme": 16,
+        "intel": 3
+      },
+      "fang_xuanling": {
+        "observe": 1,
+        "scheme": 17
+      },
+      "weichi_jingde": {
+        "mobilize": 6
+      }
+    },
+    "activityChoices": {
+      "summon_spy(召见密探)": 7,
+      "counsel_xuanling(与房玄龄议事)": 9,
+      "meet_officials(接见朝臣)": 13,
+      "contact_insiders(联络宫中内应)": 13,
+      "inspect_guards(巡视府卫)": 18
+    },
+    "pressureStart": {
+      "succession_crisis": 49,
+      "jiancheng_hostility": 41,
+      "yuanji_ambition": 36,
+      "court_opinion": 33,
+      "qinwangfu_desperation": 25,
+      "imperial_suspicion": 21,
+      "military_readiness": 20
+    },
+    "pressureEnd": {
+      "succession_crisis": 100,
+      "jiancheng_hostility": 81,
+      "yuanji_ambition": 56,
+      "court_opinion": 47,
+      "qinwangfu_desperation": 18,
+      "imperial_suspicion": 34,
+      "military_readiness": 68
+    },
+    "pressureDelta": {
+      "succession_crisis": 51,
+      "jiancheng_hostility": 40,
+      "yuanji_ambition": 20,
+      "court_opinion": 14,
+      "qinwangfu_desperation": -7,
+      "imperial_suspicion": 13,
+      "military_readiness": 48
+    },
+    "totalNpcActions": 46,
+    "totalDegraded": 0,
+    "totalLlmImpliedCalls": 24
+  },
+  "emergenceMetrics": {
+    "npcStanceDiversity": {
+      "changsun_wuji": {
+        "distribution": {
+          "persuade": 3,
+          "scheme": 16,
+          "intel": 3
+        },
+        "shannonEntropy": 1.12,
+        "dominantStance": "scheme",
+        "dominantRatio": 0.73
+      },
+      "fang_xuanling": {
+        "distribution": {
+          "observe": 1,
+          "scheme": 17
+        },
+        "shannonEntropy": 0.31,
+        "dominantStance": "scheme",
+        "dominantRatio": 0.94
+      },
+      "weichi_jingde": {
+        "distribution": {
+          "mobilize": 6
+        },
+        "shannonEntropy": 0,
+        "dominantStance": "mobilize",
+        "dominantRatio": 1
+      }
+    },
+    "npcActionRepetitionRate": {
+      "changsun_wuji": 0,
+      "fang_xuanling": 0,
+      "weichi_jingde": 0
+    },
+    "npcSilentDays": {
+      "changsun_wuji": 8,
+      "fang_xuanling": 12,
+      "weichi_jingde": 24
+    },
+    "npcStanceTransitions": {
+      "changsun_wuji": 5,
+      "fang_xuanling": 1,
+      "weichi_jingde": 0
+    },
+    "eventBehaviorShift": [
+      {
+        "eventDay": 2,
+        "skeletonId": "skeleton_intelligence_event",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "persuade",
+              "persuade"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "observe",
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "mobilize"
+            ],
+            "after": [
+              "mobilize",
+              "mobilize"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 11,
+        "skeletonId": "skeleton_intelligence_event",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "scheme"
+            ],
+            "after": [
+              "scheme"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [],
+            "after": [
+              "scheme"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [],
+            "after": []
+          }
+        }
+      },
+      {
+        "eventDay": 13,
+        "skeletonId": "skeleton_imperial_summons",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "scheme"
+            ],
+            "after": [
+              "intel",
+              "intel"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [],
+            "after": []
+          },
+          "weichi_jingde": {
+            "before": [],
+            "after": []
+          }
+        }
+      },
+      {
+        "eventDay": 18,
+        "skeletonId": "skeleton_banquet_crisis",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [],
+            "after": []
+          }
+        }
+      },
+      {
+        "eventDay": 20,
+        "skeletonId": "skeleton_intelligence_event",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "intel",
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [],
+            "after": []
+          }
+        }
+      },
+      {
+        "eventDay": 29,
+        "skeletonId": "skeleton_imperial_summons",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "scheme"
+            ],
+            "after": []
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme"
+            ],
+            "after": []
+          },
+          "weichi_jingde": {
+            "before": [],
+            "after": []
+          }
+        }
+      }
+    ]
+  },
+  "ruleBasedIssues": [
+    {
+      "type": "response_repetition",
+      "detail": "scene_dialogue 输出相似度过高 (42% 5-gram overlap)，records [34] 和 [35]",
+      "recordIndex": 35
+    },
+    {
+      "type": "response_repetition",
+      "detail": "scene_dialogue 输出相似度过高 (43% 5-gram overlap)，records [35] 和 [36]",
+      "recordIndex": 36
+    },
+    {
+      "type": "response_repetition",
+      "detail": "scene_dialogue 输出相似度过高 (41% 5-gram overlap)，records [36] 和 [37]",
+      "recordIndex": 37
+    },
+    {
+      "type": "response_repetition",
+      "detail": "scene_dialogue 输出相似度过高 (45% 5-gram overlap)，records [56] 和 [57]",
+      "recordIndex": 57
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 6 个记忆关键词但 response 无一体现",
+      "recordIndex": 29
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 6 个记忆关键词但 response 无一体现",
+      "recordIndex": 30
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 11 个记忆关键词但 response 无一体现",
+      "recordIndex": 34
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 11 个记忆关键词但 response 无一体现",
+      "recordIndex": 35
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 11 个记忆关键词但 response 无一体现",
+      "recordIndex": 36
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 11 个记忆关键词但 response 无一体现",
+      "recordIndex": 37
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 11 个记忆关键词但 response 无一体现",
+      "recordIndex": 48
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 11 个记忆关键词但 response 无一体现",
+      "recordIndex": 49
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 15 个记忆关键词但 response 无一体现",
+      "recordIndex": 56
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 15 个记忆关键词但 response 无一体现",
+      "recordIndex": 57
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 15 个记忆关键词但 response 无一体现",
+      "recordIndex": 58
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 20 个记忆关键词但 response 无一体现",
+      "recordIndex": 70
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 20 个记忆关键词但 response 无一体现",
+      "recordIndex": 71
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 20 个记忆关键词但 response 无一体现",
+      "recordIndex": 72
+    }
+  ],
+  "memoryAnalysis": {
+    "totalMemoriesAdded": 0,
+    "duplicateRate": 0,
+    "emotionalTagDiversity": 0,
+    "growthCurve": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+}

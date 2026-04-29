@@ -1,0 +1,3823 @@
+[
+  {
+    "day": 0,
+    "dateStr": "",
+    "phase": "config",
+    "detail": {
+      "strategy": "suppress_jiancheng",
+      "maxDays": 30
+    }
+  },
+  {
+    "day": 0,
+    "dateStr": "武德九年1月1日",
+    "phase": "activity",
+    "detail": {
+      "id": "summon_spy",
+      "name": "召见密探",
+      "flavor": "那名内应已被怀疑，但尚未暴露，或许只剩最后一次机会。"
+    }
+  },
+  {
+    "day": 0,
+    "dateStr": "武德九年1月1日",
+    "phase": "activity",
+    "detail": {
+      "id": "contact_insiders",
+      "name": "联络宫中内应",
+      "flavor": "那名内应是多年前埋下的棋，从未动用，如今终于到了用他的时候。"
+    }
+  },
+  {
+    "day": 0,
+    "dateStr": "武德九年1月1日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 8,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "plant_spy",
+          "action": "密接宫中内侍以布耳目",
+          "desc": "长孙无忌私会宫中内侍，遣心腹于禁中布眼线。",
+          "deltas": [
+            "succession_crisis+2",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "drill",
+          "action": "点检甲仗，操练府中亲卫",
+          "desc": "尉迟敬德于府中点检甲仗，操练亲卫。",
+          "deltas": [
+            "military_readiness+3",
+            "qinwangfu_desperation+2",
+            "imperial_suspicion+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "密议后事预案以保府中",
+          "desc": "房玄龄与长孙无忌密议应对之策，拟定事后善后预案。",
+          "deltas": [
+            "qinwangfu_desperation-2",
+            "succession_crisis+1"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [],
+      "briefing": "【武德九年正月初一】\n\n今日暂无大事。"
+    }
+  },
+  {
+    "day": 0,
+    "dateStr": "武德九年1月1日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 50,
+        "jiancheng_hostility": 42,
+        "yuanji_ambition": 36,
+        "court_opinion": 31,
+        "qinwangfu_desperation": 26,
+        "imperial_suspicion": 23,
+        "military_readiness": 25
+      }
+    }
+  },
+  {
+    "day": 1,
+    "dateStr": "武德九年1月2日",
+    "phase": "activity",
+    "detail": {
+      "id": "summon_spy",
+      "name": "召见密探",
+      "flavor": "截获的那份军册只录了三百人，但按供给消耗推算，实际屯兵恐怕不止于此。"
+    }
+  },
+  {
+    "day": 1,
+    "dateStr": "武德九年1月2日",
+    "phase": "activity",
+    "detail": {
+      "id": "meet_officials",
+      "name": "接见朝臣",
+      "flavor": "一位凉州来的小吏自称带有边将口信，拿出的证物分量极重，来意却更加难以评判。"
+    }
+  },
+  {
+    "day": 1,
+    "dateStr": "武德九年1月2日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 7,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "plant_spy",
+          "action": "密接宫廷内侍以探守将倾向",
+          "desc": "长孙无忌密会宫中内侍，探查玄武门守将之动向。",
+          "deltas": [
+            "succession_crisis+2",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "drill",
+          "action": "点检府卫甲胄，厉声催促将士",
+          "desc": "尉迟敬德于府中点检甲仗，厉声督促府卫严阵以待。",
+          "deltas": [
+            "military_readiness+3",
+            "qinwangfu_desperation+2"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "拟定事后朝堂安抚之策",
+          "desc": "房玄龄于府中密拟事后安抚朝臣之方略。",
+          "deltas": [
+            "succession_crisis+1",
+            "qinwangfu_desperation-2"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [],
+      "briefing": "【武德九年正月初二】\n\n今日暂无大事。"
+    }
+  },
+  {
+    "day": 1,
+    "dateStr": "武德九年1月2日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 54,
+        "jiancheng_hostility": 45,
+        "yuanji_ambition": 37,
+        "court_opinion": 31,
+        "qinwangfu_desperation": 27,
+        "imperial_suspicion": 23,
+        "military_readiness": 27
+      }
+    }
+  },
+  {
+    "day": 2,
+    "dateStr": "武德九年1月3日",
+    "phase": "activity",
+    "detail": {
+      "id": "meet_officials",
+      "name": "接见朝臣",
+      "flavor": "今日访客众多，李世民一一接见，送走最后一人后倚椅闭目，脑中迅速梳理每一张脸。"
+    }
+  },
+  {
+    "day": 2,
+    "dateStr": "武德九年1月3日",
+    "phase": "activity",
+    "detail": {
+      "id": "summon_spy",
+      "name": "召见密探",
+      "flavor": "那人道，太子昨夜彻夜未眠，书房灯火直至五更，随侍的宦官们个个噤若寒蝉。"
+    }
+  },
+  {
+    "day": 2,
+    "dateStr": "武德九年1月3日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 8,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "plant_spy",
+          "action": "收买禁军内侍以密报宫内动向",
+          "desc": "长孙无忌密会宫中内侍，以财帛收买其效忠并传递情报。",
+          "deltas": [
+            "succession_crisis+2",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "drill",
+          "action": "点检甲仗严训骑射",
+          "desc": "尉迟敬德于府中点检甲仗，严训骑射，督促将士备战。",
+          "deltas": [
+            "military_readiness+3",
+            "qinwangfu_desperation+2",
+            "imperial_suspicion+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "与长孙无忌拟定应对方略",
+          "desc": "房玄龄与长孙无忌密议，拟定应对东宫之方略。",
+          "deltas": [
+            "succession_crisis+2",
+            "qinwangfu_desperation-2"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [
+        "skeleton_intelligence_event"
+      ],
+      "briefing": "【武德九年正月初三】\n\n有紧急事态需要处理——\n· 情报事件：秦王府收到重要情报..."
+    }
+  },
+  {
+    "day": 2,
+    "dateStr": "武德九年1月3日",
+    "phase": "scene_start",
+    "detail": {
+      "sceneName": "event_skeleton_intelligence_event_1776844665501",
+      "narratorIntro": "武德九年正月初四，长安城的春节余温尚未散尽，秦王府内却已冷若冰霜。一名潜入府中的宫内密使带来了惊人的消息：太子在东宫密议，拟向圣上呈递一份关于‘整饬兵权’的奏章，旨在以‘休养生息’为由，削减秦王在京及"
+    }
+  },
+  {
+    "day": 2,
+    "dateStr": "武德九年1月3日",
+    "phase": "player_input",
+    "detail": {
+      "turn": 0,
+      "input": "继续"
+    }
+  },
+  {
+    "day": 2,
+    "dateStr": "武德九年1月3日",
+    "phase": "scene_dialogue",
+    "detail": {
+      "turn": 0,
+      "entries": [
+        {
+          "type": "npc",
+          "speaker": "长孙无忌",
+          "content": "殿下，时间不等人。若这份奏章在圣上案头签了字，那时再求转圜，恐怕就难了。此时的犹豫，等同于将颈项递给对方的快刀。"
+        },
+        {
+          "type": "npc",
+          "speaker": "尉迟敬德",
+          "content": "殿下！您还在想什么？这种时候，唯有雷霆手段才能震慑那些宵小！末将的刀，早就等不及了！"
+        },
+        {
+          "type": "npc",
+          "speaker": "房玄龄",
+          "content": "诸位且宽心。殿下，请您先过目此信，看看太子在奏章中究竟如何措辞，以便我们能精准地寻找破绽，方能定计。"
+        }
+      ]
+    }
+  },
+  {
+    "day": 2,
+    "dateStr": "武德九年1月3日",
+    "phase": "player_input",
+    "detail": {
+      "turn": 1,
+      "input": "请父王明察"
+    }
+  },
+  {
+    "day": 2,
+    "dateStr": "武德九年1月3日",
+    "phase": "scene_dialogue",
+    "detail": {
+      "turn": 1,
+      "entries": [
+        {
+          "type": "npc",
+          "speaker": "长孙无忌",
+          "content": "殿下，此举极为冒险。太子此计冠以‘休养生息’之名，正是拿捏住了圣上想要安定天下的心理。若殿下此时上奏，恐被圣上视为兄弟阋墙、争权夺利，反而正中对方下怀。"
+        },
+        {
+          "type": "npc",
+          "speaker": "尉迟敬德",
+          "content": "殿下！您怎能如此天真？圣上现在听的是太子的谗言！您现在去，不是请明察，是去给对方递投名状！末将绝不能同意这种坐以待毙的法子！"
+        },
+        {
+          "type": "npc",
+          "speaker": "房玄龄",
+          "content": "臣以为，圣上对太子的信任正浓，且此奏章在形式上无可挑剔。若无确凿证据证明太子此举是在‘谋权’而非‘理政’，强行上奏恐适得其反，反而让圣上觉得殿下心存不轨，急于掌控兵权。"
+        }
+      ]
+    }
+  },
+  {
+    "day": 2,
+    "dateStr": "武德九年1月3日",
+    "phase": "player_input",
+    "detail": {
+      "turn": 2,
+      "input": "我们放弃吧"
+    }
+  },
+  {
+    "day": 2,
+    "dateStr": "武德九年1月3日",
+    "phase": "scene_dialogue",
+    "detail": {
+      "turn": 2,
+      "entries": [
+        {
+          "type": "npc",
+          "speaker": "长孙无忌",
+          "content": "殿下，请三思！放弃兵权意味着您将失去在这长安城生存的唯一依仗。您知道这意味着什么，一旦失去权力，等待您的将不再是安稳，而是无底的深渊。"
+        },
+        {
+          "type": "npc",
+          "speaker": "房玄龄",
+          "content": "（低头深深叹息）臣原以为殿下在权衡利弊，却没想到您已心灰意冷。若您真的如此决定，那么这场博弈，便在此时此刻落幕了。"
+        },
+        {
+          "type": "narrator",
+          "speaker": "narrator",
+          "content": "密室内，烛火在最后一次剧烈地摇曳后，渐渐失去了光亮，将众人的脸庞浸没在浓重的阴影之中。案头上的那封密信被风轻轻吹动，页角在桌面上发出沙沙的声响，像是在嘲讽着这场权力之争的结局。尉迟敬德手中的刀柄被握得咯吱作响，但最终未能出鞘；长孙无忌僵在原地，眼神中充满了不解与绝望；而房玄龄则缓缓合上了眼，在沉重的"
+        }
+      ]
+    }
+  },
+  {
+    "day": 2,
+    "dateStr": "武德九年1月3日",
+    "phase": "scene_ending",
+    "detail": {
+      "endingText": "密室内，烛火在最后一次剧烈地摇曳后，渐渐失去了光亮，将众人的脸庞浸没在浓重的阴影之中。案头上的那封密信被风轻轻吹动，页角在桌面上发出沙沙的声响，像是在嘲讽着这场权力之争的结局。尉迟敬德手中的刀柄被握得咯吱作响，但最终未能出鞘；长孙无忌僵在原地，眼神中充满了不解与绝望；而房玄龄则缓缓合上了眼，在沉重的沉默中低下了头。在这个寒冷的初四之夜，秦王府的这座密室里，曾经的野心与杀气被一种令人窒息的颓然所取代。所有人依然维持着原本的姿势，但心中的某种信念已然崩塌，唯余下凄冷的冬风在窗外呼啸。"
+    }
+  },
+  {
+    "day": 2,
+    "dateStr": "武德九年1月3日",
+    "phase": "memory_diff",
+    "detail": {
+      "beforeCounts": {},
+      "afterCounts": {
+        "weichi_jingde": 1,
+        "changsun_wuji": 1,
+        "fang_xuanling": 1
+      },
+      "added": {
+        "weichi_jingde": [
+          {
+            "event": "在密室权力之争失败时，紧握刀柄却最终未能出鞘。",
+            "emotionalTag": "压抑颓然"
+          }
+        ],
+        "changsun_wuji": [
+          {
+            "event": "面对权力争夺的结局，陷入极大的不解与绝望之中。",
+            "emotionalTag": "绝望不解"
+          }
+        ],
+        "fang_xuanling": [
+          {
+            "event": "在沉重的沉默中低头，心中原有的信念彻底崩塌。",
+            "emotionalTag": "心灰意冷"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "day": 2,
+    "dateStr": "武德九年1月3日",
+    "phase": "event_end",
+    "detail": {
+      "summary": "密室内，烛火在最后一次剧烈地摇曳后，渐渐失去了光亮，将众人的脸庞浸没在浓重的阴影之中。案头上的那封密信被风轻轻吹动，页角在桌面上发出沙沙的声响，像是在嘲讽着这场权力之争的结局。尉迟敬德手中的刀柄被握得咯吱作响，但最终未能出鞘；长孙无忌僵在原地，眼神中充满了不解与绝望；而房玄龄则缓缓合上了眼，在沉重的沉默中低下了头。在这个寒冷的初四之夜，秦王府的这座密室里，曾经的野心与杀气被一种令人窒息的颓然所取代。所有人依然维持着原本的姿势，但心中的某种信念已然崩塌，唯余下凄冷的冬风在窗外呼啸。",
+      "eventLog": [
+        {
+          "name": "密奏削权之忧",
+          "day": 3,
+          "summary": "密室内，烛火在最后一次剧烈地摇曳后，渐渐失去了光亮，将众人的脸庞浸没在浓重的阴影之中。案头上的那封密信被风轻轻吹动，页角在桌面上发出沙沙的声响，像是在嘲讽着这场权力之争的结局。尉迟敬德手中的刀柄被握得咯吱作响，但最终未能出鞘；长孙无忌僵在原地，眼神中充满了不解与绝望；而房玄龄则缓缓合上了眼，在沉重的沉默中低下了头。在这个寒冷的初四之夜，秦王府的这座密室里，曾经的野心与杀气被一种令人窒息的颓然所取代"
+        }
+      ]
+    }
+  },
+  {
+    "day": 2,
+    "dateStr": "武德九年1月3日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 59,
+        "jiancheng_hostility": 47,
+        "yuanji_ambition": 38,
+        "court_opinion": 31,
+        "qinwangfu_desperation": 28,
+        "imperial_suspicion": 24,
+        "military_readiness": 33
+      }
+    }
+  },
+  {
+    "day": 3,
+    "dateStr": "武德九年1月4日",
+    "phase": "activity",
+    "detail": {
+      "id": "meet_officials",
+      "name": "接见朝臣",
+      "flavor": "今日有位老友借送礼之名来访，礼物平常，随口说的那句话，却让李世民整夜未眠。"
+    }
+  },
+  {
+    "day": 3,
+    "dateStr": "武德九年1月4日",
+    "phase": "activity",
+    "detail": {
+      "id": "counsel_xuanling",
+      "name": "与房玄龄议事",
+      "flavor": "\"朝堂上有一步棋臣想了很久，\"他拿起棋子又放回去，\"现在还不是时候。\""
+    }
+  },
+  {
+    "day": 3,
+    "dateStr": "武德九年1月4日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 8,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "coordinate",
+          "action": "密联宫内内侍探听圣意",
+          "desc": "长孙无忌密派亲信联络宫中内侍，探听陛下近日动向。",
+          "deltas": [
+            "succession_crisis+1",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "rally",
+          "action": "召集心腹将领激荡军心",
+          "desc": "尉迟敬德召集府内心腹将领，敦促整饬甲仗。",
+          "deltas": [
+            "military_readiness+2",
+            "qinwangfu_desperation+2",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "与长孙无忌共拟应对方略",
+          "desc": "房玄龄与长孙无忌于密室共拟应对东宫之方略。",
+          "deltas": [
+            "succession_crisis+1",
+            "qinwangfu_desperation-2"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [],
+      "briefing": "【武德九年正月初四】\n\n今日暂无大事。"
+    }
+  },
+  {
+    "day": 3,
+    "dateStr": "武德九年1月4日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 62,
+        "jiancheng_hostility": 50,
+        "yuanji_ambition": 39,
+        "court_opinion": 31,
+        "qinwangfu_desperation": 28,
+        "imperial_suspicion": 23,
+        "military_readiness": 35
+      }
+    }
+  },
+  {
+    "day": 4,
+    "dateStr": "武德九年1月5日",
+    "phase": "activity",
+    "detail": {
+      "id": "meet_officials",
+      "name": "接见朝臣",
+      "flavor": "一位将领借问候伤势的由头登门，落座后第一句话是：\"王爷，时间不多了。\""
+    }
+  },
+  {
+    "day": 4,
+    "dateStr": "武德九年1月5日",
+    "phase": "activity",
+    "detail": {
+      "id": "counsel_xuanling",
+      "name": "与房玄龄议事",
+      "flavor": "他分析太原一系的人脉盘根，条分缕析，像是在替人解一道无解的棋局。"
+    }
+  },
+  {
+    "day": 4,
+    "dateStr": "武德九年1月5日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 8,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "advise",
+          "action": "私议秦王以定其志",
+          "desc": "长孙无忌密见秦王，分析利弊以定其志。",
+          "deltas": [
+            "succession_crisis+2"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "drill",
+          "action": "点检府卫甲仗，督促将士磨砺刀兵",
+          "desc": "尉迟敬德在府中点检甲仗，督促将士操练兵马。",
+          "deltas": [
+            "military_readiness+3",
+            "qinwangfu_desperation+2",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "与长孙无忌密拟应对之策",
+          "desc": "房玄龄与长孙无忌于书房密议，拟定应对东宫削权之方略。",
+          "deltas": [
+            "succession_crisis+1",
+            "qinwangfu_desperation-2"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [],
+      "briefing": "【武德九年正月初五】\n\n今日暂无大事。"
+    }
+  },
+  {
+    "day": 4,
+    "dateStr": "武德九年1月5日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 66,
+        "jiancheng_hostility": 52,
+        "yuanji_ambition": 40,
+        "court_opinion": 31,
+        "qinwangfu_desperation": 28,
+        "imperial_suspicion": 22,
+        "military_readiness": 37
+      }
+    }
+  },
+  {
+    "day": 5,
+    "dateStr": "武德九年1月6日",
+    "phase": "activity",
+    "detail": {
+      "id": "summon_spy",
+      "name": "召见密探",
+      "flavor": "\"玄武门附近，昨夜有人测量了城垒厚度，\"探子轻声道，\"不是我们的人。\""
+    }
+  },
+  {
+    "day": 5,
+    "dateStr": "武德九年1月6日",
+    "phase": "activity",
+    "detail": {
+      "id": "contact_insiders",
+      "name": "联络宫中内应",
+      "flavor": "\"宫中我能信任的人，已经从十二人减到七人，那五人是怎么消失的，不必详说了。\""
+    }
+  },
+  {
+    "day": 5,
+    "dateStr": "武德九年1月6日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 8,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "advise",
+          "action": "夜谈秦王以定决心",
+          "desc": "长孙无忌夜访秦王，劝其在危机之时果断决断。",
+          "deltas": [
+            "succession_crisis+2",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "remonstrate",
+          "action": "跪谏秦王速决储位之争",
+          "desc": "尉迟敬德跪请秦王，直言应当尽快决断应对之策。",
+          "deltas": [
+            "qinwangfu_desperation+3",
+            "military_readiness+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "与长孙无忌密议应对之策",
+          "desc": "房玄龄与长孙无忌在密室中拟定应对削权之策。",
+          "deltas": [
+            "succession_crisis+2",
+            "qinwangfu_desperation-3"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [],
+      "briefing": "【武德九年正月初六】\n\n今日暂无大事。"
+    }
+  },
+  {
+    "day": 5,
+    "dateStr": "武德九年1月6日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 71,
+        "jiancheng_hostility": 54,
+        "yuanji_ambition": 41,
+        "court_opinion": 32,
+        "qinwangfu_desperation": 28,
+        "imperial_suspicion": 25,
+        "military_readiness": 39
+      }
+    }
+  },
+  {
+    "day": 6,
+    "dateStr": "武德九年1月7日",
+    "phase": "activity",
+    "detail": {
+      "id": "meet_officials",
+      "name": "接见朝臣",
+      "flavor": "一位将领借问候伤势的由头登门，落座后第一句话是：\"王爷，时间不多了。\""
+    }
+  },
+  {
+    "day": 6,
+    "dateStr": "武德九年1月7日",
+    "phase": "activity",
+    "detail": {
+      "id": "contact_insiders",
+      "name": "联络宫中内应",
+      "flavor": "炭笔刻在食盒隔层里的字迹只有拇指甲大，却将宫内防御部署的更动标注得清清楚楚。"
+    }
+  },
+  {
+    "day": 6,
+    "dateStr": "武德九年1月7日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 9,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "coordinate",
+          "action": "密函联络玄武门守将",
+          "desc": "长孙无忌密发书函联络玄武门守将，探其虚实。",
+          "deltas": [
+            "succession_crisis+2",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "remonstrate",
+          "action": "跪请秦王速决除齐王",
+          "desc": "尉迟敬德于府中跪请秦王速决除齐王之策。",
+          "deltas": [
+            "qinwangfu_desperation+3",
+            "military_readiness+2",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "与长孙无忌密议定计",
+          "desc": "房玄龄与长孙无忌于府中密议，拟定应对东宫之方略。",
+          "deltas": [
+            "succession_crisis+2",
+            "qinwangfu_desperation-2"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [],
+      "briefing": "【武德九年正月初七】\n\n今日暂无大事。"
+    }
+  },
+  {
+    "day": 6,
+    "dateStr": "武德九年1月7日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 75,
+        "jiancheng_hostility": 57,
+        "yuanji_ambition": 42,
+        "court_opinion": 32,
+        "qinwangfu_desperation": 30,
+        "imperial_suspicion": 25,
+        "military_readiness": 43
+      }
+    }
+  },
+  {
+    "day": 7,
+    "dateStr": "武德九年1月8日",
+    "phase": "activity",
+    "detail": {
+      "id": "meet_officials",
+      "name": "接见朝臣",
+      "flavor": "杜如晦来访时带来一份名单，是近日频繁出入东宫的京官，悄悄压在茶盏之下。"
+    }
+  },
+  {
+    "day": 7,
+    "dateStr": "武德九年1月8日",
+    "phase": "activity",
+    "detail": {
+      "id": "contact_insiders",
+      "name": "联络宫中内应",
+      "flavor": "内应递来的是一只空药瓶，瓶底磨去了一层，露出刻在里头的字迹——约期，在下旬的无月之夜。"
+    }
+  },
+  {
+    "day": 7,
+    "dateStr": "武德九年1月8日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 8,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "strategize",
+          "action": "拟定应对东宫之方略",
+          "desc": "长孙无忌与秦王密议，拟定应对东宫之方略。",
+          "deltas": [
+            "succession_crisis+3",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "remonstrate",
+          "action": "跪请秦王速决齐王",
+          "desc": "尉迟敬德于府中跪请李世民速决齐王。",
+          "deltas": [
+            "qinwangfu_desperation+3",
+            "military_readiness+2"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "与长孙无忌密议破局之策",
+          "desc": "房玄龄与长孙无忌在密室中商议具体应对方略。",
+          "deltas": [
+            "succession_crisis+2",
+            "qinwangfu_desperation-3"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [
+        "skeleton_imperial_summons"
+      ],
+      "briefing": "【武德九年正月初八】\n\n有紧急事态需要处理——\n· 皇帝召见：李渊单独召见秦王..."
+    }
+  },
+  {
+    "day": 7,
+    "dateStr": "武德九年1月8日",
+    "phase": "scene_start",
+    "detail": {
+      "sceneName": "event_skeleton_imperial_summons_1776845187168",
+      "narratorIntro": "武德九年正月初九，长安城的寒气尚未散尽。太极宫的深红宫墙在阴天之下显得格外压抑。秦王李世民在禁卫军的引导下，缓步走向御书房。由于日前密奏削权之事令秦王府陷入低谷，此次突然的召见显得意味深长。御书房内，"
+    }
+  },
+  {
+    "day": 7,
+    "dateStr": "武德九年1月8日",
+    "phase": "player_input",
+    "detail": {
+      "turn": 0,
+      "input": "这是威胁吗"
+    }
+  },
+  {
+    "day": 7,
+    "dateStr": "武德九年1月8日",
+    "phase": "scene_dialogue",
+    "detail": {
+      "turn": 0,
+      "entries": [
+        {
+          "type": "npc",
+          "speaker": "长孙无忌",
+          "content": "殿下，在朝堂之上，没有直白的威胁，只有权衡的陷阱。太子近日密奏削权，此时陛下召见，极可能是想试探殿下的忠诚，亦或是给太子一个处理殿下的契机。"
+        },
+        {
+          "type": "npc",
+          "speaker": "房玄龄",
+          "content": "无忌之言极是。这不是简单的威胁，而是一场博弈。若殿下在殿内稍有失言，便正中了太子的下怀，将‘不臣’之名坐实。"
+        },
+        {
+          "type": "npc",
+          "speaker": "尉迟敬德",
+          "content": "管他是什么陷阱！若是圣上不依，末将只要殿下一声令下，便可让这御书房外的禁卫统统退下！"
+        }
+      ]
+    }
+  },
+  {
+    "day": 7,
+    "dateStr": "武德九年1月8日",
+    "phase": "player_input",
+    "detail": {
+      "turn": 1,
+      "input": "改日再议"
+    }
+  },
+  {
+    "day": 7,
+    "dateStr": "武德九年1月8日",
+    "phase": "scene_dialogue",
+    "detail": {
+      "turn": 1,
+      "entries": [
+        {
+          "type": "npc",
+          "speaker": "长孙无忌",
+          "content": "殿下！圣上已然下诏召见，此时若是推诿或迟疑，在陛下看来便是藐视圣意，更是给了太子口实，指控殿下心怀不轨，意欲反叛！"
+        },
+        {
+          "type": "npc",
+          "speaker": "房玄龄",
+          "content": "殿下快请入殿。此时之局，进是博弈，不进则是认罪。改日再议已无可能，唯有在圣上面前化危为机。"
+        },
+        {
+          "type": "npc",
+          "speaker": "尉迟敬德",
+          "content": "殿下，虽说敬德不喜弯弯绕绕，但此次召见绝不能缺席。请殿下入内，末将就在门外守候，随时待命！"
+        }
+      ]
+    }
+  },
+  {
+    "day": 7,
+    "dateStr": "武德九年1月8日",
+    "phase": "player_input",
+    "detail": {
+      "turn": 2,
+      "input": "你怎么看"
+    }
+  },
+  {
+    "day": 7,
+    "dateStr": "武德九年1月8日",
+    "phase": "scene_dialogue",
+    "detail": {
+      "turn": 2,
+      "entries": [
+        {
+          "type": "npc",
+          "speaker": "房玄龄",
+          "content": "臣看来，此番召见并非简单的问候，而是陛下在权衡。太子近日紧咬‘太白经天’之说，试图在陛下心中种下猜忌之根。此次面圣，关键在于‘去锋芒’，殿下需展现出对圣上的绝对忠诚，将所有功勋归于陛下，方能化解危机。"
+        },
+        {
+          "type": "npc",
+          "speaker": "长孙无忌",
+          "content": "无忌则认为，这是一个危险的信号。太子之谋不在于削权，而在于令陛下认为殿下‘不可控’。若此次入殿无法让陛下安心，恐怕走出这道门时，等待殿下的将不再是召见，而是禁足，甚至更糟。"
+        },
+        {
+          "type": "npc",
+          "speaker": "尉迟敬德",
+          "content": "敬德看不透那些弯弯绕绕，但末将看透了人心。此时之局，就像是在战场上被敌军合围，退无可退。殿下，只要您心中有决断，末将便是您的盾，纵使前方是刀山火海，也定保殿下周全！"
+        }
+      ]
+    }
+  },
+  {
+    "day": 7,
+    "dateStr": "武德九年1月8日",
+    "phase": "player_input",
+    "detail": {
+      "turn": 3,
+      "input": "你要杀我？"
+    }
+  },
+  {
+    "day": 7,
+    "dateStr": "武德九年1月8日",
+    "phase": "scene_dialogue",
+    "detail": {
+      "turn": 3,
+      "entries": [
+        {
+          "type": "npc",
+          "speaker": "尉迟敬德",
+          "content": "殿下！您在说什么胡话！敬德这条命是您从死人堆里拉出来的，若要杀您，末将宁可先自刎于此，绝不容许任何人触碰您一根汗毛！"
+        },
+        {
+          "type": "npc",
+          "speaker": "长孙无忌",
+          "content": "殿下，请息怒。无忌与殿下乃是至亲，秦王府上下数百口人的性命与殿下共在一条船上。一荣俱荣，一损俱损，臣等怎敢有此非分之想？"
+        },
+        {
+          "type": "npc",
+          "speaker": "房玄龄",
+          "content": "殿下，此时心中焦虑，产生此念在所难免。但真正的威胁不在于此处，而是在那道门后。请殿下定心，臣等愿为殿下肝脑涂地，绝无二心。"
+        }
+      ]
+    }
+  },
+  {
+    "day": 7,
+    "dateStr": "武德九年1月8日",
+    "phase": "player_input",
+    "detail": {
+      "turn": 4,
+      "input": "罢了"
+    }
+  },
+  {
+    "day": 7,
+    "dateStr": "武德九年1月8日",
+    "phase": "scene_dialogue",
+    "detail": {
+      "turn": 4,
+      "entries": [
+        {
+          "type": "narrator",
+          "speaker": "narrator",
+          "content": "李世民轻轻挥了挥手，将方才的疑虑与肃杀之气尽数挥散。他深深地看了房玄龄、长孙无忌与尉迟敬德一眼，三人此时神情虽然仍有余悸，但目光中透出的忠诚却比任何誓言都要沉重。"
+        },
+        {
+          "type": "npc",
+          "speaker": "房玄龄",
+          "content": "殿下请入殿，臣等在门外恭候佳音。"
+        },
+        {
+          "type": "narrator",
+          "speaker": "narrator",
+          "content": "李世民整理好衣冠，脊背挺得笔直，在三人的注视下，缓步迈过了御书房那道高高的门槛。随着沉重的殿门在身后发出一声低沉的闷响，将外界的寒风与同僚的叮嘱彻底隔绝，他独自面对着殿内那道在沉香缭绕中若隐若现的身影。此时的太极宫内静得可怕，唯有他的脚步声在空旷的大殿中回荡，每一步都像是踏在帝国权力的心弦之上。面对"
+        }
+      ]
+    }
+  },
+  {
+    "day": 7,
+    "dateStr": "武德九年1月8日",
+    "phase": "scene_ending",
+    "detail": {
+      "endingText": "李世民整理好衣冠，脊背挺得笔直，在三人的注视下，缓步迈过了御书房那道高高的门槛。随着沉重的殿门在身后发出一声低沉的闷响，将外界的寒风与同僚的叮嘱彻底隔绝，他独自面对着殿内那道在沉香缭绕中若隐若现的身影。此时的太极宫内静得可怕，唯有他的脚步声在空旷的大殿中回荡，每一步都像是踏在帝国权力的心弦之上。面对着屏风后那个掌握生杀大权的父亲，李世民在心底发出一声轻叹，在深红色的宫墙环绕之中，他缓缓跪下，将额头触地，在这令人窒息的静谧中等待着第一声发问。"
+    }
+  },
+  {
+    "day": 7,
+    "dateStr": "武德九年1月8日",
+    "phase": "memory_diff",
+    "detail": {
+      "beforeCounts": {
+        "weichi_jingde": 1,
+        "changsun_wuji": 1,
+        "fang_xuanling": 1
+      },
+      "afterCounts": {
+        "weichi_jingde": 2,
+        "changsun_wuji": 2,
+        "fang_xuanling": 2
+      },
+      "added": {
+        "weichi_jingde": [
+          {
+            "event": "见证李世民孤身面对生杀大权，心中紧绷不安。",
+            "emotionalTag": "紧张警觉"
+          }
+        ],
+        "changsun_wuji": [
+          {
+            "event": "目送李世民独入御书房面对父皇，深感局势紧迫。",
+            "emotionalTag": "忧心忡忡"
+          }
+        ],
+        "fang_xuanling": [
+          {
+            "event": "在沉重的殿门关闭前叮嘱李世民，深知此次会面之危。",
+            "emotionalTag": "沉重忧虑"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "day": 7,
+    "dateStr": "武德九年1月8日",
+    "phase": "event_end",
+    "detail": {
+      "summary": "李世民整理好衣冠，脊背挺得笔直，在三人的注视下，缓步迈过了御书房那道高高的门槛。随着沉重的殿门在身后发出一声低沉的闷响，将外界的寒风与同僚的叮嘱彻底隔绝，他独自面对着殿内那道在沉香缭绕中若隐若现的身影。此时的太极宫内静得可怕，唯有他的脚步声在空旷的大殿中回荡，每一步都像是踏在帝国权力的心弦之上。面对着屏风后那个掌握生杀大权的父亲，李世民在心底发出一声轻叹，在深红色的宫墙环绕之中，他缓缓跪下，将额头触地，在这令人窒息的静谧中等待着第一声发问。",
+      "eventLog": [
+        {
+          "name": "密奏削权之忧",
+          "day": 3,
+          "summary": "密室内，烛火在最后一次剧烈地摇曳后，渐渐失去了光亮，将众人的脸庞浸没在浓重的阴影之中。案头上的那封密信被风轻轻吹动，页角在桌面上发出沙沙的声响，像是在嘲讽着这场权力之争的结局。尉迟敬德手中的刀柄被握得咯吱作响，但最终未能出鞘；长孙无忌僵在原地，眼神中充满了不解与绝望；而房玄龄则缓缓合上了眼，在沉重的沉默中低下了头。在这个寒冷的初四之夜，秦王府的这座密室里，曾经的野心与杀气被一种令人窒息的颓然所取代"
+        },
+        {
+          "name": "御前试心",
+          "day": 8,
+          "summary": "李世民整理好衣冠，脊背挺得笔直，在三人的注视下，缓步迈过了御书房那道高高的门槛。随着沉重的殿门在身后发出一声低沉的闷响，将外界的寒风与同僚的叮嘱彻底隔绝，他独自面对着殿内那道在沉香缭绕中若隐若现的身影。此时的太极宫内静得可怕，唯有他的脚步声在空旷的大殿中回荡，每一步都像是踏在帝国权力的心弦之上。面对着屏风后那个掌握生杀大权的父亲，李世民在心底发出一声轻叹，在深红色的宫墙环绕之中，他缓缓跪下，将额头"
+        }
+      ]
+    }
+  },
+  {
+    "day": 7,
+    "dateStr": "武德九年1月8日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 83,
+        "jiancheng_hostility": 59,
+        "yuanji_ambition": 43,
+        "court_opinion": 33,
+        "qinwangfu_desperation": 31,
+        "imperial_suspicion": 20,
+        "military_readiness": 46
+      }
+    }
+  },
+  {
+    "day": 8,
+    "dateStr": "武德九年1月9日",
+    "phase": "activity",
+    "detail": {
+      "id": "summon_spy",
+      "name": "召见密探",
+      "flavor": "\"东宫近日操练比往常勤了三倍，\"他说，\"那些兵，眼神不像是演武，倒像是在等一道令。\""
+    }
+  },
+  {
+    "day": 8,
+    "dateStr": "武德九年1月9日",
+    "phase": "activity",
+    "detail": {
+      "id": "contact_insiders",
+      "name": "联络宫中内应",
+      "flavor": "那名内应是多年前埋下的棋，从未动用，如今终于到了用他的时候。"
+    }
+  },
+  {
+    "day": 8,
+    "dateStr": "武德九年1月9日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 11,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "coordinate",
+          "action": "密遣心腹联络宫中内侍",
+          "desc": "长孙无忌密遣心腹入宫，联络内侍以布内应。",
+          "deltas": [
+            "succession_crisis+2",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "remonstrate",
+          "action": "跪请殿下速决齐王",
+          "desc": "尉迟敬德于府中跪请秦王速决齐王。",
+          "deltas": [
+            "qinwangfu_desperation+3",
+            "military_readiness+2",
+            "imperial_suspicion+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "与长孙无忌拟定善后方略",
+          "desc": "房玄龄与长孙无忌在府中密议，拟定应对之策及事后善后方略。",
+          "deltas": [
+            "succession_crisis+1",
+            "qinwangfu_desperation-2"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [],
+      "briefing": "【武德九年正月初九】\n\n今日暂无大事。"
+    }
+  },
+  {
+    "day": 8,
+    "dateStr": "武德九年1月9日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 85,
+        "jiancheng_hostility": 61,
+        "yuanji_ambition": 44,
+        "court_opinion": 34,
+        "qinwangfu_desperation": 33,
+        "imperial_suspicion": 24,
+        "military_readiness": 49
+      }
+    }
+  },
+  {
+    "day": 9,
+    "dateStr": "武德九年1月10日",
+    "phase": "activity",
+    "detail": {
+      "id": "counsel_xuanling",
+      "name": "与房玄龄议事",
+      "flavor": "房玄龄将文书逐一归类，分作\"可为\"\"不可为\"\"待时而为\"三叠，眼神专注而平静。"
+    }
+  },
+  {
+    "day": 9,
+    "dateStr": "武德九年1月10日",
+    "phase": "activity",
+    "detail": {
+      "id": "inspect_guards",
+      "name": "巡视府卫",
+      "flavor": "城内最近出现数支身份不明的小队以\"行商\"为掩护落脚，李世民命人持续跟踪动向。"
+    }
+  },
+  {
+    "day": 9,
+    "dateStr": "武德九年1月10日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 11,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "coordinate",
+          "action": "密函联络宫中禁军",
+          "desc": "长孙无忌秘密遣人向宫内禁军传递密函，确认其态度。",
+          "deltas": [
+            "succession_crisis+2"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "rally",
+          "action": "召集府中亲兵点校甲胄",
+          "desc": "尉迟敬德于府中召集心腹亲兵，点校甲胄。",
+          "deltas": [
+            "military_readiness+3",
+            "qinwangfu_desperation+2",
+            "jiancheng_hostility+2"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "与长孙无忌密拟权变方略",
+          "desc": "房玄龄与长孙无忌于府中密议，拟定应对东宫的权变方略。",
+          "deltas": [
+            "succession_crisis+2",
+            "qinwangfu_desperation-2"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [],
+      "briefing": "【武德九年正月初十】\n\n今日暂无大事。"
+    }
+  },
+  {
+    "day": 9,
+    "dateStr": "武德九年1月10日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 88,
+        "jiancheng_hostility": 64,
+        "yuanji_ambition": 45,
+        "court_opinion": 35,
+        "qinwangfu_desperation": 32,
+        "imperial_suspicion": 25,
+        "military_readiness": 52
+      }
+    }
+  },
+  {
+    "day": 10,
+    "dateStr": "武德九年1月11日",
+    "phase": "activity",
+    "detail": {
+      "id": "meet_officials",
+      "name": "接见朝臣",
+      "flavor": "一位骑都尉借口述职，实则带来了某位将领的口信，七绕八绕，意思只有一个：随时可用。"
+    }
+  },
+  {
+    "day": 10,
+    "dateStr": "武德九年1月11日",
+    "phase": "activity",
+    "detail": {
+      "id": "inspect_guards",
+      "name": "巡视府卫",
+      "flavor": "登上府内最高处眺望，城中灯火稀疏，然而某处方向有几点火光聚集，停驻不动。"
+    }
+  },
+  {
+    "day": 10,
+    "dateStr": "武德九年1月11日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 12,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "coordinate",
+          "action": "密联宫中禁卫探其虚实",
+          "desc": "长孙无忌密遣心腹联络宫中禁卫，试探其对秦王之态度。",
+          "deltas": [
+            "succession_crisis+2",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "remonstrate",
+          "action": "跪请秦王速决储位之争",
+          "desc": "尉迟敬德于府中跪请秦王速决储位之事。",
+          "deltas": [
+            "qinwangfu_desperation+3",
+            "military_readiness+2",
+            "imperial_suspicion+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "与长孙无忌密拟行动方略",
+          "desc": "房玄龄与长孙无忌于府中密议，拟定具体应对之策。",
+          "deltas": [
+            "succession_crisis+2",
+            "qinwangfu_desperation-2"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [],
+      "briefing": "【武德九年正月十一】\n\n今日暂无大事。"
+    }
+  },
+  {
+    "day": 10,
+    "dateStr": "武德九年1月11日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 91,
+        "jiancheng_hostility": 65,
+        "yuanji_ambition": 46,
+        "court_opinion": 35,
+        "qinwangfu_desperation": 33,
+        "imperial_suspicion": 26,
+        "military_readiness": 55
+      }
+    }
+  },
+  {
+    "day": 11,
+    "dateStr": "武德九年1月12日",
+    "phase": "activity",
+    "detail": {
+      "id": "counsel_xuanling",
+      "name": "与房玄龄议事",
+      "flavor": "房玄龄将文书逐一归类，分作\"可为\"\"不可为\"\"待时而为\"三叠，眼神专注而平静。"
+    }
+  },
+  {
+    "day": 11,
+    "dateStr": "武德九年1月12日",
+    "phase": "activity",
+    "detail": {
+      "id": "inspect_guards",
+      "name": "巡视府卫",
+      "flavor": "检查捆扎内门的粗麻绳，发现有一根被悄悄换成了材质相似但强度更低的细绳。"
+    }
+  },
+  {
+    "day": 11,
+    "dateStr": "武德九年1月12日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 11,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "plant_spy",
+          "action": "密联宫内近侍以求内应",
+          "desc": "长孙无忌私下联络宫内近侍，密查宫门守将动向。",
+          "deltas": [
+            "succession_crisis+2",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "remonstrate",
+          "action": "跪请秦王速决死生",
+          "desc": "尉迟敬德于府中跪请秦王速定对策，以除齐王之患。",
+          "deltas": [
+            "qinwangfu_desperation+3",
+            "military_readiness+2"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "与长孙无忌密议决胜方略",
+          "desc": "房玄龄与长孙无忌在府中密议，商定应对东宫之方略。",
+          "deltas": [
+            "succession_crisis+2",
+            "qinwangfu_desperation-2"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [
+        "skeleton_intelligence_event"
+      ],
+      "briefing": "【武德九年正月十二】\n\n有紧急事态需要处理——\n· 情报事件：秦王府收到重要情报..."
+    }
+  },
+  {
+    "day": 11,
+    "dateStr": "武德九年1月12日",
+    "phase": "scene_start",
+    "detail": {
+      "sceneName": "event_skeleton_intelligence_event_1776845614181",
+      "narratorIntro": "武德九年正月十三，长安的寒气尚未散去，秦王府的密室内炭火噼啪作响，却无法温暖室内凝固的空气。储位之争已至白热化，每一道来自太极宫的指令都可能成为致命的枷锁。就在此时，一名浑身风雪的内应悄无声息地潜入，"
+    }
+  },
+  {
+    "day": 11,
+    "dateStr": "武德九年1月12日",
+    "phase": "player_input",
+    "detail": {
+      "turn": 0,
+      "input": "凭什么"
+    }
+  },
+  {
+    "day": 11,
+    "dateStr": "武德九年1月12日",
+    "phase": "scene_dialogue",
+    "detail": {
+      "turn": 0,
+      "entries": [
+        {
+          "type": "npc",
+          "speaker": "尉迟敬德",
+          "content": "正是如此！殿下为大唐四海平定，血战无数，如今功成名就，太子竟想在背后捅这一刀！这简直是欺人太甚，末将这就出府，让那些想调走我等的人见识见识大王的怒火！"
+        },
+        {
+          "type": "npc",
+          "speaker": "长孙无忌",
+          "content": "殿下息怒。太子此时敢如此行事，凭的正是他‘嫡长子’的身份，以及在陛下心中‘温顺’的假象。在他看来，殿下在外的军功越高，在京中的威望越盛，对他而言便越像一柄悬在头顶的利剑。"
+        },
+        {
+          "type": "npc",
+          "speaker": "房玄龄",
+          "content": "太子此举，恰恰是利用了‘权臣乱政’的疑虑。他向陛下进言时，定会将殿下在京中豢养将领的行为，描述为‘私养禁卫，意在不轨’。如此一来，调离将领便成了维护圣权的‘正义’之举。"
+        }
+      ]
+    }
+  },
+  {
+    "day": 11,
+    "dateStr": "武德九年1月12日",
+    "phase": "player_input",
+    "detail": {
+      "turn": 1,
+      "input": "你要杀我？"
+    }
+  },
+  {
+    "day": 11,
+    "dateStr": "武德九年1月12日",
+    "phase": "scene_dialogue",
+    "detail": {
+      "turn": 1,
+      "entries": [
+        {
+          "type": "npc",
+          "speaker": "尉迟敬德",
+          "content": "殿下！这已经不是‘想’的问题了，这就是在磨刀！调走将领，削弱羽翼，接下来就是让殿下在长安这座囚笼里坐以待毙！末将绝不答应，纵使是面对太子，敬德也愿为殿下杀出一条血路！"
+        },
+        {
+          "type": "npc",
+          "speaker": "长孙无忌",
+          "content": "殿下，太子虽不至于此时便在圣上面前直接请旨诛杀，但此举之意已然昭然。调离亲信，是为‘去其爪牙’。爪牙一旦被拔，殿下在太极宫面前将再无任何反抗之能。届时，即便是一纸贬谪之令，也能让殿下在无形之中‘消失’。"
+        },
+        {
+          "type": "npc",
+          "speaker": "房玄龄",
+          "content": "此乃绝杀之局。对方先将殿下孤立，使其陷入绝境。一旦殿下在府中只剩下寥寥数人，太子即便想直接动手，也无需担心任何变数。此信之出现，正说明对方已将杀招排到了最后一步。"
+        }
+      ]
+    }
+  },
+  {
+    "day": 11,
+    "dateStr": "武德九年1月12日",
+    "phase": "player_input",
+    "detail": {
+      "turn": 2,
+      "input": "容后再议"
+    }
+  },
+  {
+    "day": 11,
+    "dateStr": "武德九年1月12日",
+    "phase": "scene_dialogue",
+    "detail": {
+      "turn": 2,
+      "entries": [
+        {
+          "type": "npc",
+          "speaker": "尉迟敬德",
+          "content": "殿下！此时此刻竟还‘容后再议’？对方的刀已经快贴到脖子上了！末将不怕死，但末将怕的是大王如此犹豫，让府中的兄弟们白白地死在太子的算计之中！"
+        },
+        {
+          "type": "npc",
+          "speaker": "长孙无忌",
+          "content": "殿下，无忌深知您此刻心中之纠结，骨肉相残之事，纵使是铁石心肠之人亦难以为快。然而，政敌之争不容半刻之迟疑，太子的计划一旦在圣上面前奏效，我等将再无议事之机。"
+        },
+        {
+          "type": "npc",
+          "speaker": "房玄龄",
+          "content": "臣斗胆提醒殿下，此信虽是密报，但其拟定之日就在近日。若明日圣上的诏书下达，调兵之令一旦出宫，我们将无法在不触犯圣命的前提下将其拦截。此时的‘再议’，恐在对方眼中便是‘认输’。"
+        }
+      ]
+    }
+  },
+  {
+    "day": 11,
+    "dateStr": "武德九年1月12日",
+    "phase": "player_input",
+    "detail": {
+      "turn": 3,
+      "input": "你当我怕你？"
+    }
+  },
+  {
+    "day": 11,
+    "dateStr": "武德九年1月12日",
+    "phase": "scene_dialogue",
+    "detail": {
+      "turn": 3,
+      "entries": [
+        {
+          "type": "npc",
+          "speaker": "尉迟敬德",
+          "content": "好！这才是我大王的风骨！区区一张名单，竟能让殿下如此迟疑，简直是浪费了天策上将的名号！既然大王不怕，末将便更不怕了，此时此刻，只要您一声令下，末将愿为先锋，将那些算计之辈统统扫除！"
+        },
+        {
+          "type": "npc",
+          "speaker": "长孙无忌",
+          "content": "殿下之气节，无忌深知。但在朝堂之争中，‘不怕’是底气，‘算准’才是胜机。既然殿下已下定决心不再退让，那么我们便不必再顾虑太子的面子，直接推演最激进的对策——将这封密信‘不经意’地呈给陛下，反将一军。"
+        },
+        {
+          "type": "npc",
+          "speaker": "房玄龄",
+          "content": "既然殿下已然不惧，臣便敢于献上最险之策。此时若能让陛下意识到太子在私自拟定调兵名单，而非经过圣上首肯，那么这便是太子‘擅权’，反而能让陛下对其产生嫌隙。只是此举如走钢丝，需得极其精妙的措辞。"
+        }
+      ]
+    }
+  },
+  {
+    "day": 11,
+    "dateStr": "武德九年1月12日",
+    "phase": "player_input",
+    "detail": {
+      "turn": 4,
+      "input": "就这么办"
+    }
+  },
+  {
+    "day": 11,
+    "dateStr": "武德九年1月12日",
+    "phase": "scene_dialogue",
+    "detail": {
+      "turn": 4,
+      "entries": [
+        {
+          "type": "npc",
+          "speaker": "长孙无忌",
+          "content": "我立刻联络宫内的人，确保奏章在明晨第一时间呈递。此时必须抢在太子的名单下达之前，反客为主，将对方的杀招化为自毁的利刃。"
+        },
+        {
+          "type": "npc",
+          "speaker": "尉迟敬德",
+          "content": "末将这就去点将！既然大王已定，那些试图削弱我等的人，定要让他们见识见识，什么才叫真正的兵权在手！"
+        },
+        {
+          "type": "narrator",
+          "speaker": "narrator",
+          "content": "秦王缓缓站起身，走到窗前，望着窗外长安城深沉的夜色。密室内的炭火依旧噼啪作响，但此时的温暖已无法掩盖空气中弥漫的肃杀之气。房玄龄在灯下疾书，笔尖在纸上发出沙沙的响声，每一笔都像是在切割着某种禁忌。长孙无忌低声地与密使交代指令，尉迟敬德则在门外沉稳而有力地集结亲随。\n\n秦王看着案几上被揉皱的密信，眼神"
+        }
+      ]
+    }
+  },
+  {
+    "day": 11,
+    "dateStr": "武德九年1月12日",
+    "phase": "scene_ending",
+    "detail": {
+      "endingText": "秦王缓缓站起身，走到窗前，望着窗外长安城深沉的夜色。密室内的炭火依旧噼啪作响，但此时的温暖已无法掩盖空气中弥漫的肃杀之气。房玄龄在灯下疾书，笔尖在纸上发出沙沙的响声，每一笔都像是在切割着某种禁忌。长孙无忌低声地与密使交代指令，尉迟敬德则在门外沉稳而有力地集结亲随。\n\n秦王看着案几上被揉皱的密信，眼神在昏暗的灯光下显得深邃而冰冷。他意识到，一旦这封奏章递出，他与太子的关系将再无转圜之余地，这场权力的游戏已经走到了无法回头的死路。在这狭小的密室内，一个足以撼动整个长安的计划正悄然成型。他深吸一口寒气，心中那抹最后的顾虑被彻底掩埋，只剩下对权力顶端的极致渴求。"
+    }
+  },
+  {
+    "day": 11,
+    "dateStr": "武德九年1月12日",
+    "phase": "memory_diff",
+    "detail": {
+      "beforeCounts": {
+        "weichi_jingde": 2,
+        "changsun_wuji": 2,
+        "fang_xuanling": 2
+      },
+      "afterCounts": {
+        "weichi_jingde": 3,
+        "changsun_wuji": 3,
+        "fang_xuanling": 3
+      },
+      "added": {
+        "weichi_jingde": [
+          {
+            "event": "在密室门外集结亲随，为秦王的计划提供武力保障",
+            "emotionalTag": "肃杀"
+          }
+        ],
+        "changsun_wuji": [
+          {
+            "event": "低声向密使交代指令，部署权力更迭的秘密行动",
+            "emotionalTag": "谨慎"
+          }
+        ],
+        "fang_xuanling": [
+          {
+            "event": "在密室内起草一份触及禁忌、足以撼动长安的关键奏章",
+            "emotionalTag": "决绝"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "day": 11,
+    "dateStr": "武德九年1月12日",
+    "phase": "event_end",
+    "detail": {
+      "summary": "秦王缓缓站起身，走到窗前，望着窗外长安城深沉的夜色。密室内的炭火依旧噼啪作响，但此时的温暖已无法掩盖空气中弥漫的肃杀之气。房玄龄在灯下疾书，笔尖在纸上发出沙沙的响声，每一笔都像是在切割着某种禁忌。长孙无忌低声地与密使交代指令，尉迟敬德则在门外沉稳而有力地集结亲随。\n\n秦王看着案几上被揉皱的密信，眼神在昏暗的灯光下显得深邃而冰冷。他意识到，一旦这封奏章递出，他与太子的关系将再无转圜之余地，这场权力的游戏已经走到了无法回头的死路。在这狭小的密室内，一个足以撼动整个长安的计划正悄然成型。他深吸一口寒气，心中那抹最后的顾虑被彻底掩埋，只剩下对权力顶端的极致渴求。",
+      "eventLog": [
+        {
+          "name": "密奏削权之忧",
+          "day": 3,
+          "summary": "密室内，烛火在最后一次剧烈地摇曳后，渐渐失去了光亮，将众人的脸庞浸没在浓重的阴影之中。案头上的那封密信被风轻轻吹动，页角在桌面上发出沙沙的声响，像是在嘲讽着这场权力之争的结局。尉迟敬德手中的刀柄被握得咯吱作响，但最终未能出鞘；长孙无忌僵在原地，眼神中充满了不解与绝望；而房玄龄则缓缓合上了眼，在沉重的沉默中低下了头。在这个寒冷的初四之夜，秦王府的这座密室里，曾经的野心与杀气被一种令人窒息的颓然所取代"
+        },
+        {
+          "name": "御前试心",
+          "day": 8,
+          "summary": "李世民整理好衣冠，脊背挺得笔直，在三人的注视下，缓步迈过了御书房那道高高的门槛。随着沉重的殿门在身后发出一声低沉的闷响，将外界的寒风与同僚的叮嘱彻底隔绝，他独自面对着殿内那道在沉香缭绕中若隐若现的身影。此时的太极宫内静得可怕，唯有他的脚步声在空旷的大殿中回荡，每一步都像是踏在帝国权力的心弦之上。面对着屏风后那个掌握生杀大权的父亲，李世民在心底发出一声轻叹，在深红色的宫墙环绕之中，他缓缓跪下，将额头"
+        },
+        {
+          "name": "密奏削权之讯",
+          "day": 12,
+          "summary": "秦王缓缓站起身，走到窗前，望着窗外长安城深沉的夜色。密室内的炭火依旧噼啪作响，但此时的温暖已无法掩盖空气中弥漫的肃杀之气。房玄龄在灯下疾书，笔尖在纸上发出沙沙的响声，每一笔都像是在切割着某种禁忌。长孙无忌低声地与密使交代指令，尉迟敬德则在门外沉稳而有力地集结亲随。\n\n秦王看着案几上被揉皱的密信，眼神在昏暗的灯光下显得深邃而冰冷。他意识到，一旦这封奏章递出，他与太子的关系将再无转圜之余地，这场权力的"
+        }
+      ]
+    }
+  },
+  {
+    "day": 11,
+    "dateStr": "武德九年1月12日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 94,
+        "jiancheng_hostility": 67,
+        "yuanji_ambition": 46,
+        "court_opinion": 36,
+        "qinwangfu_desperation": 33,
+        "imperial_suspicion": 27,
+        "military_readiness": 60
+      }
+    }
+  },
+  {
+    "day": 12,
+    "dateStr": "武德九年1月13日",
+    "phase": "activity",
+    "detail": {
+      "id": "meet_officials",
+      "name": "接见朝臣",
+      "flavor": "年轻的小将鼓足勇气登门自荐，言辞虽糙，眼神坦然，倒比那些油滑的老官员更令人放心。"
+    }
+  },
+  {
+    "day": 12,
+    "dateStr": "武德九年1月13日",
+    "phase": "activity",
+    "detail": {
+      "id": "inspect_guards",
+      "name": "巡视府卫",
+      "flavor": "检查东侧角门，门闩与插销俱在，然而合缝之处有新鲜泥迹，不知何时留下。"
+    }
+  },
+  {
+    "day": 12,
+    "dateStr": "武德九年1月13日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 11,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "coordinate",
+          "action": "密联宫中内应探守将虚实",
+          "desc": "长孙无忌密遣心腹潜入宫中，联络内侍以探守将虚实。",
+          "deltas": [
+            "succession_crisis+2",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "remonstrate",
+          "action": "跪谏秦王速决齐王",
+          "desc": "尉迟敬德于秦王府内跪请殿下速决齐王。",
+          "deltas": [
+            "qinwangfu_desperation+3",
+            "military_readiness+2"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "与长孙无忌密议善后之方略",
+          "desc": "房玄龄与长孙无忌在密室内商议事后应对之策。",
+          "deltas": [
+            "succession_crisis+1",
+            "qinwangfu_desperation-2"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [],
+      "briefing": "【武德九年正月十三】\n\n今日暂无大事。"
+    }
+  },
+  {
+    "day": 12,
+    "dateStr": "武德九年1月13日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 96,
+        "jiancheng_hostility": 68,
+        "yuanji_ambition": 47,
+        "court_opinion": 36,
+        "qinwangfu_desperation": 34,
+        "imperial_suspicion": 26,
+        "military_readiness": 62
+      }
+    }
+  },
+  {
+    "day": 13,
+    "dateStr": "武德九年1月14日",
+    "phase": "activity",
+    "detail": {
+      "id": "meet_officials",
+      "name": "接见朝臣",
+      "flavor": "来访的户部郎中话不多，只是在聊到东宫近况时，眼神闪了一下。"
+    }
+  },
+  {
+    "day": 13,
+    "dateStr": "武德九年1月14日",
+    "phase": "activity",
+    "detail": {
+      "id": "inspect_guards",
+      "name": "巡视府卫",
+      "flavor": "亲自测试内院紧急关闭程序，从外警号响起到所有内门落锁，共用了不到一盏茶的时间。"
+    }
+  },
+  {
+    "day": 13,
+    "dateStr": "武德九年1月14日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 11,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "coordinate",
+          "action": "密会宫中内应探守将立场",
+          "desc": "长孙无忌密会宫中内应，探听守将立场。",
+          "deltas": [
+            "succession_crisis+2",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "remonstrate",
+          "action": "直谏秦王速定夺",
+          "desc": "尉迟敬德于府内直言秦王，促其速定夺除敌之策。",
+          "deltas": [
+            "qinwangfu_desperation+3",
+            "military_readiness+2"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "与长孙无忌密拟事后章程",
+          "desc": "房玄龄与长孙无忌于密室内商议事后应对之策。",
+          "deltas": [
+            "succession_crisis+1",
+            "qinwangfu_desperation-2"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [
+        "skeleton_banquet_crisis"
+      ],
+      "briefing": "【武德九年正月十四】\n\n有紧急事态需要处理——\n· 宴会危局：敌对方设宴款待秦王..."
+    }
+  },
+  {
+    "day": 13,
+    "dateStr": "武德九年1月14日",
+    "phase": "scene_start",
+    "detail": {
+      "sceneName": "event_skeleton_banquet_crisis_1776845969367",
+      "narratorIntro": "正月十五，长安城灯火辉煌，而东宫宴厅内的气氛却与外界的欢庆截然相反。太子李建成以贺节为名，邀请秦王赴宴，席间虽有美酒佳肴，但空气中却弥漫着令人窒息的压迫感。齐王李元吉在侧，眼神阴鸷，而太子的笑容温和得"
+    }
+  },
+  {
+    "day": 13,
+    "dateStr": "武德九年1月14日",
+    "phase": "player_input",
+    "detail": {
+      "turn": 0,
+      "input": "不再犹豫"
+    }
+  },
+  {
+    "day": 13,
+    "dateStr": "武德九年1月14日",
+    "phase": "scene_dialogue",
+    "detail": {
+      "turn": 0,
+      "entries": [
+        {
+          "type": "npc",
+          "speaker": "尉迟敬德",
+          "content": "好！殿下这般气势才像是在虎牢关大破十万大军时的模样。只要您一声令下，敬德定让这东宫之内再无一人敢挡殿下之路！"
+        },
+        {
+          "type": "npc",
+          "speaker": "长孙无忌",
+          "content": "殿下决断之快，无忌心悦之，但请切记，此处乃东宫腹地，太子的禁卫之势尚未散去，此刻的‘不犹豫’应化作胸中之剑，而非口中之锋。"
+        },
+        {
+          "type": "npc",
+          "speaker": "房玄龄",
+          "content": "既然殿下已定心志，臣便在此刻为您筹谋。我们将以最恭顺之礼掩盖最决绝之意，在试探中寻找太子的破绽。"
+        }
+      ]
+    }
+  },
+  {
+    "day": 13,
+    "dateStr": "武德九年1月14日",
+    "phase": "player_input",
+    "detail": {
+      "turn": 1,
+      "input": "请父王明察"
+    }
+  },
+  {
+    "day": 13,
+    "dateStr": "武德九年1月14日",
+    "phase": "scene_dialogue",
+    "detail": {
+      "turn": 1,
+      "entries": [
+        {
+          "type": "npc",
+          "speaker": "长孙无忌",
+          "content": "殿下，陛下此时并不在东宫。如此直言‘明察’，恐怕会让太子认为您在以圣上之名相威胁，此刻局面极易失控，还请慎之。"
+        },
+        {
+          "type": "npc",
+          "speaker": "房玄龄",
+          "content": "此举虽出人意料，却也像是在提醒太子，无论在东宫如何布局，最终仍需面对陛下的裁决。若是能让太子心生忌惮，或许能反客为主，但时机之险，确实极高。"
+        },
+        {
+          "type": "npc",
+          "speaker": "尉迟敬德",
+          "content": "殿下既然已发话，便无需再顾虑这些弯弯绕绕！若太子敢在这种时候发难，敬德定让这席间之人一个也走不掉！"
+        }
+      ]
+    }
+  },
+  {
+    "day": 13,
+    "dateStr": "武德九年1月14日",
+    "phase": "player_input",
+    "detail": {
+      "turn": 2,
+      "input": "先下去吧"
+    }
+  },
+  {
+    "day": 13,
+    "dateStr": "武德九年1月14日",
+    "phase": "scene_dialogue",
+    "detail": {
+      "turn": 2,
+      "entries": [
+        {
+          "type": "npc",
+          "speaker": "li_jiancheng",
+          "content": "好一个‘先下去’。看来秦王殿下是真的打算将这场戏，演到最后一步了。"
+        },
+        {
+          "type": "npc",
+          "speaker": "li_yuanji",
+          "content": "呵呵，如此气概，倒是让在座的各位都感到压力不小啊。"
+        },
+        {
+          "type": "narrator",
+          "speaker": "narrator",
+          "content": "东宫的烛火在寒风中剧烈摇曳，将席间三人的影子在墙上拉得狭长而诡异。秦王端坐在原位，目光如电，直视着对面那张似笑非笑的脸庞；而李建成则缓缓放下手中的酒杯，杯底与桌面碰撞出一声清脆的轻响，如同某种无形的信号。齐王李元吉在侧，阴鸷的目光在秦王与东宫禁卫之间来回逡巡，手指不自觉地在衣袖中轻轻敲击。空气仿佛在"
+        }
+      ]
+    }
+  },
+  {
+    "day": 13,
+    "dateStr": "武德九年1月14日",
+    "phase": "scene_ending",
+    "detail": {
+      "endingText": "东宫的烛火在寒风中剧烈摇曳，将席间三人的影子在墙上拉得狭长而诡异。秦王端坐在原位，目光如电，直视着对面那张似笑非笑的脸庞；而李建成则缓缓放下手中的酒杯，杯底与桌面碰撞出一声清脆的轻响，如同某种无形的信号。齐王李元吉在侧，阴鸷的目光在秦王与东宫禁卫之间来回逡巡，手指不自觉地在衣袖中轻轻敲击。空气仿佛在这一刻凝固，四周潜伏的甲胄碰撞声若隐若现，将这奢华的宴厅变成了一座密不透风的囚笼。每个人都屏住呼吸，在这正月十五的灯火辉煌之中，等待着那最后一道名为‘决断’的指令落下。此刻的沉默比任何激烈的争吵都更加沉重，压在每一个人的心头，而这场权力的博弈，终于在至亲兄弟的对峙中，达到了最紧绷的临界点。"
+    }
+  },
+  {
+    "day": 13,
+    "dateStr": "武德九年1月14日",
+    "phase": "memory_diff",
+    "detail": {
+      "beforeCounts": {
+        "weichi_jingde": 3,
+        "changsun_wuji": 3,
+        "fang_xuanling": 3
+      },
+      "afterCounts": {
+        "weichi_jingde": 4,
+        "changsun_wuji": 4,
+        "fang_xuanling": 4
+      },
+      "added": {
+        "weichi_jingde": [
+          {
+            "event": "在东宫宴会上警觉到四周甲胄碰撞声，意识到已成囚笼。",
+            "emotionalTag": "高度警觉"
+          }
+        ],
+        "changsun_wuji": [
+          {
+            "event": "见证至亲兄弟在正月十五的灯火中决裂，意识到局势危殆。",
+            "emotionalTag": "心沉之极"
+          }
+        ],
+        "fang_xuanling": [
+          {
+            "event": "洞察到三王对峙的权力博弈已达临界点，等待决断指令。",
+            "emotionalTag": "冷静凝重"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "day": 13,
+    "dateStr": "武德九年1月14日",
+    "phase": "event_end",
+    "detail": {
+      "summary": "东宫的烛火在寒风中剧烈摇曳，将席间三人的影子在墙上拉得狭长而诡异。秦王端坐在原位，目光如电，直视着对面那张似笑非笑的脸庞；而李建成则缓缓放下手中的酒杯，杯底与桌面碰撞出一声清脆的轻响，如同某种无形的信号。齐王李元吉在侧，阴鸷的目光在秦王与东宫禁卫之间来回逡巡，手指不自觉地在衣袖中轻轻敲击。空气仿佛在这一刻凝固，四周潜伏的甲胄碰撞声若隐若现，将这奢华的宴厅变成了一座密不透风的囚笼。每个人都屏住呼吸，在这正月十五的灯火辉煌之中，等待着那最后一道名为‘决断’的指令落下。此刻的沉默比任何激烈的争吵都更加沉重，压在每一个人的心头，而这场权力的博弈，终于在至亲兄弟的对峙中，达到了最紧绷的临界点。",
+      "eventLog": [
+        {
+          "name": "密奏削权之忧",
+          "day": 3,
+          "summary": "密室内，烛火在最后一次剧烈地摇曳后，渐渐失去了光亮，将众人的脸庞浸没在浓重的阴影之中。案头上的那封密信被风轻轻吹动，页角在桌面上发出沙沙的声响，像是在嘲讽着这场权力之争的结局。尉迟敬德手中的刀柄被握得咯吱作响，但最终未能出鞘；长孙无忌僵在原地，眼神中充满了不解与绝望；而房玄龄则缓缓合上了眼，在沉重的沉默中低下了头。在这个寒冷的初四之夜，秦王府的这座密室里，曾经的野心与杀气被一种令人窒息的颓然所取代"
+        },
+        {
+          "name": "御前试心",
+          "day": 8,
+          "summary": "李世民整理好衣冠，脊背挺得笔直，在三人的注视下，缓步迈过了御书房那道高高的门槛。随着沉重的殿门在身后发出一声低沉的闷响，将外界的寒风与同僚的叮嘱彻底隔绝，他独自面对着殿内那道在沉香缭绕中若隐若现的身影。此时的太极宫内静得可怕，唯有他的脚步声在空旷的大殿中回荡，每一步都像是踏在帝国权力的心弦之上。面对着屏风后那个掌握生杀大权的父亲，李世民在心底发出一声轻叹，在深红色的宫墙环绕之中，他缓缓跪下，将额头"
+        },
+        {
+          "name": "密奏削权之讯",
+          "day": 12,
+          "summary": "秦王缓缓站起身，走到窗前，望着窗外长安城深沉的夜色。密室内的炭火依旧噼啪作响，但此时的温暖已无法掩盖空气中弥漫的肃杀之气。房玄龄在灯下疾书，笔尖在纸上发出沙沙的响声，每一笔都像是在切割着某种禁忌。长孙无忌低声地与密使交代指令，尉迟敬德则在门外沉稳而有力地集结亲随。\n\n秦王看着案几上被揉皱的密信，眼神在昏暗的灯光下显得深邃而冰冷。他意识到，一旦这封奏章递出，他与太子的关系将再无转圜之余地，这场权力的"
+        },
+        {
+          "name": "东宫元宵危宴",
+          "day": 14,
+          "summary": "东宫的烛火在寒风中剧烈摇曳，将席间三人的影子在墙上拉得狭长而诡异。秦王端坐在原位，目光如电，直视着对面那张似笑非笑的脸庞；而李建成则缓缓放下手中的酒杯，杯底与桌面碰撞出一声清脆的轻响，如同某种无形的信号。齐王李元吉在侧，阴鸷的目光在秦王与东宫禁卫之间来回逡巡，手指不自觉地在衣袖中轻轻敲击。空气仿佛在这一刻凝固，四周潜伏的甲胄碰撞声若隐若现，将这奢华的宴厅变成了一座密不透风的囚笼。每个人都屏住呼吸，"
+        }
+      ]
+    }
+  },
+  {
+    "day": 13,
+    "dateStr": "武德九年1月14日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 100,
+        "jiancheng_hostility": 70,
+        "yuanji_ambition": 48,
+        "court_opinion": 37,
+        "qinwangfu_desperation": 46,
+        "imperial_suspicion": 26,
+        "military_readiness": 64
+      }
+    }
+  },
+  {
+    "day": 14,
+    "dateStr": "武德九年1月15日",
+    "phase": "activity",
+    "detail": {
+      "id": "counsel_xuanling",
+      "name": "与房玄龄议事",
+      "flavor": "\"兵是死的，人心是活的。\"他指着沙盘上两支箭头，\"殿下眼下最缺的不是前者。\""
+    }
+  },
+  {
+    "day": 14,
+    "dateStr": "武德九年1月15日",
+    "phase": "activity",
+    "detail": {
+      "id": "inspect_guards",
+      "name": "巡视府卫",
+      "flavor": "唤来今日当值的队正，逐条核对换班记录，发现一处交接时间有两刻钟的空缺。"
+    }
+  },
+  {
+    "day": 14,
+    "dateStr": "武德九年1月15日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 11,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "coordinate",
+          "action": "密约宫内守将确保配合",
+          "desc": "长孙无忌密遣心腹联络宫中守将，确保行动时予以配合。",
+          "deltas": [
+            "succession_crisis+2",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "remonstrate",
+          "action": "跪请秦王速决齐王",
+          "desc": "尉迟敬德于府中跪请秦王，恳请速决齐王。",
+          "deltas": [
+            "qinwangfu_desperation+3",
+            "military_readiness+2"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "密议行动方略与善后之策",
+          "desc": "房玄龄与长孙无忌密议行动细节及事后善后之策。",
+          "deltas": [
+            "succession_crisis+2",
+            "qinwangfu_desperation-2"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [],
+      "briefing": "【武德九年正月十五】\n\n今日暂无大事。"
+    }
+  },
+  {
+    "day": 14,
+    "dateStr": "武德九年1月15日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 99,
+        "jiancheng_hostility": 72,
+        "yuanji_ambition": 48,
+        "court_opinion": 38,
+        "qinwangfu_desperation": 46,
+        "imperial_suspicion": 27,
+        "military_readiness": 66
+      }
+    }
+  },
+  {
+    "day": 15,
+    "dateStr": "武德九年1月16日",
+    "phase": "activity",
+    "detail": {
+      "id": "meet_officials",
+      "name": "接见朝臣",
+      "flavor": "今日宾客措辞极为谨慎，每一句话都像经过演练，李世民越听越觉得此人不简单。"
+    }
+  },
+  {
+    "day": 15,
+    "dateStr": "武德九年1月16日",
+    "phase": "activity",
+    "detail": {
+      "id": "inspect_guards",
+      "name": "巡视府卫",
+      "flavor": "检视了几名新调入护卫的面貌与档案，其中一人的出生地与另一份情报中出现的地名相同。"
+    }
+  },
+  {
+    "day": 15,
+    "dateStr": "武德九年1月16日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 11,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "coordinate",
+          "action": "密联宫中禁卫内应",
+          "desc": "长孙无忌密遣心腹，联络宫中禁卫将领，商定配合之策。",
+          "deltas": [
+            "succession_crisis+2",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "remonstrate",
+          "action": "跪请秦王速决死战",
+          "desc": "尉迟敬德于府中跪请秦王，促其速决除敌之策。",
+          "deltas": [
+            "qinwangfu_desperation+3",
+            "military_readiness+2"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "与长孙无忌密议行事方略",
+          "desc": "房玄龄与长孙无忌于府中密议具体行事方略。",
+          "deltas": [
+            "succession_crisis+1",
+            "qinwangfu_desperation-2"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [],
+      "briefing": "【武德九年正月十六】\n\n今日暂无大事。"
+    }
+  },
+  {
+    "day": 15,
+    "dateStr": "武德九年1月16日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 99,
+        "jiancheng_hostility": 73,
+        "yuanji_ambition": 49,
+        "court_opinion": 38,
+        "qinwangfu_desperation": 46,
+        "imperial_suspicion": 27,
+        "military_readiness": 68
+      }
+    }
+  },
+  {
+    "day": 16,
+    "dateStr": "武德九年1月17日",
+    "phase": "activity",
+    "detail": {
+      "id": "counsel_xuanling",
+      "name": "与房玄龄议事",
+      "flavor": "他引用了殿下少年时读过的兵书，说那句话如今读来与当年全然不同。"
+    }
+  },
+  {
+    "day": 16,
+    "dateStr": "武德九年1月17日",
+    "phase": "activity",
+    "detail": {
+      "id": "inspect_guards",
+      "name": "巡视府卫",
+      "flavor": "后院库房的锁具更换了一批，钥匙清点在册，持有者仅限五人，逐一核对无误。"
+    }
+  },
+  {
+    "day": 16,
+    "dateStr": "武德九年1月17日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 11,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "coordinate",
+          "action": "密联宫中内应监视禁卫",
+          "desc": "长孙无忌密遣心腹入宫，联络内侍以掌握禁卫动向。",
+          "deltas": [
+            "succession_crisis+2",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "remonstrate",
+          "action": "跪请秦王速决除逆",
+          "desc": "尉迟敬德于府中跪请秦王尽早决断，除掉李建成与李元吉。",
+          "deltas": [
+            "qinwangfu_desperation+3",
+            "military_readiness+2"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "与长孙无忌密议决胜方略",
+          "desc": "房玄龄与长孙无忌于密室商议应对东宫之具体方略。",
+          "deltas": [
+            "succession_crisis+2",
+            "qinwangfu_desperation-2"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [],
+      "briefing": "【武德九年正月十七】\n\n今日暂无大事。"
+    }
+  },
+  {
+    "day": 16,
+    "dateStr": "武德九年1月17日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 99,
+        "jiancheng_hostility": 74,
+        "yuanji_ambition": 50,
+        "court_opinion": 39,
+        "qinwangfu_desperation": 46,
+        "imperial_suspicion": 28,
+        "military_readiness": 70
+      }
+    }
+  },
+  {
+    "day": 17,
+    "dateStr": "武德九年1月18日",
+    "phase": "activity",
+    "detail": {
+      "id": "summon_spy",
+      "name": "召见密探",
+      "flavor": "截获的那封信只字未提兵事，通篇论的是佛法，然而某些词句的排列，分明是约期的暗语。"
+    }
+  },
+  {
+    "day": 17,
+    "dateStr": "武德九年1月18日",
+    "phase": "activity",
+    "detail": {
+      "id": "inspect_guards",
+      "name": "巡视府卫",
+      "flavor": "巡检马厩，发现有两匹战马昨夜不安嘶鸣，周围无明显痕迹，原因未明，倍加警惕。"
+    }
+  },
+  {
+    "day": 17,
+    "dateStr": "武德九年1月18日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 11,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "coordinate",
+          "action": "秘联宫内内应以策守将",
+          "desc": "长孙无忌密遣心腹潜入宫中，联络内侍并收买守将。",
+          "deltas": [
+            "succession_crisis+2",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "remonstrate",
+          "action": "跪谏秦王速决死生",
+          "desc": "尉迟敬德于府中跪请秦王速决，要求速除李建成与李元吉。",
+          "deltas": [
+            "qinwangfu_desperation+3",
+            "military_readiness+2"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "与长孙无忌密议变后之善后布局",
+          "desc": "房玄龄与长孙无忌在密室商定事后处置之策。",
+          "deltas": [
+            "succession_crisis+1",
+            "qinwangfu_desperation-2"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [],
+      "briefing": "【武德九年正月十八】\n\n今日暂无大事。"
+    }
+  },
+  {
+    "day": 17,
+    "dateStr": "武德九年1月18日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 99,
+        "jiancheng_hostility": 76,
+        "yuanji_ambition": 50,
+        "court_opinion": 40,
+        "qinwangfu_desperation": 46,
+        "imperial_suspicion": 29,
+        "military_readiness": 72
+      }
+    }
+  },
+  {
+    "day": 18,
+    "dateStr": "武德九年1月19日",
+    "phase": "activity",
+    "detail": {
+      "id": "counsel_xuanling",
+      "name": "与房玄龄议事",
+      "flavor": "房玄龄将两份截然相反的情报并排摆放，说：\"真相或在其间，或在其外，殿下三思。\""
+    }
+  },
+  {
+    "day": 18,
+    "dateStr": "武德九年1月19日",
+    "phase": "activity",
+    "detail": {
+      "id": "inspect_guards",
+      "name": "巡视府卫",
+      "flavor": "后院库房的锁具更换了一批，钥匙清点在册，持有者仅限五人，逐一核对无误。"
+    }
+  },
+  {
+    "day": 18,
+    "dateStr": "武德九年1月19日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 11,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "plant_spy",
+          "action": "密约宫内内应联络守将",
+          "desc": "长孙无忌密见宫中内侍，交代联络宫门守将之宜。",
+          "deltas": [
+            "succession_crisis+2",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "remonstrate",
+          "action": "跪请秦王决断速除敌首",
+          "desc": "尉迟敬德于秦王府中跪谏，促请殿下速决除敌之计。",
+          "deltas": [
+            "qinwangfu_desperation+3",
+            "military_readiness+2"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "密议禁卫布阵与事后应对",
+          "desc": "房玄龄与长孙无忌密议禁卫布阵及事后之对策。",
+          "deltas": [
+            "succession_crisis+1",
+            "qinwangfu_desperation-2"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [],
+      "briefing": "【武德九年正月十九】\n\n今日暂无大事。"
+    }
+  },
+  {
+    "day": 18,
+    "dateStr": "武德九年1月19日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 99,
+        "jiancheng_hostility": 77,
+        "yuanji_ambition": 51,
+        "court_opinion": 40,
+        "qinwangfu_desperation": 45,
+        "imperial_suspicion": 30,
+        "military_readiness": 74
+      }
+    }
+  },
+  {
+    "day": 19,
+    "dateStr": "武德九年1月20日",
+    "phase": "activity",
+    "detail": {
+      "id": "meet_officials",
+      "name": "接见朝臣",
+      "flavor": "年轻的小将鼓足勇气登门自荐，言辞虽糙，眼神坦然，倒比那些油滑的老官员更令人放心。"
+    }
+  },
+  {
+    "day": 19,
+    "dateStr": "武德九年1月20日",
+    "phase": "activity",
+    "detail": {
+      "id": "inspect_guards",
+      "name": "巡视府卫",
+      "flavor": "命心腹乔装成路人，试图以蒙混话术进入偏门，被巡逻卫士当场识破并喝止，值得嘉许。"
+    }
+  },
+  {
+    "day": 19,
+    "dateStr": "武德九年1月20日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 12,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "coordinate",
+          "action": "联络宫内内侍及禁卫守将",
+          "desc": "长孙无忌密遣心腹入宫，联络内侍并试探禁卫守将之意。",
+          "deltas": [
+            "succession_crisis+2",
+            "jiancheng_hostility+1",
+            "court_opinion-1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "remonstrate",
+          "action": "跪请秦王速决齐王死生",
+          "desc": "尉迟敬德跪请秦王决断，主张速除齐王。",
+          "deltas": [
+            "qinwangfu_desperation+3",
+            "military_readiness+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "密拟行动方略与事后奏章",
+          "desc": "房玄龄与长孙无忌在密室内拟定行动计划及事后奏章。",
+          "deltas": [
+            "succession_crisis+1",
+            "qinwangfu_desperation-2"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [],
+      "briefing": "【武德九年正月二十】\n\n今日暂无大事。"
+    }
+  },
+  {
+    "day": 19,
+    "dateStr": "武德九年1月20日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 99,
+        "jiancheng_hostility": 78,
+        "yuanji_ambition": 51,
+        "court_opinion": 39,
+        "qinwangfu_desperation": 46,
+        "imperial_suspicion": 29,
+        "military_readiness": 74
+      }
+    }
+  },
+  {
+    "day": 20,
+    "dateStr": "武德九年1月21日",
+    "phase": "activity",
+    "detail": {
+      "id": "summon_spy",
+      "name": "召见密探",
+      "flavor": "那人从袖中取出一封残信，纸已焦黄，却是太子亲笔——某些字迹，比刀锋更令人心寒。"
+    }
+  },
+  {
+    "day": 20,
+    "dateStr": "武德九年1月21日",
+    "phase": "activity",
+    "detail": {
+      "id": "inspect_guards",
+      "name": "巡视府卫",
+      "flavor": "正门守卫轮班时有几秒空档，李世民当场指出，命令从即日起错开换班节点。"
+    }
+  },
+  {
+    "day": 20,
+    "dateStr": "武德九年1月21日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 11,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "coordinate",
+          "action": "密联宫中禁卫内应",
+          "desc": "长孙无忌于长安密见禁卫将领，交代配合之策。",
+          "deltas": [
+            "succession_crisis+2",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "remonstrate",
+          "action": "跪请秦王速决除敌",
+          "desc": "尉迟敬德于府中跪请秦王速决，建议尽早除掉齐王。",
+          "deltas": [
+            "qinwangfu_desperation+3",
+            "military_readiness+2"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "与长孙无忌密议事后处置之策",
+          "desc": "房玄龄与长孙无忌于密室共商事后之应对方略。",
+          "deltas": [
+            "succession_crisis+2",
+            "qinwangfu_desperation-2"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [
+        "skeleton_intelligence_event"
+      ],
+      "briefing": "【武德九年正月廿一】\n\n有紧急事态需要处理——\n· 情报事件：秦王府收到重要情报..."
+    }
+  },
+  {
+    "day": 20,
+    "dateStr": "武德九年1月21日",
+    "phase": "scene_start",
+    "detail": {
+      "sceneName": "event_skeleton_intelligence_event_1776846568052",
+      "narratorIntro": "武德九年正月廿二，长安城的寒风如利刃般割过宫墙。密室之中，炭火早已燃成暗红，却无法驱散空气中凝结的冰霜。一名浑身湿透、呼吸急促的密使在长孙无忌的接引下踉跄而入，将一份用油布层层包裹的残卷递上。此时，储"
+    }
+  },
+  {
+    "day": 20,
+    "dateStr": "武德九年1月21日",
+    "phase": "player_input",
+    "detail": {
+      "turn": 0,
+      "input": "退下"
+    }
+  },
+  {
+    "day": 20,
+    "dateStr": "武德九年1月21日",
+    "phase": "scene_dialogue",
+    "detail": {
+      "turn": 0,
+      "entries": [
+        {
+          "type": "narrator",
+          "speaker": "narrator",
+          "content": "密使在战战兢兢中领命，低头快步退出了密室，沉重的木门在身后缓缓合拢，将外界的寒风与喧嚣彻底隔绝。室内重新陷入了一种近乎凝固的死寂，唯有炭火偶尔爆裂的一声脆响，在空旷的房间内回荡。"
+        },
+        {
+          "type": "npc",
+          "speaker": "长孙无忌",
+          "content": "既然密使已走，此间再无外人。殿下，此时此刻，您心中的决断便是我们所有人的生死线。"
+        },
+        {
+          "type": "narrator",
+          "speaker": "narrator",
+          "content": "密室之内，灯火在寒风的缝隙中摇曳，将几人的身影在墙上拉扯得诡谲而细长。长孙无忌、房玄龄与尉迟敬德三人静静地伫立在阴影之中，目光齐刷刷地聚焦在端坐在上位的秦王身上。案几上的那卷密信在微弱的光线下泛着幽光，像是一道无法逾越的深渊，将当前的局势切割得极其危险。\n\n秦王的身影在烛火的摇曳中沉静如山，他的面容"
+        }
+      ]
+    }
+  },
+  {
+    "day": 20,
+    "dateStr": "武德九年1月21日",
+    "phase": "scene_ending",
+    "detail": {
+      "endingText": "密室之内，灯火在寒风的缝隙中摇曳，将几人的身影在墙上拉扯得诡谲而细长。长孙无忌、房玄龄与尉迟敬德三人静静地伫立在阴影之中，目光齐刷刷地聚焦在端坐在上位的秦王身上。案几上的那卷密信在微弱的光线下泛着幽光，像是一道无法逾越的深渊，将当前的局势切割得极其危险。\n\n秦王的身影在烛火的摇曳中沉静如山，他的面容隐藏在阴影之下，唯有一双眼睛冷冽如霜，死死地盯着那卷油布残卷。空气中弥漫着檀香与冷汗交织的古怪气息，所有人都屏住呼吸，等待着那个决定命运的指令。在这种极度的压抑中，时间仿佛停止了流动，唯有心中那股不可遏制的肃杀之气，在密室冰冷的空气中悄然滋长。"
+    }
+  },
+  {
+    "day": 20,
+    "dateStr": "武德九年1月21日",
+    "phase": "memory_diff",
+    "detail": {
+      "beforeCounts": {
+        "weichi_jingde": 4,
+        "changsun_wuji": 4,
+        "fang_xuanling": 4
+      },
+      "afterCounts": {
+        "weichi_jingde": 5,
+        "changsun_wuji": 5,
+        "fang_xuanling": 5
+      },
+      "added": {
+        "weichi_jingde": [
+          {
+            "event": "在阴影中伫立，感知到空气中悄然滋长的肃杀之气。",
+            "emotionalTag": "高度戒备"
+          }
+        ],
+        "changsun_wuji": [
+          {
+            "event": "在密室中见证决定命运的密信，静候秦王的最终指令。",
+            "emotionalTag": "紧张压抑"
+          }
+        ],
+        "fang_xuanling": [
+          {
+            "event": "在极度压抑的氛围中，意识到当前的局势已极其危险。",
+            "emotionalTag": "忧心忡忡"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "day": 20,
+    "dateStr": "武德九年1月21日",
+    "phase": "event_end",
+    "detail": {
+      "summary": "密室之内，灯火在寒风的缝隙中摇曳，将几人的身影在墙上拉扯得诡谲而细长。长孙无忌、房玄龄与尉迟敬德三人静静地伫立在阴影之中，目光齐刷刷地聚焦在端坐在上位的秦王身上。案几上的那卷密信在微弱的光线下泛着幽光，像是一道无法逾越的深渊，将当前的局势切割得极其危险。\n\n秦王的身影在烛火的摇曳中沉静如山，他的面容隐藏在阴影之下，唯有一双眼睛冷冽如霜，死死地盯着那卷油布残卷。空气中弥漫着檀香与冷汗交织的古怪气息，所有人都屏住呼吸，等待着那个决定命运的指令。在这种极度的压抑中，时间仿佛停止了流动，唯有心中那股不可遏制的肃杀之气，在密室冰冷的空气中悄然滋长。",
+      "eventLog": [
+        {
+          "name": "密奏削权之忧",
+          "day": 3,
+          "summary": "密室内，烛火在最后一次剧烈地摇曳后，渐渐失去了光亮，将众人的脸庞浸没在浓重的阴影之中。案头上的那封密信被风轻轻吹动，页角在桌面上发出沙沙的声响，像是在嘲讽着这场权力之争的结局。尉迟敬德手中的刀柄被握得咯吱作响，但最终未能出鞘；长孙无忌僵在原地，眼神中充满了不解与绝望；而房玄龄则缓缓合上了眼，在沉重的沉默中低下了头。在这个寒冷的初四之夜，秦王府的这座密室里，曾经的野心与杀气被一种令人窒息的颓然所取代"
+        },
+        {
+          "name": "御前试心",
+          "day": 8,
+          "summary": "李世民整理好衣冠，脊背挺得笔直，在三人的注视下，缓步迈过了御书房那道高高的门槛。随着沉重的殿门在身后发出一声低沉的闷响，将外界的寒风与同僚的叮嘱彻底隔绝，他独自面对着殿内那道在沉香缭绕中若隐若现的身影。此时的太极宫内静得可怕，唯有他的脚步声在空旷的大殿中回荡，每一步都像是踏在帝国权力的心弦之上。面对着屏风后那个掌握生杀大权的父亲，李世民在心底发出一声轻叹，在深红色的宫墙环绕之中，他缓缓跪下，将额头"
+        },
+        {
+          "name": "密奏削权之讯",
+          "day": 12,
+          "summary": "秦王缓缓站起身，走到窗前，望着窗外长安城深沉的夜色。密室内的炭火依旧噼啪作响，但此时的温暖已无法掩盖空气中弥漫的肃杀之气。房玄龄在灯下疾书，笔尖在纸上发出沙沙的响声，每一笔都像是在切割着某种禁忌。长孙无忌低声地与密使交代指令，尉迟敬德则在门外沉稳而有力地集结亲随。\n\n秦王看着案几上被揉皱的密信，眼神在昏暗的灯光下显得深邃而冰冷。他意识到，一旦这封奏章递出，他与太子的关系将再无转圜之余地，这场权力的"
+        },
+        {
+          "name": "东宫元宵危宴",
+          "day": 14,
+          "summary": "东宫的烛火在寒风中剧烈摇曳，将席间三人的影子在墙上拉得狭长而诡异。秦王端坐在原位，目光如电，直视着对面那张似笑非笑的脸庞；而李建成则缓缓放下手中的酒杯，杯底与桌面碰撞出一声清脆的轻响，如同某种无形的信号。齐王李元吉在侧，阴鸷的目光在秦王与东宫禁卫之间来回逡巡，手指不自觉地在衣袖中轻轻敲击。空气仿佛在这一刻凝固，四周潜伏的甲胄碰撞声若隐若现，将这奢华的宴厅变成了一座密不透风的囚笼。每个人都屏住呼吸，"
+        },
+        {
+          "name": "密诏惊雷",
+          "day": 21,
+          "summary": "密室之内，灯火在寒风的缝隙中摇曳，将几人的身影在墙上拉扯得诡谲而细长。长孙无忌、房玄龄与尉迟敬德三人静静地伫立在阴影之中，目光齐刷刷地聚焦在端坐在上位的秦王身上。案几上的那卷密信在微弱的光线下泛着幽光，像是一道无法逾越的深渊，将当前的局势切割得极其危险。\n\n秦王的身影在烛火的摇曳中沉静如山，他的面容隐藏在阴影之下，唯有一双眼睛冷冽如霜，死死地盯着那卷油布残卷。空气中弥漫着檀香与冷汗交织的古怪气息，"
+        }
+      ]
+    }
+  },
+  {
+    "day": 20,
+    "dateStr": "武德九年1月21日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 99,
+        "jiancheng_hostility": 80,
+        "yuanji_ambition": 52,
+        "court_opinion": 40,
+        "qinwangfu_desperation": 46,
+        "imperial_suspicion": 31,
+        "military_readiness": 79
+      }
+    }
+  },
+  {
+    "day": 21,
+    "dateStr": "武德九年1月22日",
+    "phase": "activity",
+    "detail": {
+      "id": "meet_officials",
+      "name": "接见朝臣",
+      "flavor": "来访者是个年轻御史，措辞方正，眼神却在秦王府陈设上反复打量，令人寻味。"
+    }
+  },
+  {
+    "day": 21,
+    "dateStr": "武德九年1月22日",
+    "phase": "activity",
+    "detail": {
+      "id": "inspect_guards",
+      "name": "巡视府卫",
+      "flavor": "与府卫统领逐点排查薄弱处，东侧墙高不足，夜间补设了三处鹿角。"
+    }
+  },
+  {
+    "day": 21,
+    "dateStr": "武德九年1月22日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 10,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "coordinate",
+          "action": "密联宫内守将以定军心",
+          "desc": "长孙无忌秘密联络宫中守将，商议配合之策。",
+          "deltas": [
+            "succession_crisis+2"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "remonstrate",
+          "action": "跪请秦王速定死战之策",
+          "desc": "尉迟敬德于府中跪请秦王速定计策，力主先行除齐王。",
+          "deltas": [
+            "qinwangfu_desperation+3",
+            "military_readiness+2"
+          ],
+          "degrade": 1
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "密议行动方略及善后之策",
+          "desc": "房玄龄与长孙无忌密议行动方略及事后善后之策。",
+          "deltas": [
+            "succession_crisis+2",
+            "qinwangfu_desperation-2"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [],
+      "briefing": "【武德九年正月廿二】\n\n今日暂无大事。"
+    }
+  },
+  {
+    "day": 21,
+    "dateStr": "武德九年1月22日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 99,
+        "jiancheng_hostility": 80,
+        "yuanji_ambition": 52,
+        "court_opinion": 40,
+        "qinwangfu_desperation": 47,
+        "imperial_suspicion": 30,
+        "military_readiness": 81
+      }
+    }
+  },
+  {
+    "day": 22,
+    "dateStr": "武德九年1月23日",
+    "phase": "activity",
+    "detail": {
+      "id": "meet_officials",
+      "name": "接见朝臣",
+      "flavor": "接见结束后，房玄龄悄声说：\"此人来前刚出了东宫。\"李世民只是点点头，未置一词。"
+    }
+  },
+  {
+    "day": 22,
+    "dateStr": "武德九年1月23日",
+    "phase": "activity",
+    "detail": {
+      "id": "inspect_guards",
+      "name": "巡视府卫",
+      "flavor": "黎明前最暗的时刻，府卫换班完毕，一切又回到表面的平静。"
+    }
+  },
+  {
+    "day": 22,
+    "dateStr": "武德九年1月23日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 11,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "coordinate",
+          "action": "密联宫内守将约定配合",
+          "desc": "长孙无忌密遣心腹，联络宫中守将，商定配合之策。",
+          "deltas": [
+            "succession_crisis+2",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "remonstrate",
+          "action": "跪请秦王速决生死之策",
+          "desc": "尉迟敬德于府中跪请秦王，直言促其速决。",
+          "deltas": [
+            "qinwangfu_desperation+3",
+            "military_readiness+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "与长孙无忌密议大计并拟定善后之策",
+          "desc": "房玄龄与长孙无忌在密室拟定行动方略并规划善后事宜。",
+          "deltas": [
+            "succession_crisis+1",
+            "qinwangfu_desperation-2"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [],
+      "briefing": "【武德九年正月廿三】\n\n今日暂无大事。"
+    }
+  },
+  {
+    "day": 22,
+    "dateStr": "武德九年1月23日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 99,
+        "jiancheng_hostility": 81,
+        "yuanji_ambition": 53,
+        "court_opinion": 40,
+        "qinwangfu_desperation": 47,
+        "imperial_suspicion": 30,
+        "military_readiness": 81
+      }
+    }
+  },
+  {
+    "day": 23,
+    "dateStr": "武德九年1月24日",
+    "phase": "activity",
+    "detail": {
+      "id": "counsel_xuanling",
+      "name": "与房玄龄议事",
+      "flavor": "房玄龄问起秦王府几位幕僚的近况，语气随意，眼神却丝毫不随意。"
+    }
+  },
+  {
+    "day": 23,
+    "dateStr": "武德九年1月24日",
+    "phase": "activity",
+    "detail": {
+      "id": "inspect_guards",
+      "name": "巡视府卫",
+      "flavor": "黎明前最暗的时刻，府卫换班完毕，一切又回到表面的平静。"
+    }
+  },
+  {
+    "day": 23,
+    "dateStr": "武德九年1月24日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 11,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "coordinate",
+          "action": "密联宫内禁卫确认立场",
+          "desc": "长孙无忌密遣心腹联络宫中禁卫，确认其对秦王的忠诚。",
+          "deltas": [
+            "succession_crisis+1",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "remonstrate",
+          "action": "死谏秦王速决齐王",
+          "desc": "尉迟敬德于府内跪谏秦王，请旨速除齐王李元吉。",
+          "deltas": [
+            "qinwangfu_desperation+3",
+            "military_readiness+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "与长孙无忌密议事后政局之安顿",
+          "desc": "房玄龄与长孙无忌于密室中拟定事后之应对方案。",
+          "deltas": [
+            "succession_crisis+1",
+            "qinwangfu_desperation-2"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [
+        "skeleton_imperial_summons"
+      ],
+      "briefing": "【武德九年正月廿四】\n\n有紧急事态需要处理——\n· 皇帝召见：李渊单独召见秦王..."
+    }
+  },
+  {
+    "day": 23,
+    "dateStr": "武德九年1月24日",
+    "phase": "scene_start",
+    "detail": {
+      "sceneName": "event_skeleton_imperial_summons_1776846828927",
+      "narratorIntro": "武德九年正月廿五，长安的寒风如刀，将太极宫的深墙围得死寂。就在此时，圣上的一道口谕打破了秦王府的紧绷——陛下在御书房单独召见秦王。此时东宫的杀机已至临界，而圣上的态度向来晦暗莫测。穿过长长的回廊，脚下"
+    }
+  },
+  {
+    "day": 23,
+    "dateStr": "武德九年1月24日",
+    "phase": "player_input",
+    "detail": {
+      "turn": 0,
+      "input": "大哥如果我不喝呢"
+    }
+  },
+  {
+    "day": 23,
+    "dateStr": "武德九年1月24日",
+    "phase": "scene_dialogue",
+    "detail": {
+      "turn": 0,
+      "entries": [
+        {
+          "type": "npc",
+          "speaker": "房玄龄",
+          "content": "殿下，此时太子殿下并未在场，且此处乃是御书房，非宴饮之所。臣惶恐，殿下是否因局势紧绷，心绪不宁？"
+        },
+        {
+          "type": "npc",
+          "speaker": "长孙无忌",
+          "content": "殿下，圣上口谕召见，此时正处于生死之机。请殿下速速定神，莫要让殿内的禁卫察觉到您的任何异样。"
+        },
+        {
+          "type": "npc",
+          "speaker": "尉迟敬德",
+          "content": "喝什么？殿下，现在没时间喝酒！您快看那些禁卫的眼睛，他们像狼一样盯着咱们呢！"
+        }
+      ]
+    }
+  },
+  {
+    "day": 23,
+    "dateStr": "武德九年1月24日",
+    "phase": "player_input",
+    "detail": {
+      "turn": 1,
+      "input": "请父王明察"
+    }
+  },
+  {
+    "day": 23,
+    "dateStr": "武德九年1月24日",
+    "phase": "scene_dialogue",
+    "detail": {
+      "turn": 1,
+      "entries": [
+        {
+          "type": "narrator",
+          "speaker": "narrator",
+          "content": "秦王不顾幕僚劝诫，径直步入殿内，沉重的殿门在身后合拢。李渊端坐在书案后，闻听此称呼，眉头微皱，目光冷漠地看向次子，冷声问道：'明察？世民，你入殿便如此急切，究竟是想让朕明察东宫的‘忠诚’，还是想让朕明察你心中的‘野心’？'"
+        },
+        {
+          "type": "npc",
+          "speaker": "长孙无忌",
+          "content": "（在殿外低声）殿下如此鲁莽，竟在未试色之前便径直入内，此举太过冒险，恐失了分寸。"
+        },
+        {
+          "type": "npc",
+          "speaker": "尉迟敬德",
+          "content": "（在殿外低声）无忌，殿下向来如此，快刀斩乱麻！只要陛下不翻脸，这便是最好的试探！"
+        }
+      ]
+    }
+  },
+  {
+    "day": 23,
+    "dateStr": "武德九年1月24日",
+    "phase": "player_input",
+    "detail": {
+      "turn": 2,
+      "input": "我决定了"
+    }
+  },
+  {
+    "day": 23,
+    "dateStr": "武德九年1月24日",
+    "phase": "scene_dialogue",
+    "detail": {
+      "turn": 2,
+      "entries": [
+        {
+          "type": "npc",
+          "speaker": "房玄龄",
+          "content": "（在殿外面色苍白）殿下在内竟如此直接，此举乃是破釜沉舟，若圣上此时心向东宫，后果不堪设想。"
+        },
+        {
+          "type": "npc",
+          "speaker": "长孙无忌",
+          "content": "（在殿外低声）局势已至绝路，与其在猜忌中被动等死，不如以决绝之态逼圣上表态。殿下此举，是在赌圣上心中最后的公正。"
+        },
+        {
+          "type": "npc",
+          "speaker": "尉迟敬德",
+          "content": "（在殿外按住腰间剑柄）只要殿下一声令下，末将管他什么摊牌，直接将这殿门撞开，把人抢出来！"
+        }
+      ]
+    }
+  },
+  {
+    "day": 23,
+    "dateStr": "武德九年1月24日",
+    "phase": "player_input",
+    "detail": {
+      "turn": 3,
+      "input": "今日到此为止"
+    }
+  },
+  {
+    "day": 23,
+    "dateStr": "武德九年1月24日",
+    "phase": "scene_dialogue",
+    "detail": {
+      "turn": 3,
+      "entries": [
+        {
+          "type": "npc",
+          "speaker": "尉迟敬德",
+          "content": "（在殿外按住腰间剑柄）只要殿下一声令下，末将管他什么摊牌，直接将这殿门撞开，把人抢出来！"
+        },
+        {
+          "type": "player",
+          "speaker": "李世民",
+          "content": "今日到此为止"
+        },
+        {
+          "type": "narrator",
+          "speaker": "narrator",
+          "content": "御书房内，死一般的寂静笼罩在父子二人之间。秦王那句“今日到此为止”在空旷的大殿中回荡，像是一把沉重的锁，将此时的所有猜忌、野心与绝望一并封死。李渊依然保持着起身的姿态，那双锐利的眼睛死死盯着世民，眼神中交织着惊愕、愤怒与一种无法言说的复杂情感。两人之间仅隔着一张简单的书案，却仿佛横亘着万丈深渊，再无"
+        }
+      ]
+    }
+  },
+  {
+    "day": 23,
+    "dateStr": "武德九年1月24日",
+    "phase": "scene_ending",
+    "detail": {
+      "endingText": "御书房内，死一般的寂静笼罩在父子二人之间。秦王那句“今日到此为止”在空旷的大殿中回荡，像是一把沉重的锁，将此时的所有猜忌、野心与绝望一并封死。李渊依然保持着起身的姿态，那双锐利的眼睛死死盯着世民，眼神中交织着惊愕、愤怒与一种无法言说的复杂情感。两人之间仅隔着一张简单的书案，却仿佛横亘着万丈深渊，再无话可说。\n\n殿外的寒风依旧凛冽，长孙无忌、房玄龄与尉迟敬德三人屏息凝神，在死寂的等待中听着殿内传出的最后一声回响。他们看不见殿内的景象，只能感觉到空气中弥漫的浓重杀机与压抑。香炉中的最后一缕青烟缓缓升起，随即在寒气中地消散，留下的是一种山雨欲来风满楼的紧绷感。这一次会面没有给出最终的答案，只有一种决"
+    }
+  },
+  {
+    "day": 23,
+    "dateStr": "武德九年1月24日",
+    "phase": "memory_diff",
+    "detail": {
+      "beforeCounts": {
+        "weichi_jingde": 5,
+        "changsun_wuji": 5,
+        "fang_xuanling": 5
+      },
+      "afterCounts": {
+        "weichi_jingde": 6,
+        "changsun_wuji": 6,
+        "fang_xuanling": 6
+      },
+      "added": {
+        "weichi_jingde": [
+          {
+            "event": "在凛冽寒风中感受殿内压抑的杀气，预感到局势山雨欲来。",
+            "emotionalTag": "紧绷"
+          }
+        ],
+        "changsun_wuji": [
+          {
+            "event": "在御书房外感受到秦王与李渊之间决裂的沉重氛围。",
+            "emotionalTag": "焦虑"
+          }
+        ],
+        "fang_xuanling": [
+          {
+            "event": "屏息等待会面结果，察觉到空气中弥漫的浓重杀机与危机。",
+            "emotionalTag": "忧虑"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "day": 23,
+    "dateStr": "武德九年1月24日",
+    "phase": "event_end",
+    "detail": {
+      "summary": "御书房内，死一般的寂静笼罩在父子二人之间。秦王那句“今日到此为止”在空旷的大殿中回荡，像是一把沉重的锁，将此时的所有猜忌、野心与绝望一并封死。李渊依然保持着起身的姿态，那双锐利的眼睛死死盯着世民，眼神中交织着惊愕、愤怒与一种无法言说的复杂情感。两人之间仅隔着一张简单的书案，却仿佛横亘着万丈深渊，再无话可说。\n\n殿外的寒风依旧凛冽，长孙无忌、房玄龄与尉迟敬德三人屏息凝神，在死寂的等待中听着殿内传出的最后一声回响。他们看不见殿内的景象，只能感觉到空气中弥漫的浓重杀机与压抑。香炉中的最后一缕青烟缓缓升起，随即在寒气中地消散，留下的是一种山雨欲来风满楼的紧绷感。这一次会面没有给出最终的答案，只有一种决",
+      "eventLog": [
+        {
+          "name": "密奏削权之忧",
+          "day": 3,
+          "summary": "密室内，烛火在最后一次剧烈地摇曳后，渐渐失去了光亮，将众人的脸庞浸没在浓重的阴影之中。案头上的那封密信被风轻轻吹动，页角在桌面上发出沙沙的声响，像是在嘲讽着这场权力之争的结局。尉迟敬德手中的刀柄被握得咯吱作响，但最终未能出鞘；长孙无忌僵在原地，眼神中充满了不解与绝望；而房玄龄则缓缓合上了眼，在沉重的沉默中低下了头。在这个寒冷的初四之夜，秦王府的这座密室里，曾经的野心与杀气被一种令人窒息的颓然所取代"
+        },
+        {
+          "name": "御前试心",
+          "day": 8,
+          "summary": "李世民整理好衣冠，脊背挺得笔直，在三人的注视下，缓步迈过了御书房那道高高的门槛。随着沉重的殿门在身后发出一声低沉的闷响，将外界的寒风与同僚的叮嘱彻底隔绝，他独自面对着殿内那道在沉香缭绕中若隐若现的身影。此时的太极宫内静得可怕，唯有他的脚步声在空旷的大殿中回荡，每一步都像是踏在帝国权力的心弦之上。面对着屏风后那个掌握生杀大权的父亲，李世民在心底发出一声轻叹，在深红色的宫墙环绕之中，他缓缓跪下，将额头"
+        },
+        {
+          "name": "密奏削权之讯",
+          "day": 12,
+          "summary": "秦王缓缓站起身，走到窗前，望着窗外长安城深沉的夜色。密室内的炭火依旧噼啪作响，但此时的温暖已无法掩盖空气中弥漫的肃杀之气。房玄龄在灯下疾书，笔尖在纸上发出沙沙的响声，每一笔都像是在切割着某种禁忌。长孙无忌低声地与密使交代指令，尉迟敬德则在门外沉稳而有力地集结亲随。\n\n秦王看着案几上被揉皱的密信，眼神在昏暗的灯光下显得深邃而冰冷。他意识到，一旦这封奏章递出，他与太子的关系将再无转圜之余地，这场权力的"
+        },
+        {
+          "name": "东宫元宵危宴",
+          "day": 14,
+          "summary": "东宫的烛火在寒风中剧烈摇曳，将席间三人的影子在墙上拉得狭长而诡异。秦王端坐在原位，目光如电，直视着对面那张似笑非笑的脸庞；而李建成则缓缓放下手中的酒杯，杯底与桌面碰撞出一声清脆的轻响，如同某种无形的信号。齐王李元吉在侧，阴鸷的目光在秦王与东宫禁卫之间来回逡巡，手指不自觉地在衣袖中轻轻敲击。空气仿佛在这一刻凝固，四周潜伏的甲胄碰撞声若隐若现，将这奢华的宴厅变成了一座密不透风的囚笼。每个人都屏住呼吸，"
+        },
+        {
+          "name": "密诏惊雷",
+          "day": 21,
+          "summary": "密室之内，灯火在寒风的缝隙中摇曳，将几人的身影在墙上拉扯得诡谲而细长。长孙无忌、房玄龄与尉迟敬德三人静静地伫立在阴影之中，目光齐刷刷地聚焦在端坐在上位的秦王身上。案几上的那卷密信在微弱的光线下泛着幽光，像是一道无法逾越的深渊，将当前的局势切割得极其危险。\n\n秦王的身影在烛火的摇曳中沉静如山，他的面容隐藏在阴影之下，唯有一双眼睛冷冽如霜，死死地盯着那卷油布残卷。空气中弥漫着檀香与冷汗交织的古怪气息，"
+        },
+        {
+          "name": "深宫寒召",
+          "day": 24,
+          "summary": "御书房内，死一般的寂静笼罩在父子二人之间。秦王那句“今日到此为止”在空旷的大殿中回荡，像是一把沉重的锁，将此时的所有猜忌、野心与绝望一并封死。李渊依然保持着起身的姿态，那双锐利的眼睛死死盯着世民，眼神中交织着惊愕、愤怒与一种无法言说的复杂情感。两人之间仅隔着一张简单的书案，却仿佛横亘着万丈深渊，再无话可说。\n\n殿外的寒风依旧凛冽，长孙无忌、房玄龄与尉迟敬德三人屏息凝神，在死寂的等待中听着殿内传出的"
+        }
+      ]
+    }
+  },
+  {
+    "day": 23,
+    "dateStr": "武德九年1月24日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 100,
+        "jiancheng_hostility": 82,
+        "yuanji_ambition": 53,
+        "court_opinion": 41,
+        "qinwangfu_desperation": 46,
+        "imperial_suspicion": 25,
+        "military_readiness": 82
+      }
+    }
+  },
+  {
+    "day": 24,
+    "dateStr": "武德九年1月25日",
+    "phase": "activity",
+    "detail": {
+      "id": "meet_officials",
+      "name": "接见朝臣",
+      "flavor": "来人是礼部官员，表面议事，话锋一转却打探起秦王府近日的门客人数。"
+    }
+  },
+  {
+    "day": 24,
+    "dateStr": "武德九年1月25日",
+    "phase": "activity",
+    "detail": {
+      "id": "inspect_guards",
+      "name": "巡视府卫",
+      "flavor": "核查了紧急集结所需时间：从号角响起到战备完成，现在是一刻半——目标是一刻内完成。"
+    }
+  },
+  {
+    "day": 24,
+    "dateStr": "武德九年1月25日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 11,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "coordinate",
+          "action": "密联宫内内应确保守将配合",
+          "desc": "长孙无忌密会宫内禁卫，商议守将配合之策。",
+          "deltas": [
+            "succession_crisis+3",
+            "jiancheng_hostility+2"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "remonstrate",
+          "action": "死谏秦王速除齐王",
+          "desc": "尉迟敬德于府中死谏秦王，促其速除齐王。",
+          "deltas": [
+            "qinwangfu_desperation+3",
+            "military_readiness+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "密拟变局细节与善后方案",
+          "desc": "房玄龄与长孙无忌密议，拟定行动细节及善后之策。",
+          "deltas": [
+            "succession_crisis+2",
+            "qinwangfu_desperation-2"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [],
+      "briefing": "【武德九年正月廿五】\n\n今日暂无大事。"
+    }
+  },
+  {
+    "day": 24,
+    "dateStr": "武德九年1月25日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 99,
+        "jiancheng_hostility": 84,
+        "yuanji_ambition": 54,
+        "court_opinion": 41,
+        "qinwangfu_desperation": 47,
+        "imperial_suspicion": 25,
+        "military_readiness": 82
+      }
+    }
+  },
+  {
+    "day": 25,
+    "dateStr": "武德九年1月26日",
+    "phase": "activity",
+    "detail": {
+      "id": "counsel_xuanling",
+      "name": "与房玄龄议事",
+      "flavor": "他将一份人事调动的名单缓缓折好，叹道：\"有些棋，走了就无法收回。\""
+    }
+  },
+  {
+    "day": 25,
+    "dateStr": "武德九年1月26日",
+    "phase": "activity",
+    "detail": {
+      "id": "inspect_guards",
+      "name": "巡视府卫",
+      "flavor": "唤来今日当值的队正，逐条核对换班记录，发现一处交接时间有两刻钟的空缺。"
+    }
+  },
+  {
+    "day": 25,
+    "dateStr": "武德九年1月26日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 11,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "coordinate",
+          "action": "密联宫禁卫将领",
+          "desc": "长孙无忌密遣心腹，联络宫中禁卫将领。",
+          "deltas": [
+            "succession_crisis+2",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "remonstrate",
+          "action": "跪请秦王速决死战",
+          "desc": "尉迟敬德于府中跪请秦王速决生死之争。",
+          "deltas": [
+            "qinwangfu_desperation+3",
+            "military_readiness+2"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "与长孙无忌定夺具体行动方略",
+          "desc": "房玄龄与长孙无忌密议，拟定应对东宫的行动方略。",
+          "deltas": [
+            "succession_crisis+2",
+            "qinwangfu_desperation-2"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [],
+      "briefing": "【武德九年正月廿六】\n\n今日暂无大事。"
+    }
+  },
+  {
+    "day": 25,
+    "dateStr": "武德九年1月26日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 99,
+        "jiancheng_hostility": 85,
+        "yuanji_ambition": 54,
+        "court_opinion": 42,
+        "qinwangfu_desperation": 46,
+        "imperial_suspicion": 26,
+        "military_readiness": 84
+      }
+    }
+  },
+  {
+    "day": 26,
+    "dateStr": "武德九年1月27日",
+    "phase": "activity",
+    "detail": {
+      "id": "summon_spy",
+      "name": "召见密探",
+      "flavor": "那人道，太子昨夜彻夜未眠，书房灯火直至五更，随侍的宦官们个个噤若寒蝉。"
+    }
+  },
+  {
+    "day": 26,
+    "dateStr": "武德九年1月27日",
+    "phase": "activity",
+    "detail": {
+      "id": "inspect_guards",
+      "name": "巡视府卫",
+      "flavor": "核查了紧急集结所需时间：从号角响起到战备完成，现在是一刻半——目标是一刻内完成。"
+    }
+  },
+  {
+    "day": 26,
+    "dateStr": "武德九年1月27日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 12,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "coordinate",
+          "action": "密联宫中内应议守将立场",
+          "desc": "长孙无忌暗遣密使入宫，联络潜伏内应，确认宫门守将之立场。",
+          "deltas": [
+            "succession_crisis+2",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "remonstrate",
+          "action": "横刀跪谏促秦王决断",
+          "desc": "尉迟敬德于府中横刀跪谏，促请秦王速决齐王。",
+          "deltas": [
+            "qinwangfu_desperation+3",
+            "military_readiness+2",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "与长孙无忌密拟定局方略",
+          "desc": "房玄龄与长孙无忌密议，拟定应对太子的具体行动计划。",
+          "deltas": [
+            "succession_crisis+2",
+            "qinwangfu_desperation+1"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [],
+      "briefing": "【武德九年正月廿七】\n\n今日暂无大事。"
+    }
+  },
+  {
+    "day": 26,
+    "dateStr": "武德九年1月27日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 99,
+        "jiancheng_hostility": 87,
+        "yuanji_ambition": 55,
+        "court_opinion": 42,
+        "qinwangfu_desperation": 49,
+        "imperial_suspicion": 28,
+        "military_readiness": 85
+      }
+    }
+  },
+  {
+    "day": 27,
+    "dateStr": "武德九年1月28日",
+    "phase": "activity",
+    "detail": {
+      "id": "meet_officials",
+      "name": "接见朝臣",
+      "flavor": "年轻的小将鼓足勇气登门自荐，言辞虽糙，眼神坦然，倒比那些油滑的老官员更令人放心。"
+    }
+  },
+  {
+    "day": 27,
+    "dateStr": "武德九年1月28日",
+    "phase": "activity",
+    "detail": {
+      "id": "inspect_guards",
+      "name": "巡视府卫",
+      "flavor": "深夜绕府一周，数清了所有明哨与暗哨位置，与图册核对，发现东北角少了一人。"
+    }
+  },
+  {
+    "day": 27,
+    "dateStr": "武德九年1月28日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 11,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "coordinate",
+          "action": "密联宫内内侍及禁军将领",
+          "desc": "长孙无忌密遣心腹联络内侍，探查禁军守将意向。",
+          "deltas": [
+            "succession_crisis+2",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "remonstrate",
+          "action": "跪谏秦王速决齐王",
+          "desc": "尉迟敬德于府中跪请秦王速决齐王。",
+          "deltas": [
+            "qinwangfu_desperation+3",
+            "military_readiness+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "与长孙无忌拟定最终方略",
+          "desc": "房玄龄与长孙无忌密议，拟定行动细节与事后善后之策。",
+          "deltas": [
+            "succession_crisis+2",
+            "qinwangfu_desperation-2"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [],
+      "briefing": "【武德九年正月廿八】\n\n今日暂无大事。"
+    }
+  },
+  {
+    "day": 27,
+    "dateStr": "武德九年1月28日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 99,
+        "jiancheng_hostility": 88,
+        "yuanji_ambition": 55,
+        "court_opinion": 42,
+        "qinwangfu_desperation": 50,
+        "imperial_suspicion": 27,
+        "military_readiness": 86
+      }
+    }
+  },
+  {
+    "day": 28,
+    "dateStr": "武德九年1月29日",
+    "phase": "activity",
+    "detail": {
+      "id": "counsel_xuanling",
+      "name": "与房玄龄议事",
+      "flavor": "\"依旧制此事当奏陛下定夺，然而有些奏章递上去便无退路。\""
+    }
+  },
+  {
+    "day": 28,
+    "dateStr": "武德九年1月29日",
+    "phase": "activity",
+    "detail": {
+      "id": "inspect_guards",
+      "name": "巡视府卫",
+      "flavor": "检查东侧角门，门闩与插销俱在，然而合缝之处有新鲜泥迹，不知何时留下。"
+    }
+  },
+  {
+    "day": 28,
+    "dateStr": "武德九年1月29日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 12,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "coordinate",
+          "action": "密遣心腹联络禁卫守将",
+          "desc": "长孙无忌密遣心腹联络禁卫守将，商议宫门开启之事。",
+          "deltas": [
+            "succession_crisis+1",
+            "jiancheng_hostility+2",
+            "court_opinion-1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "remonstrate",
+          "action": "跪请秦王速决杀敌",
+          "desc": "尉迟敬德于府中跪请秦王速决，直言迟疑必致祸端。",
+          "deltas": [
+            "qinwangfu_desperation+3",
+            "military_readiness+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "拟定定策方案与善后章奏",
+          "desc": "房玄龄与长孙无忌密议行动细节，拟定事后奏章。",
+          "deltas": [
+            "succession_crisis+2",
+            "qinwangfu_desperation-2"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [],
+      "briefing": "【武德九年正月廿九】\n\n今日暂无大事。"
+    }
+  },
+  {
+    "day": 28,
+    "dateStr": "武德九年1月29日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 99,
+        "jiancheng_hostility": 90,
+        "yuanji_ambition": 55,
+        "court_opinion": 42,
+        "qinwangfu_desperation": 49,
+        "imperial_suspicion": 28,
+        "military_readiness": 86
+      }
+    }
+  },
+  {
+    "day": 29,
+    "dateStr": "武德九年1月30日",
+    "phase": "activity",
+    "detail": {
+      "id": "counsel_xuanling",
+      "name": "与房玄龄议事",
+      "flavor": "\"殿下，此事不能只靠忠心，忠心是薪柴，谋算才是火折子。\""
+    }
+  },
+  {
+    "day": 29,
+    "dateStr": "武德九年1月30日",
+    "phase": "activity",
+    "detail": {
+      "id": "inspect_guards",
+      "name": "巡视府卫",
+      "flavor": "今日侦察发现，近日有两人分批次绕府四周踱步，间隔规律，明显是故意踩点。"
+    }
+  },
+  {
+    "day": 29,
+    "dateStr": "武德九年1月30日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 12,
+      "npcActions": [
+        {
+          "who": "changsun_wuji",
+          "stance": "coordinate",
+          "action": "密会宫中内应部署宫门之策",
+          "desc": "长孙无忌密会宫中内应，部署掌控宫门之策。",
+          "deltas": [
+            "succession_crisis+2",
+            "jiancheng_hostility+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "weichi_jingde",
+          "stance": "remonstrate",
+          "action": "直谏秦王速除元吉",
+          "desc": "尉迟敬德在府内直谏秦王，促其速除齐王李元吉。",
+          "deltas": [
+            "qinwangfu_desperation+3",
+            "military_readiness+1"
+          ],
+          "degrade": 0
+        },
+        {
+          "who": "fang_xuanling",
+          "stance": "strategize",
+          "action": "与长孙无忌密拟决断计划",
+          "desc": "房玄龄与长孙无忌在密室内拟定行动计划及善后预案。",
+          "deltas": [
+            "succession_crisis+2",
+            "qinwangfu_desperation-2"
+          ],
+          "degrade": 0
+        }
+      ],
+      "triggeredEvents": [
+        "skeleton_banquet_crisis"
+      ],
+      "briefing": "【武德九年正月三十】\n\n有紧急事态需要处理——\n· 宴会危局：敌对方设宴款待秦王..."
+    }
+  },
+  {
+    "day": 29,
+    "dateStr": "武德九年1月30日",
+    "phase": "scene_start",
+    "detail": {
+      "sceneName": "event_skeleton_banquet_crisis_1776847388455",
+      "narratorIntro": "敌对方设宴款待秦王\n\n局势紧迫，事态正在发展..."
+    }
+  },
+  {
+    "day": 29,
+    "dateStr": "武德九年1月30日",
+    "phase": "player_input",
+    "detail": {
+      "turn": 0,
+      "input": "动手吧"
+    }
+  },
+  {
+    "day": 29,
+    "dateStr": "武德九年1月30日",
+    "phase": "scene_dialogue",
+    "detail": {
+      "turn": 0,
+      "entries": [
+        {
+          "type": "narrator",
+          "speaker": "narrator",
+          "content": "秦王一声令下，尉迟敬德暴起，长剑出鞘，直取座侧近卫。宴厅内瞬间大乱，杯盘碎裂，太子与齐王惊愕起身，四周侍卫纷纷拔刀。"
+        },
+        {
+          "type": "npc",
+          "speaker": "尉迟敬德",
+          "content": "殿下英断！末将这就为殿下杀出一条血路，将那太子与齐王的狗头取来！"
+        },
+        {
+          "type": "npc",
+          "speaker": "长孙无忌",
+          "content": "事已至此，再无回头路。臣这就护送殿下移至安全之所，以免被乱军所伤！"
+        }
+      ]
+    }
+  },
+  {
+    "day": 29,
+    "dateStr": "武德九年1月30日",
+    "phase": "player_input",
+    "detail": {
+      "turn": 1,
+      "input": "传令下去"
+    }
+  },
+  {
+    "day": 29,
+    "dateStr": "武德九年1月30日",
+    "phase": "scene_dialogue",
+    "detail": {
+      "turn": 1,
+      "entries": [
+        {
+          "type": "npc",
+          "speaker": "尉迟敬德",
+          "content": "命我等荡平此地，末将绝不留一人！杀！"
+        },
+        {
+          "type": "npc",
+          "speaker": "长孙无忌",
+          "content": "殿下之令已达，左右两翼已全部封锁，此地已成囚笼，叛逆绝无生路！"
+        },
+        {
+          "type": "narrator",
+          "speaker": "narrator",
+          "content": "宴厅之内，刀光剑影交织，将原本的奢华之景撕裂得支离破碎。秦王的号令如惊雷般落下，亲随将领们迅速响应，将太子与齐王的护卫死死地压制在角落之中。破碎的玉盘与倾覆的酒盏散落在地，殷红的酒液与鲜血混合在一起，在金色的地毯上洇染开来。太子李建成面色惨白，在混乱的厮杀中仓皇退后，而齐王李元吉则在绝望的嘶吼声中被"
+        }
+      ]
+    }
+  },
+  {
+    "day": 29,
+    "dateStr": "武德九年1月30日",
+    "phase": "scene_ending",
+    "detail": {
+      "endingText": "宴厅之内，刀光剑影交织，将原本的奢华之景撕裂得支离破碎。秦王的号令如惊雷般落下，亲随将领们迅速响应，将太子与齐王的护卫死死地压制在角落之中。破碎的玉盘与倾覆的酒盏散落在地，殷红的酒液与鲜血混合在一起，在金色的地毯上洇染开来。太子李建成面色惨白，在混乱的厮杀中仓皇退后，而齐王李元吉则在绝望的嘶吼声中被重重围住。尉迟敬德的巨剑挥砍之间，带起阵阵血雾，周围的空气中充满了铁锈味与惊恐的喘息。随着最后一名抵抗的禁军倒在血泊之中，嘈杂的厮杀声戛然而止，整个东宫宴厅陷入了一种死一般的寂静。秦王静静地伫立在满地狼藉之中，目光冷峻地审视着瘫坐在地、瑟瑟发抖的对手，手中握紧的剑锋正滴落着最后一滴血珠。"
+    }
+  },
+  {
+    "day": 29,
+    "dateStr": "武德九年1月30日",
+    "phase": "memory_diff",
+    "detail": {
+      "beforeCounts": {
+        "weichi_jingde": 6,
+        "changsun_wuji": 6,
+        "fang_xuanling": 6
+      },
+      "afterCounts": {
+        "weichi_jingde": 7,
+        "changsun_wuji": 7,
+        "fang_xuanling": 6
+      },
+      "added": {
+        "weichi_jingde": [
+          {
+            "event": "执巨剑血洗宴厅，助秦王彻底镇压太子与齐王。",
+            "emotionalTag": "杀伐果断"
+          }
+        ],
+        "changsun_wuji": [
+          {
+            "event": "目睹东宫宴厅血洗之变，见证秦王终结权力之争。",
+            "emotionalTag": "沉稳冷峻"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "day": 29,
+    "dateStr": "武德九年1月30日",
+    "phase": "event_end",
+    "detail": {
+      "summary": "宴厅之内，刀光剑影交织，将原本的奢华之景撕裂得支离破碎。秦王的号令如惊雷般落下，亲随将领们迅速响应，将太子与齐王的护卫死死地压制在角落之中。破碎的玉盘与倾覆的酒盏散落在地，殷红的酒液与鲜血混合在一起，在金色的地毯上洇染开来。太子李建成面色惨白，在混乱的厮杀中仓皇退后，而齐王李元吉则在绝望的嘶吼声中被重重围住。尉迟敬德的巨剑挥砍之间，带起阵阵血雾，周围的空气中充满了铁锈味与惊恐的喘息。随着最后一名抵抗的禁军倒在血泊之中，嘈杂的厮杀声戛然而止，整个东宫宴厅陷入了一种死一般的寂静。秦王静静地伫立在满地狼藉之中，目光冷峻地审视着瘫坐在地、瑟瑟发抖的对手，手中握紧的剑锋正滴落着最后一滴血珠。",
+      "eventLog": [
+        {
+          "name": "密奏削权之忧",
+          "day": 3,
+          "summary": "密室内，烛火在最后一次剧烈地摇曳后，渐渐失去了光亮，将众人的脸庞浸没在浓重的阴影之中。案头上的那封密信被风轻轻吹动，页角在桌面上发出沙沙的声响，像是在嘲讽着这场权力之争的结局。尉迟敬德手中的刀柄被握得咯吱作响，但最终未能出鞘；长孙无忌僵在原地，眼神中充满了不解与绝望；而房玄龄则缓缓合上了眼，在沉重的沉默中低下了头。在这个寒冷的初四之夜，秦王府的这座密室里，曾经的野心与杀气被一种令人窒息的颓然所取代"
+        },
+        {
+          "name": "御前试心",
+          "day": 8,
+          "summary": "李世民整理好衣冠，脊背挺得笔直，在三人的注视下，缓步迈过了御书房那道高高的门槛。随着沉重的殿门在身后发出一声低沉的闷响，将外界的寒风与同僚的叮嘱彻底隔绝，他独自面对着殿内那道在沉香缭绕中若隐若现的身影。此时的太极宫内静得可怕，唯有他的脚步声在空旷的大殿中回荡，每一步都像是踏在帝国权力的心弦之上。面对着屏风后那个掌握生杀大权的父亲，李世民在心底发出一声轻叹，在深红色的宫墙环绕之中，他缓缓跪下，将额头"
+        },
+        {
+          "name": "密奏削权之讯",
+          "day": 12,
+          "summary": "秦王缓缓站起身，走到窗前，望着窗外长安城深沉的夜色。密室内的炭火依旧噼啪作响，但此时的温暖已无法掩盖空气中弥漫的肃杀之气。房玄龄在灯下疾书，笔尖在纸上发出沙沙的响声，每一笔都像是在切割着某种禁忌。长孙无忌低声地与密使交代指令，尉迟敬德则在门外沉稳而有力地集结亲随。\n\n秦王看着案几上被揉皱的密信，眼神在昏暗的灯光下显得深邃而冰冷。他意识到，一旦这封奏章递出，他与太子的关系将再无转圜之余地，这场权力的"
+        },
+        {
+          "name": "东宫元宵危宴",
+          "day": 14,
+          "summary": "东宫的烛火在寒风中剧烈摇曳，将席间三人的影子在墙上拉得狭长而诡异。秦王端坐在原位，目光如电，直视着对面那张似笑非笑的脸庞；而李建成则缓缓放下手中的酒杯，杯底与桌面碰撞出一声清脆的轻响，如同某种无形的信号。齐王李元吉在侧，阴鸷的目光在秦王与东宫禁卫之间来回逡巡，手指不自觉地在衣袖中轻轻敲击。空气仿佛在这一刻凝固，四周潜伏的甲胄碰撞声若隐若现，将这奢华的宴厅变成了一座密不透风的囚笼。每个人都屏住呼吸，"
+        },
+        {
+          "name": "密诏惊雷",
+          "day": 21,
+          "summary": "密室之内，灯火在寒风的缝隙中摇曳，将几人的身影在墙上拉扯得诡谲而细长。长孙无忌、房玄龄与尉迟敬德三人静静地伫立在阴影之中，目光齐刷刷地聚焦在端坐在上位的秦王身上。案几上的那卷密信在微弱的光线下泛着幽光，像是一道无法逾越的深渊，将当前的局势切割得极其危险。\n\n秦王的身影在烛火的摇曳中沉静如山，他的面容隐藏在阴影之下，唯有一双眼睛冷冽如霜，死死地盯着那卷油布残卷。空气中弥漫着檀香与冷汗交织的古怪气息，"
+        },
+        {
+          "name": "深宫寒召",
+          "day": 24,
+          "summary": "御书房内，死一般的寂静笼罩在父子二人之间。秦王那句“今日到此为止”在空旷的大殿中回荡，像是一把沉重的锁，将此时的所有猜忌、野心与绝望一并封死。李渊依然保持着起身的姿态，那双锐利的眼睛死死盯着世民，眼神中交织着惊愕、愤怒与一种无法言说的复杂情感。两人之间仅隔着一张简单的书案，却仿佛横亘着万丈深渊，再无话可说。\n\n殿外的寒风依旧凛冽，长孙无忌、房玄龄与尉迟敬德三人屏息凝神，在死寂的等待中听着殿内传出的"
+        },
+        {
+          "name": "宴会危局",
+          "day": 30,
+          "summary": "宴厅之内，刀光剑影交织，将原本的奢华之景撕裂得支离破碎。秦王的号令如惊雷般落下，亲随将领们迅速响应，将太子与齐王的护卫死死地压制在角落之中。破碎的玉盘与倾覆的酒盏散落在地，殷红的酒液与鲜血混合在一起，在金色的地毯上洇染开来。太子李建成面色惨白，在混乱的厮杀中仓皇退后，而齐王李元吉则在绝望的嘶吼声中被重重围住。尉迟敬德的巨剑挥砍之间，带起阵阵血雾，周围的空气中充满了铁锈味与惊恐的喘息。随着最后一名抵"
+        }
+      ]
+    }
+  },
+  {
+    "day": 29,
+    "dateStr": "武德九年1月30日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 100,
+        "jiancheng_hostility": 91,
+        "yuanji_ambition": 56,
+        "court_opinion": 43,
+        "qinwangfu_desperation": 60,
+        "imperial_suspicion": 29,
+        "military_readiness": 86
+      }
+    }
+  }
+]

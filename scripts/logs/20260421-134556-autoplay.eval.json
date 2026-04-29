@@ -1,0 +1,284 @@
+{
+  "inputFile": "scripts/logs/20260421-134556-autoplay.json",
+  "timestamp": "2026-04-22T05:22:19.811Z",
+  "metrics": {
+    "totalDays": 26,
+    "eventCount": 5,
+    "eventDays": [
+      2,
+      11,
+      12,
+      15,
+      21
+    ],
+    "avgEventInterval": 4.75,
+    "eventIntervalStdDev": 3.031088913245535,
+    "npcDecisions": {
+      "changsun_wuji": {
+        "persuade": 3,
+        "intel": 5,
+        "scheme": 18
+      },
+      "weichi_jingde": {
+        "mobilize": 12
+      },
+      "fang_xuanling": {
+        "observe": 1,
+        "scheme": 23
+      }
+    },
+    "activityChoices": {
+      "train_troops(练兵演武)": 7,
+      "summon_spy(召见密探)": 8,
+      "review_memorials(批阅奏折)": 2,
+      "family_time(陪伴家眷)": 1,
+      "inspect_guards(巡视府卫)": 1,
+      "counsel_xuanling(与房玄龄议事)": 3,
+      "reassure_jingde(安抚尉迟敬德)": 4,
+      "contact_insiders(联络宫中内应)": 5,
+      "meet_officials(接见朝臣)": 6,
+      "study(温书习字)": 3,
+      "counsel_wuji(与长孙无忌密谈)": 2
+    },
+    "pressureStart": {
+      "succession_crisis": 49,
+      "jiancheng_hostility": 43,
+      "yuanji_ambition": 36,
+      "court_opinion": 34,
+      "qinwangfu_desperation": 26,
+      "imperial_suspicion": 22,
+      "military_readiness": 26
+    },
+    "pressureEnd": {
+      "succession_crisis": 99,
+      "jiancheng_hostility": 93,
+      "yuanji_ambition": 54,
+      "court_opinion": 49,
+      "qinwangfu_desperation": 17,
+      "imperial_suspicion": 40,
+      "military_readiness": 71
+    },
+    "pressureDelta": {
+      "succession_crisis": 50,
+      "jiancheng_hostility": 50,
+      "yuanji_ambition": 18,
+      "court_opinion": 15,
+      "qinwangfu_desperation": -9,
+      "imperial_suspicion": 18,
+      "military_readiness": 45
+    },
+    "totalNpcActions": 62,
+    "totalDegraded": 1,
+    "totalLlmImpliedCalls": 26
+  },
+  "emergenceMetrics": {
+    "npcStanceDiversity": {
+      "changsun_wuji": {
+        "distribution": {
+          "persuade": 3,
+          "intel": 5,
+          "scheme": 18
+        },
+        "shannonEntropy": 1.18,
+        "dominantStance": "scheme",
+        "dominantRatio": 0.69
+      },
+      "weichi_jingde": {
+        "distribution": {
+          "mobilize": 12
+        },
+        "shannonEntropy": 0,
+        "dominantStance": "mobilize",
+        "dominantRatio": 1
+      },
+      "fang_xuanling": {
+        "distribution": {
+          "observe": 1,
+          "scheme": 23
+        },
+        "shannonEntropy": 0.25,
+        "dominantStance": "scheme",
+        "dominantRatio": 0.96
+      }
+    },
+    "npcActionRepetitionRate": {
+      "changsun_wuji": 0,
+      "weichi_jingde": 0,
+      "fang_xuanling": 0.13
+    },
+    "npcSilentDays": {
+      "changsun_wuji": 0,
+      "weichi_jingde": 14,
+      "fang_xuanling": 2
+    },
+    "npcStanceTransitions": {
+      "changsun_wuji": 8,
+      "weichi_jingde": 0,
+      "fang_xuanling": 1
+    },
+    "eventBehaviorShift": [
+      {
+        "eventDay": 2,
+        "skeletonId": "skeleton_intelligence_event",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "persuade",
+              "persuade"
+            ],
+            "after": [
+              "persuade",
+              "intel"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "mobilize",
+              "mobilize"
+            ],
+            "after": [
+              "mobilize",
+              "mobilize"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "observe",
+              "scheme"
+            ],
+            "after": [
+              "scheme"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 11,
+        "skeletonId": "skeleton_imperial_summons",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "scheme",
+              "intel"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "mobilize",
+              "mobilize"
+            ],
+            "after": []
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 12,
+        "skeletonId": "skeleton_intelligence_event",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "intel",
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "intel"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "mobilize"
+            ],
+            "after": []
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 15,
+        "skeletonId": "skeleton_banquet_crisis",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "scheme",
+              "intel"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [],
+            "after": []
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 21,
+        "skeletonId": "skeleton_intelligence_event",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [],
+            "after": [
+              "mobilize"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

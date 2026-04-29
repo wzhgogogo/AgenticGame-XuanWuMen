@@ -1,0 +1,96 @@
+{
+  "inputFile": "scripts/logs/20260420-132745-autoplay.json",
+  "timestamp": "2026-04-20T05:55:51.011Z",
+  "metrics": {
+    "totalDays": 15,
+    "eventCount": 2,
+    "eventDays": [
+      2,
+      11
+    ],
+    "avgEventInterval": 9,
+    "eventIntervalStdDev": 0,
+    "npcDecisions": {
+      "weichi_jingde": {
+        "gather_intel": 14
+      },
+      "changsun_wuji": {
+        "gather_intel": 4,
+        "seek_allies": 3
+      },
+      "fang_xuanling": {
+        "gather_intel": 2,
+        "scheme": 4,
+        "seek_allies": 3
+      }
+    },
+    "activityChoices": {
+      "reassure_jingde(安抚尉迟敬德)": 4,
+      "counsel_xuanling(与房玄龄议事)": 5,
+      "meet_officials(接见朝臣)": 5,
+      "train_troops(练兵演武)": 1,
+      "family_time(陪伴家眷)": 3,
+      "summon_spy(召见密探)": 2,
+      "review_memorials(批阅奏折)": 3,
+      "inspect_guards(巡视府卫)": 1,
+      "study(温书习字)": 1,
+      "counsel_wuji(与长孙无忌密谈)": 1,
+      "contact_insiders(联络宫中内应)": 1
+    },
+    "pressureStart": {
+      "succession_crisis": 47,
+      "jiancheng_hostility": 41,
+      "yuanji_ambition": 36,
+      "court_opinion": 31,
+      "qinwangfu_desperation": 25,
+      "imperial_suspicion": 21,
+      "military_readiness": 22
+    },
+    "pressureEnd": {
+      "succession_crisis": 65,
+      "jiancheng_hostility": 57,
+      "yuanji_ambition": 48,
+      "court_opinion": 34,
+      "qinwangfu_desperation": 31,
+      "imperial_suspicion": 26,
+      "military_readiness": 63
+    },
+    "pressureDelta": {
+      "succession_crisis": 18,
+      "jiancheng_hostility": 16,
+      "yuanji_ambition": 12,
+      "court_opinion": 3,
+      "qinwangfu_desperation": 6,
+      "imperial_suspicion": 5,
+      "military_readiness": 41
+    },
+    "totalNpcActions": 30,
+    "totalLlmImpliedCalls": 15
+  },
+  "llmEval": {
+    "scores": [
+      {
+        "dimension": "角色一致性",
+        "score": 3,
+        "reasoning": "房玄龄和长孙无忌的行为基本符合人设，体现了稳重与谨慎。但尉迟敬德的人设是'刚猛、容易激进'，但在15天的记录中，他几乎在重复地执行gather_intel（搜集情报），完全没有出现confront（对抗）或warn（警告）等符合其性格的激进行为，角色特质被抹平为纯粹的情报员。"
+      },
+      {
+        "dimension": "节奏合理性",
+        "score": 2,
+        "reasoning": "节奏极其平淡。15天内仅触发2次事件，且NPC的决策序列陷入了严重的‘循环陷阱’：几乎每天都在重复‘察看动向’→‘确认嫌隙’→‘摸清底细’。缺乏有效的触发机制来打破这种低效率的循环，导致游戏体验像是在阅读同一段话的15个微小变体。"
+      },
+      {
+        "dimension": "压力叙事弧",
+        "score": 3,
+        "reasoning": "数据端形成了基本的叙事趋势：military_readiness（军事准备）大幅提升，succession_crisis（继承危机）上升，预示着局势正从政治博弈转向武力冲突。但压力轴的增长与NPC的实际行为脱节（行为在搜集情报，压力却在军事准备上飞涨），缺乏逻辑上的因果映射。"
+      },
+      {
+        "dimension": "涌现质量",
+        "score": 2,
+        "reasoning": "涌现质量较低。NPC的决策呈现出高度的模板化，大量重复‘太子与齐王盟约崩塌’这一单一认知。没有出现基于不同压力值触发的意外转折或NPC之间的互动冲突，目前的‘涌现’仅停留在词汇替换层面，而非逻辑层面的复杂行为涌现。"
+      }
+    ],
+    "overallScore": 2.5,
+    "summary": "系统框架完整但LLM决策陷入严重的重复性循环，导致游戏沦为‘情报搜集模拟器’，亟需通过引入更强的事件触发机制和多样化的行为激励来打破僵局。"
+  }
+}

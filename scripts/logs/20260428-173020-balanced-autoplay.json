@@ -1,0 +1,11 @@
+[
+  {
+    "day": 0,
+    "dateStr": "",
+    "phase": "config",
+    "detail": {
+      "strategy": "balanced",
+      "maxDays": 30
+    }
+  }
+]

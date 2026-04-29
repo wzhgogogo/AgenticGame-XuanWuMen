@@ -1,0 +1,592 @@
+{
+  "inputFile": "scripts/logs/20260422-143243-suppress_jiancheng-autoplay.json",
+  "timestamp": "2026-04-22T08:44:48.360Z",
+  "metrics": {
+    "totalDays": 30,
+    "eventCount": 7,
+    "eventDays": [
+      2,
+      7,
+      11,
+      16,
+      20,
+      23,
+      29
+    ],
+    "avgEventInterval": 4.5,
+    "eventIntervalStdDev": 0.9574271077563381,
+    "npcDecisions": {
+      "changsun_wuji": {
+        "intel": 3,
+        "scheme": 26,
+        "persuade": 1
+      },
+      "weichi_jingde": {
+        "mobilize": 7,
+        "confront": 23
+      },
+      "fang_xuanling": {
+        "scheme": 30
+      }
+    },
+    "activityChoices": {
+      "counsel_xuanling(与房玄龄议事)": 14,
+      "summon_spy(召见密探)": 10,
+      "contact_insiders(联络宫中内应)": 5,
+      "meet_officials(接见朝臣)": 11,
+      "inspect_guards(巡视府卫)": 20
+    },
+    "pressureStart": {
+      "succession_crisis": 50,
+      "jiancheng_hostility": 42,
+      "yuanji_ambition": 36,
+      "court_opinion": 32,
+      "qinwangfu_desperation": 25,
+      "imperial_suspicion": 22,
+      "military_readiness": 23
+    },
+    "pressureEnd": {
+      "succession_crisis": 99,
+      "jiancheng_hostility": 89,
+      "yuanji_ambition": 56,
+      "court_opinion": 45,
+      "qinwangfu_desperation": 45,
+      "imperial_suspicion": 39,
+      "military_readiness": 88
+    },
+    "pressureDelta": {
+      "succession_crisis": 49,
+      "jiancheng_hostility": 47,
+      "yuanji_ambition": 20,
+      "court_opinion": 13,
+      "qinwangfu_desperation": 20,
+      "imperial_suspicion": 17,
+      "military_readiness": 65
+    },
+    "totalNpcActions": 90,
+    "totalDegraded": 1,
+    "totalLlmImpliedCalls": 30
+  },
+  "emergenceMetrics": {
+    "npcStanceDiversity": {
+      "changsun_wuji": {
+        "distribution": {
+          "intel": 3,
+          "scheme": 26,
+          "persuade": 1
+        },
+        "shannonEntropy": 0.67,
+        "dominantStance": "scheme",
+        "dominantRatio": 0.87
+      },
+      "weichi_jingde": {
+        "distribution": {
+          "mobilize": 7,
+          "confront": 23
+        },
+        "shannonEntropy": 0.78,
+        "dominantStance": "confront",
+        "dominantRatio": 0.77
+      },
+      "fang_xuanling": {
+        "distribution": {
+          "scheme": 30
+        },
+        "shannonEntropy": 0,
+        "dominantStance": "scheme",
+        "dominantRatio": 1
+      }
+    },
+    "npcActionRepetitionRate": {
+      "changsun_wuji": 0.07,
+      "weichi_jingde": 0.07,
+      "fang_xuanling": 0.13
+    },
+    "npcSilentDays": {
+      "changsun_wuji": 0,
+      "weichi_jingde": 0,
+      "fang_xuanling": 0
+    },
+    "npcStanceTransitions": {
+      "changsun_wuji": 3,
+      "weichi_jingde": 1,
+      "fang_xuanling": 0
+    },
+    "eventBehaviorShift": [
+      {
+        "eventDay": 2,
+        "skeletonId": "skeleton_intelligence_event",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "intel",
+              "intel"
+            ],
+            "after": [
+              "scheme",
+              "persuade"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "mobilize",
+              "mobilize"
+            ],
+            "after": [
+              "mobilize",
+              "mobilize"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 7,
+        "skeletonId": "skeleton_imperial_summons",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "mobilize",
+              "mobilize"
+            ],
+            "after": [
+              "confront",
+              "confront"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 11,
+        "skeletonId": "skeleton_intelligence_event",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "confront",
+              "confront"
+            ],
+            "after": [
+              "confront",
+              "confront"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 16,
+        "skeletonId": "skeleton_banquet_crisis",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "confront",
+              "confront"
+            ],
+            "after": [
+              "confront",
+              "confront"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 20,
+        "skeletonId": "skeleton_intelligence_event",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "confront",
+              "confront"
+            ],
+            "after": [
+              "confront",
+              "confront"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 23,
+        "skeletonId": "skeleton_imperial_summons",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "confront",
+              "confront"
+            ],
+            "after": [
+              "confront",
+              "confront"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 29,
+        "skeletonId": "skeleton_intelligence_event",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": []
+          },
+          "weichi_jingde": {
+            "before": [
+              "confront",
+              "confront"
+            ],
+            "after": []
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": []
+          }
+        }
+      }
+    ]
+  },
+  "ruleBasedIssues": [
+    {
+      "type": "naming_violation",
+      "detail": "NPC 对李世民使用了帝王称谓（陛下/圣上）",
+      "recordIndex": 1
+    },
+    {
+      "type": "naming_violation",
+      "detail": "NPC 对李世民使用了帝王称谓（陛下/圣上）",
+      "recordIndex": 9
+    },
+    {
+      "type": "naming_violation",
+      "detail": "NPC 直呼李世民姓名，应称\"殿下\"或\"秦王\"",
+      "recordIndex": 28
+    },
+    {
+      "type": "naming_violation",
+      "detail": "NPC 对李世民使用了帝王称谓（陛下/圣上）",
+      "recordIndex": 29
+    },
+    {
+      "type": "naming_violation",
+      "detail": "NPC 对李世民使用了帝王称谓（陛下/圣上）",
+      "recordIndex": 32
+    },
+    {
+      "type": "naming_violation",
+      "detail": "NPC 对李世民使用了帝王称谓（陛下/圣上）",
+      "recordIndex": 47
+    },
+    {
+      "type": "naming_violation",
+      "detail": "NPC 直呼李世民姓名，应称\"殿下\"或\"秦王\"",
+      "recordIndex": 48
+    },
+    {
+      "type": "naming_violation",
+      "detail": "NPC 使用了李世民专属亲属称呼（父皇/大哥/四弟）",
+      "recordIndex": 49
+    },
+    {
+      "type": "naming_violation",
+      "detail": "NPC 直呼李世民姓名，应称\"殿下\"或\"秦王\"",
+      "recordIndex": 66
+    },
+    {
+      "type": "naming_violation",
+      "detail": "NPC 对李世民使用了帝王称谓（陛下/圣上）",
+      "recordIndex": 67
+    },
+    {
+      "type": "naming_violation",
+      "detail": "NPC 直呼李世民姓名，应称\"殿下\"或\"秦王\"",
+      "recordIndex": 75
+    },
+    {
+      "type": "naming_violation",
+      "detail": "NPC 直呼李世民姓名，应称\"殿下\"或\"秦王\"",
+      "recordIndex": 77
+    },
+    {
+      "type": "naming_violation",
+      "detail": "NPC 直呼李世民姓名，应称\"殿下\"或\"秦王\"",
+      "recordIndex": 92
+    },
+    {
+      "type": "naming_violation",
+      "detail": "NPC 对李世民使用了帝王称谓（陛下/圣上）",
+      "recordIndex": 99
+    },
+    {
+      "type": "naming_violation",
+      "detail": "NPC 直呼李世民姓名，应称\"殿下\"或\"秦王\"",
+      "recordIndex": 104
+    },
+    {
+      "type": "naming_violation",
+      "detail": "NPC 对李世民使用了帝王称谓（陛下/圣上）",
+      "recordIndex": 126
+    },
+    {
+      "type": "naming_violation",
+      "detail": "NPC 对李世民使用了帝王称谓（陛下/圣上）",
+      "recordIndex": 130
+    },
+    {
+      "type": "response_repetition",
+      "detail": "scene_dialogue 输出相似度过高 (59% 5-gram overlap)，records [10] 和 [11]",
+      "recordIndex": 11
+    },
+    {
+      "type": "response_repetition",
+      "detail": "scene_dialogue 输出相似度过高 (45% 5-gram overlap)，records [86] 和 [87]",
+      "recordIndex": 87
+    },
+    {
+      "type": "response_repetition",
+      "detail": "scene_dialogue 输出相似度过高 (40% 5-gram overlap)，records [87] 和 [88]",
+      "recordIndex": 88
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 6 个记忆关键词但 response 无一体现",
+      "recordIndex": 30
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 6 个记忆关键词但 response 无一体现",
+      "recordIndex": 31
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 6 个记忆关键词但 response 无一体现",
+      "recordIndex": 32
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 6 个记忆关键词但 response 无一体现",
+      "recordIndex": 33
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 11 个记忆关键词但 response 无一体现",
+      "recordIndex": 48
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 11 个记忆关键词但 response 无一体现",
+      "recordIndex": 49
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 11 个记忆关键词但 response 无一体现",
+      "recordIndex": 50
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 15 个记忆关键词但 response 无一体现",
+      "recordIndex": 68
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 15 个记忆关键词但 response 无一体现",
+      "recordIndex": 69
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 15 个记忆关键词但 response 无一体现",
+      "recordIndex": 70
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 15 个记忆关键词但 response 无一体现",
+      "recordIndex": 71
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 19 个记忆关键词但 response 无一体现",
+      "recordIndex": 87
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 22 个记忆关键词但 response 无一体现",
+      "recordIndex": 100
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 22 个记忆关键词但 response 无一体现",
+      "recordIndex": 101
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 22 个记忆关键词但 response 无一体现",
+      "recordIndex": 102
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 22 个记忆关键词但 response 无一体现",
+      "recordIndex": 103
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 22 个记忆关键词但 response 无一体现",
+      "recordIndex": 104
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 22 个记忆关键词但 response 无一体现",
+      "recordIndex": 105
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 22 个记忆关键词但 response 无一体现",
+      "recordIndex": 106
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 27 个记忆关键词但 response 无一体现",
+      "recordIndex": 127
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 27 个记忆关键词但 response 无一体现",
+      "recordIndex": 128
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 27 个记忆关键词但 response 无一体现",
+      "recordIndex": 130
+    },
+    {
+      "type": "memory_not_used",
+      "detail": "系统 prompt 注入了 27 个记忆关键词但 response 无一体现",
+      "recordIndex": 131
+    }
+  ],
+  "memoryAnalysis": {
+    "totalMemoriesAdded": 19,
+    "duplicateRate": 0,
+    "emotionalTagDiversity": 17,
+    "growthCurve": [
+      2,
+      2,
+      3,
+      3,
+      3,
+      3,
+      3
+    ]
+  }
+}

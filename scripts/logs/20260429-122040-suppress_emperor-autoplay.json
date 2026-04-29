@@ -1,0 +1,282 @@
+[
+  {
+    "day": 0,
+    "dateStr": "",
+    "phase": "config",
+    "detail": {
+      "strategy": "suppress_emperor",
+      "maxDays": 30
+    }
+  },
+  {
+    "day": 0,
+    "dateStr": "武德九年1月1日",
+    "phase": "activity",
+    "detail": {
+      "id": "summon_spy",
+      "name": "召见密探",
+      "flavor": "截获的口信只有三个字：\"月圆时。\"——是约期，还是暗号，还是一句试探，无从分辨。"
+    }
+  },
+  {
+    "day": 0,
+    "dateStr": "武德九年1月1日",
+    "phase": "activity",
+    "detail": {
+      "id": "meet_officials",
+      "name": "接见朝臣",
+      "flavor": "侯君集言辞犀利，说到激处拍案而起，李世民只是微微一笑，未置可否。"
+    }
+  },
+  {
+    "day": 0,
+    "dateStr": "武德九年1月1日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 0,
+      "npcActions": [],
+      "triggeredEvents": [],
+      "briefing": "【武德九年正月初一】\n\n今日暂无大事。"
+    }
+  },
+  {
+    "day": 0,
+    "dateStr": "武德九年1月1日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 47,
+        "jiancheng_hostility": 41,
+        "yuanji_ambition": 36,
+        "court_opinion": 30,
+        "qinwangfu_desperation": 26,
+        "imperial_suspicion": 20,
+        "military_readiness": 20
+      },
+      "playerActions": [
+        {
+          "type": "activity",
+          "day": 0
+        },
+        {
+          "type": "activity",
+          "day": 0
+        }
+      ]
+    }
+  },
+  {
+    "day": 1,
+    "dateStr": "武德九年1月2日",
+    "phase": "activity",
+    "detail": {
+      "id": "train_troops",
+      "name": "练兵演武",
+      "flavor": "今日特意操演扼守要道的阻击阵法，这路阵型，留给最不得已时使用。"
+    }
+  },
+  {
+    "day": 1,
+    "dateStr": "武德九年1月2日",
+    "phase": "activity",
+    "detail": {
+      "id": "contact_insiders",
+      "name": "联络宫中内应",
+      "flavor": "\"宫中人心浮动，有人在赌殿下，有人在观望，还有的人两边都留了退路。\""
+    }
+  },
+  {
+    "day": 1,
+    "dateStr": "武德九年1月2日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 0,
+      "npcActions": [],
+      "triggeredEvents": [],
+      "briefing": "【武德九年正月初二】\n\n今日暂无大事。"
+    }
+  },
+  {
+    "day": 1,
+    "dateStr": "武德九年1月2日",
+    "phase": "pressure_snapshot",
+    "detail": {
+      "axes": {
+        "succession_crisis": 49,
+        "jiancheng_hostility": 43,
+        "yuanji_ambition": 37,
+        "court_opinion": 31,
+        "qinwangfu_desperation": 27,
+        "imperial_suspicion": 22,
+        "military_readiness": 25
+      },
+      "playerActions": [
+        {
+          "type": "activity",
+          "day": 0
+        },
+        {
+          "type": "activity",
+          "day": 1
+        },
+        {
+          "type": "activity",
+          "day": 1
+        }
+      ]
+    }
+  },
+  {
+    "day": 2,
+    "dateStr": "武德九年1月3日",
+    "phase": "activity",
+    "detail": {
+      "id": "contact_insiders",
+      "name": "联络宫中内应",
+      "flavor": "\"殿下，我们在等一个合适的时机，但宫里的人在等的，是一个足够确定的承诺。\""
+    }
+  },
+  {
+    "day": 2,
+    "dateStr": "武德九年1月3日",
+    "phase": "activity",
+    "detail": {
+      "id": "summon_spy",
+      "name": "召见密探",
+      "flavor": "消息说，太子府近日收罗了大批毒药，以药材为掩护，分装十余箱，目的何在尚不明朗。"
+    }
+  },
+  {
+    "day": 2,
+    "dateStr": "武德九年1月3日",
+    "phase": "tick",
+    "detail": {
+      "pressureChanges": 0,
+      "npcActions": [],
+      "triggeredEvents": [
+        "skeleton_intelligence_event"
+      ],
+      "briefing": "【武德九年正月初三】\n\n有紧急事态需要处理——\n· 情报事件：秦王府收到重要情报..."
+    }
+  },
+  {
+    "day": 2,
+    "dateStr": "武德九年1月3日",
+    "phase": "scene_start",
+    "detail": {
+      "sceneName": "event_skeleton_intelligence_event_1777436546090",
+      "narratorIntro": "秦王府收到重要情报\n\n局势紧迫，事态正在发展..."
+    }
+  },
+  {
+    "day": 2,
+    "dateStr": "武德九年1月3日",
+    "phase": "player_input",
+    "detail": {
+      "turn": 0,
+      "input": "争来争去有何意义"
+    }
+  },
+  {
+    "day": 2,
+    "dateStr": "武德九年1月3日",
+    "phase": "scene_dialogue",
+    "detail": {
+      "turn": 0,
+      "entries": [
+        {
+          "type": "scene_action",
+          "speaker": "scene_action",
+          "content": "夜风忽起，烛火明灭不定……（TypeError: fetch failed）"
+        },
+        {
+          "type": "player",
+          "speaker": "李世民",
+          "content": "争来争去有何意义"
+        },
+        {
+          "type": "scene_action",
+          "speaker": "scene_action",
+          "content": "夜风忽起，烛火明灭不定……（TypeError: fetch failed）"
+        }
+      ]
+    }
+  },
+  {
+    "day": 2,
+    "dateStr": "武德九年1月3日",
+    "phase": "player_input",
+    "detail": {
+      "turn": 1,
+      "input": "大哥如果我不喝呢"
+    }
+  },
+  {
+    "day": 2,
+    "dateStr": "武德九年1月3日",
+    "phase": "scene_dialogue",
+    "detail": {
+      "turn": 1,
+      "entries": [
+        {
+          "type": "scene_action",
+          "speaker": "scene_action",
+          "content": "夜风忽起，烛火明灭不定……（TypeError: fetch failed）"
+        },
+        {
+          "type": "player",
+          "speaker": "李世民",
+          "content": "大哥如果我不喝呢"
+        },
+        {
+          "type": "scene_action",
+          "speaker": "scene_action",
+          "content": "夜风忽起，烛火明灭不定……（TypeError: fetch failed）"
+        }
+      ]
+    }
+  },
+  {
+    "day": 2,
+    "dateStr": "武德九年1月3日",
+    "phase": "player_input",
+    "detail": {
+      "turn": 2,
+      "input": "容后再议"
+    }
+  },
+  {
+    "day": 2,
+    "dateStr": "武德九年1月3日",
+    "phase": "scene_dialogue",
+    "detail": {
+      "turn": 2,
+      "entries": [
+        {
+          "type": "scene_action",
+          "speaker": "scene_action",
+          "content": "夜风忽起，烛火明灭不定……（TypeError: fetch failed）"
+        },
+        {
+          "type": "player",
+          "speaker": "李世民",
+          "content": "容后再议"
+        },
+        {
+          "type": "scene_action",
+          "speaker": "scene_action",
+          "content": "夜风忽起，烛火明灭不定……（TypeError: fetch failed）"
+        }
+      ]
+    }
+  },
+  {
+    "day": 2,
+    "dateStr": "武德九年1月3日",
+    "phase": "player_input",
+    "detail": {
+      "turn": 3,
+      "input": "不再犹豫"
+    }
+  }
+]

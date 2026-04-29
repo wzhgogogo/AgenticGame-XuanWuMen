@@ -1,0 +1,262 @@
+{
+  "inputFile": "scripts/logs/20260421-134530-autoplay.json",
+  "timestamp": "2026-04-22T05:22:16.979Z",
+  "metrics": {
+    "totalDays": 21,
+    "eventCount": 4,
+    "eventDays": [
+      2,
+      10,
+      11,
+      12
+    ],
+    "avgEventInterval": 3.3333333333333335,
+    "eventIntervalStdDev": 3.2998316455372216,
+    "npcDecisions": {
+      "changsun_wuji": {
+        "observe": 1,
+        "intel": 2,
+        "persuade": 1,
+        "scheme": 15
+      },
+      "weichi_jingde": {
+        "mobilize": 21
+      },
+      "fang_xuanling": {
+        "observe": 1,
+        "scheme": 17
+      }
+    },
+    "activityChoices": {
+      "review_memorials(批阅奏折)": 4,
+      "reassure_jingde(安抚尉迟敬德)": 5,
+      "train_troops(练兵演武)": 3,
+      "inspect_guards(巡视府卫)": 2,
+      "summon_spy(召见密探)": 4,
+      "counsel_wuji(与长孙无忌密谈)": 2,
+      "counsel_xuanling(与房玄龄议事)": 4,
+      "family_time(陪伴家眷)": 3,
+      "contact_insiders(联络宫中内应)": 2,
+      "meet_officials(接见朝臣)": 1,
+      "study(温书习字)": 1
+    },
+    "pressureStart": {
+      "succession_crisis": 49,
+      "jiancheng_hostility": 42,
+      "yuanji_ambition": 36,
+      "court_opinion": 32,
+      "qinwangfu_desperation": 23,
+      "imperial_suspicion": 22,
+      "military_readiness": 23
+    },
+    "pressureEnd": {
+      "succession_crisis": 99,
+      "jiancheng_hostility": 93,
+      "yuanji_ambition": 51,
+      "court_opinion": 44,
+      "qinwangfu_desperation": 19,
+      "imperial_suspicion": 48,
+      "military_readiness": 79
+    },
+    "pressureDelta": {
+      "succession_crisis": 50,
+      "jiancheng_hostility": 51,
+      "yuanji_ambition": 15,
+      "court_opinion": 12,
+      "qinwangfu_desperation": -4,
+      "imperial_suspicion": 26,
+      "military_readiness": 56
+    },
+    "totalNpcActions": 58,
+    "totalDegraded": 0,
+    "totalLlmImpliedCalls": 21
+  },
+  "emergenceMetrics": {
+    "npcStanceDiversity": {
+      "changsun_wuji": {
+        "distribution": {
+          "observe": 1,
+          "intel": 2,
+          "persuade": 1,
+          "scheme": 15
+        },
+        "shannonEntropy": 1.06,
+        "dominantStance": "scheme",
+        "dominantRatio": 0.79
+      },
+      "weichi_jingde": {
+        "distribution": {
+          "mobilize": 21
+        },
+        "shannonEntropy": 0,
+        "dominantStance": "mobilize",
+        "dominantRatio": 1
+      },
+      "fang_xuanling": {
+        "distribution": {
+          "observe": 1,
+          "scheme": 17
+        },
+        "shannonEntropy": 0.31,
+        "dominantStance": "scheme",
+        "dominantRatio": 0.94
+      }
+    },
+    "npcActionRepetitionRate": {
+      "changsun_wuji": 0,
+      "weichi_jingde": 0,
+      "fang_xuanling": 0.39
+    },
+    "npcSilentDays": {
+      "changsun_wuji": 2,
+      "weichi_jingde": 0,
+      "fang_xuanling": 3
+    },
+    "npcStanceTransitions": {
+      "changsun_wuji": 5,
+      "weichi_jingde": 0,
+      "fang_xuanling": 1
+    },
+    "eventBehaviorShift": [
+      {
+        "eventDay": 2,
+        "skeletonId": "skeleton_intelligence_event",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "observe",
+              "intel"
+            ],
+            "after": [
+              "scheme"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "mobilize",
+              "mobilize"
+            ],
+            "after": [
+              "mobilize",
+              "mobilize"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "observe",
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 10,
+        "skeletonId": "skeleton_imperial_summons",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "scheme",
+              "intel"
+            ],
+            "after": [
+              "scheme"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "mobilize",
+              "mobilize"
+            ],
+            "after": [
+              "mobilize",
+              "mobilize"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "scheme"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 11,
+        "skeletonId": "skeleton_banquet_crisis",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "intel",
+              "scheme"
+            ],
+            "after": [
+              "scheme"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "mobilize",
+              "mobilize"
+            ],
+            "after": [
+              "mobilize",
+              "mobilize"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "scheme"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 12,
+        "skeletonId": "skeleton_intelligence_event",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "mobilize",
+              "mobilize"
+            ],
+            "after": [
+              "mobilize",
+              "mobilize"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

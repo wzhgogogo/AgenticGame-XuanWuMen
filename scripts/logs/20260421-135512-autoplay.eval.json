@@ -1,0 +1,346 @@
+{
+  "inputFile": "scripts/logs/20260421-135512-autoplay.json",
+  "timestamp": "2026-04-22T05:22:22.337Z",
+  "metrics": {
+    "totalDays": 30,
+    "eventCount": 7,
+    "eventDays": [
+      2,
+      11,
+      12,
+      13,
+      20,
+      28,
+      29
+    ],
+    "avgEventInterval": 4.5,
+    "eventIntervalStdDev": 3.547299442298794,
+    "npcDecisions": {
+      "changsun_wuji": {
+        "persuade": 3,
+        "intel": 1,
+        "scheme": 14,
+        "observe": 1
+      },
+      "weichi_jingde": {
+        "mobilize": 23
+      },
+      "fang_xuanling": {
+        "scheme": 23,
+        "observe": 1
+      }
+    },
+    "activityChoices": {
+      "counsel_xuanling(与房玄龄议事)": 10,
+      "inspect_guards(巡视府卫)": 3,
+      "counsel_wuji(与长孙无忌密谈)": 8,
+      "train_troops(练兵演武)": 6,
+      "study(温书习字)": 3,
+      "meet_officials(接见朝臣)": 2,
+      "reassure_jingde(安抚尉迟敬德)": 7,
+      "summon_spy(召见密探)": 3,
+      "contact_insiders(联络宫中内应)": 2,
+      "family_time(陪伴家眷)": 2,
+      "review_memorials(批阅奏折)": 1
+    },
+    "pressureStart": {
+      "succession_crisis": 47,
+      "jiancheng_hostility": 39,
+      "yuanji_ambition": 36,
+      "court_opinion": 34,
+      "qinwangfu_desperation": 23,
+      "imperial_suspicion": 22,
+      "military_readiness": 23
+    },
+    "pressureEnd": {
+      "succession_crisis": 100,
+      "jiancheng_hostility": 84,
+      "yuanji_ambition": 56,
+      "court_opinion": 50,
+      "qinwangfu_desperation": 32,
+      "imperial_suspicion": 49,
+      "military_readiness": 84
+    },
+    "pressureDelta": {
+      "succession_crisis": 53,
+      "jiancheng_hostility": 45,
+      "yuanji_ambition": 20,
+      "court_opinion": 16,
+      "qinwangfu_desperation": 9,
+      "imperial_suspicion": 27,
+      "military_readiness": 61
+    },
+    "totalNpcActions": 66,
+    "totalDegraded": 2,
+    "totalLlmImpliedCalls": 27
+  },
+  "emergenceMetrics": {
+    "npcStanceDiversity": {
+      "changsun_wuji": {
+        "distribution": {
+          "persuade": 3,
+          "intel": 1,
+          "scheme": 14,
+          "observe": 1
+        },
+        "shannonEntropy": 1.19,
+        "dominantStance": "scheme",
+        "dominantRatio": 0.74
+      },
+      "weichi_jingde": {
+        "distribution": {
+          "mobilize": 23
+        },
+        "shannonEntropy": 0,
+        "dominantStance": "mobilize",
+        "dominantRatio": 1
+      },
+      "fang_xuanling": {
+        "distribution": {
+          "scheme": 23,
+          "observe": 1
+        },
+        "shannonEntropy": 0.25,
+        "dominantStance": "scheme",
+        "dominantRatio": 0.96
+      }
+    },
+    "npcActionRepetitionRate": {
+      "changsun_wuji": 0,
+      "weichi_jingde": 0,
+      "fang_xuanling": 0.25
+    },
+    "npcSilentDays": {
+      "changsun_wuji": 11,
+      "weichi_jingde": 7,
+      "fang_xuanling": 6
+    },
+    "npcStanceTransitions": {
+      "changsun_wuji": 4,
+      "weichi_jingde": 0,
+      "fang_xuanling": 2
+    },
+    "eventBehaviorShift": [
+      {
+        "eventDay": 2,
+        "skeletonId": "skeleton_intelligence_event",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "persuade",
+              "persuade"
+            ],
+            "after": [
+              "intel",
+              "scheme"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "mobilize",
+              "mobilize"
+            ],
+            "after": [
+              "mobilize",
+              "mobilize"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "scheme"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 11,
+        "skeletonId": "skeleton_intelligence_event",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "mobilize",
+              "mobilize"
+            ],
+            "after": [
+              "mobilize",
+              "mobilize"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 12,
+        "skeletonId": "skeleton_imperial_summons",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "mobilize",
+              "mobilize"
+            ],
+            "after": [
+              "mobilize",
+              "mobilize"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme"
+            ],
+            "after": [
+              "scheme",
+              "scheme"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 13,
+        "skeletonId": "skeleton_banquet_crisis",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "scheme"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "mobilize",
+              "mobilize"
+            ],
+            "after": [
+              "mobilize"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "scheme"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 20,
+        "skeletonId": "skeleton_intelligence_event",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "scheme"
+            ],
+            "after": [
+              "observe"
+            ]
+          },
+          "weichi_jingde": {
+            "before": [
+              "mobilize",
+              "mobilize"
+            ],
+            "after": [
+              "mobilize"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme",
+              "scheme"
+            ],
+            "after": [
+              "observe",
+              "scheme"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 28,
+        "skeletonId": "skeleton_imperial_summons",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [],
+            "after": []
+          },
+          "weichi_jingde": {
+            "before": [
+              "mobilize"
+            ],
+            "after": [
+              "mobilize"
+            ]
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme"
+            ],
+            "after": [
+              "scheme"
+            ]
+          }
+        }
+      },
+      {
+        "eventDay": 29,
+        "skeletonId": "skeleton_banquet_crisis",
+        "shifts": {
+          "changsun_wuji": {
+            "before": [
+              "scheme"
+            ],
+            "after": []
+          },
+          "weichi_jingde": {
+            "before": [
+              "mobilize",
+              "mobilize"
+            ],
+            "after": []
+          },
+          "fang_xuanling": {
+            "before": [
+              "scheme"
+            ],
+            "after": []
+          }
+        }
+      }
+    ]
+  }
+}

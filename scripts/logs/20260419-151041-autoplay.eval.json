@@ -1,0 +1,70 @@
+{
+  "inputFile": "scripts/autoplay-log.json",
+  "timestamp": "2026-04-19T07:10:41.055Z",
+  "metrics": {
+    "totalDays": 15,
+    "eventCount": 2,
+    "eventDays": [
+      2,
+      11
+    ],
+    "avgEventInterval": 9,
+    "eventIntervalStdDev": 0,
+    "npcDecisions": {
+      "weichi_jingde": {
+        "gather_intel": 15
+      },
+      "changsun_wuji": {
+        "gather_intel": 1,
+        "lobby": 3,
+        "scheme": 3
+      },
+      "fang_xuanling": {
+        "gather_intel": 1,
+        "seek_allies": 6,
+        "scheme": 2
+      }
+    },
+    "activityChoices": {
+      "counsel_xuanling(与房玄龄议事)": 3,
+      "summon_spy(召见密探)": 3,
+      "train_troops(练兵演武)": 2,
+      "counsel_wuji(与长孙无忌密谈)": 3,
+      "review_memorials(批阅奏折)": 1,
+      "contact_insiders(联络宫中内应)": 6,
+      "reassure_jingde(安抚尉迟敬德)": 2,
+      "meet_officials(接见朝臣)": 1,
+      "inspect_guards(巡视府卫)": 1,
+      "study(温书习字)": 1
+    },
+    "pressureStart": {
+      "succession_crisis": 47,
+      "jiancheng_hostility": 41,
+      "yuanji_ambition": 36,
+      "court_opinion": 31,
+      "qinwangfu_desperation": 25,
+      "imperial_suspicion": 21,
+      "military_readiness": 22
+    },
+    "pressureEnd": {
+      "succession_crisis": 65,
+      "jiancheng_hostility": 57,
+      "yuanji_ambition": 48,
+      "court_opinion": 41,
+      "qinwangfu_desperation": 33,
+      "imperial_suspicion": 34,
+      "military_readiness": 76
+    },
+    "pressureDelta": {
+      "succession_crisis": 18,
+      "jiancheng_hostility": 16,
+      "yuanji_ambition": 12,
+      "court_opinion": 10,
+      "qinwangfu_desperation": 8,
+      "imperial_suspicion": 13,
+      "military_readiness": 54
+    },
+    "totalNpcActions": 31,
+    "totalLlmImpliedCalls": 15
+  }
+}
